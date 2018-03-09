@@ -17,6 +17,7 @@
 
     <modules>
         <module>crawler-core</module>
+        <module>crawler-script</module>
     </modules>
 
     <dependencyManagement>
