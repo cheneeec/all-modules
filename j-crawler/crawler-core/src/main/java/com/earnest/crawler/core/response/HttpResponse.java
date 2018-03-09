@@ -18,7 +18,6 @@ public class HttpResponse {
 
     private String contentType;
 
-    private String charset;
 
     private HttpRequest httpRequest;
 

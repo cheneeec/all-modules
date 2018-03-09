@@ -33,8 +33,6 @@ public interface HttpRequest extends Cloneable {
     int getConnectTimeout();
 
 
-
-
     @Data
     class HttpProxy {
         private HttpHost httpHost;
@@ -42,6 +40,9 @@ public interface HttpRequest extends Cloneable {
         private AtomicLong successCount;
 
         private AtomicLong failureCount;
+
+        private String username;
+        private String password;
 
         private String src = "custom";//来源
     }

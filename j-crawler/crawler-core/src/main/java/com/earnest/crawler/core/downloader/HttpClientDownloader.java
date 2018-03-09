@@ -11,15 +11,19 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.CharsetUtils;
 import org.apache.http.util.EntityUtils;
+import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Slf4j
@@ -27,21 +31,25 @@ public class HttpClientDownloader implements Downloader {
 
     private final CloseableHttpClient httpClient;
 
-
     @Override
     public HttpResponse download(HttpRequest request) {
         HttpUriRequestAdapter httpUriRequest = new HttpUriRequestAdapter(request);
 //        HttpClientContext httpContext= HttpClientContext.create();
 
         try {
-            CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpUriRequest);
+            CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpUriRequest,httpUriRequest.obtainHttpContext());
             HttpEntity httpEntity = closeableHttpResponse.getEntity();
 
             HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8));
             httpResponse.setStatus(closeableHttpResponse.getStatusLine().getStatusCode());
             httpResponse.setHttpRequest(httpUriRequest);
-            httpResponse.setContentType(httpEntity.getContentType().getValue());
-//            httpResponse.setCharset(CharsetUtils.get());
+
+            if (Objects.nonNull(httpEntity.getContentType())) {
+                httpResponse.setContentType(httpEntity.getContentType().getValue());
+            }
+
+            //关闭响应
+            closeableHttpResponse.close();
             return httpResponse;
 
         } catch (IOException e) {
