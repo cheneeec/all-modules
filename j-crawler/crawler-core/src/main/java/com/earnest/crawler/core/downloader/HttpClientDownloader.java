@@ -33,11 +33,10 @@ public class HttpClientDownloader implements Downloader {
 
     @Override
     public HttpResponse download(HttpRequest request) {
+        log.info("Start downloading {}", request.getUrl());
         HttpUriRequestAdapter httpUriRequest = new HttpUriRequestAdapter(request);
-//        HttpClientContext httpContext= HttpClientContext.create();
-
         try {
-            CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpUriRequest,httpUriRequest.obtainHttpContext());
+            CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpUriRequest, httpUriRequest.obtainHttpContext());
             HttpEntity httpEntity = closeableHttpResponse.getEntity();
 
             HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8));

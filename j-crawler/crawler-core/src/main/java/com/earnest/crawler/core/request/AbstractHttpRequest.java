@@ -15,7 +15,7 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     protected String url;
 
-    protected String charset;
+    protected String charset="UTF-8";
 
     protected Map<String, String> parameters;
 
