@@ -32,6 +32,14 @@ public interface HttpRequest extends Cloneable {
 
     int getConnectTimeout();
 
+    boolean ignoreJavascript();
+
+    boolean ignoreHTMLHead();
+
+    boolean ignoreCss();
+
+
+
 
     @Data
     class HttpProxy {

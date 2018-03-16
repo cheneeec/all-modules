@@ -2,10 +2,13 @@ package com.earnest.crawler.core.request;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Setter;
+import org.apache.http.client.utils.CloneUtils;
+import org.springframework.util.CollectionUtils;
 
 
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Setter
@@ -15,7 +18,7 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     protected String url;
 
-    protected String charset="UTF-8";
+    protected String charset = "UTF-8";
 
     protected Map<String, String> parameters;
 
@@ -29,6 +32,9 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     protected int connectTimeout;
 
+    protected boolean ignoreJavascript = true;
+    protected boolean ignoreHTMLHead = true;
+    protected boolean ignoreCss = true;
 
 
     @Override
@@ -72,11 +78,37 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
         return this.connectTimeout;
     }
 
+
+    @Override
+    public boolean ignoreJavascript() {
+        return ignoreJavascript;
+    }
+
+    @Override
+    public boolean ignoreHTMLHead() {
+        return ignoreHTMLHead;
+    }
+
     public abstract String getMethod();
+
+
+    @Override
+    public boolean ignoreCss() {
+        return ignoreCss;
+    }
 
     @Override
     public Object clone() {
+        /*try {
+            AbstractHttpRequest request = (AbstractHttpRequest) super.clone();
+            request.setCookies(new HashMap<>(request.getCookies()));
+            request.setHeaders(new HashMap<>(request.getHeaders()));
 
+            return request;
+        } catch (CloneNotSupportedException ignored) {
+
+
+        }*/
         return JSONObject.parse(JSONObject.toJSONString(this));
     }
 

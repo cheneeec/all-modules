@@ -1,13 +1,12 @@
 package com.earnest.crawler.core.response;
 
 
+import com.earnest.crawler.core.request.HttpRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.http.HttpRequest;
 
 
 
-import java.util.Objects;
 
 @Data
 @NoArgsConstructor

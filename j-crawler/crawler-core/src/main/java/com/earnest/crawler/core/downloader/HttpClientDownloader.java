@@ -41,7 +41,7 @@ public class HttpClientDownloader implements Downloader {
 
             HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8));
             httpResponse.setStatus(closeableHttpResponse.getStatusLine().getStatusCode());
-            httpResponse.setHttpRequest(httpUriRequest);
+            httpResponse.setHttpRequest(request);
 
             if (Objects.nonNull(httpEntity.getContentType())) {
                 httpResponse.setContentType(httpEntity.getContentType().getValue());
