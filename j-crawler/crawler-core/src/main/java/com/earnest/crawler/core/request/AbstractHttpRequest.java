@@ -2,14 +2,12 @@ package com.earnest.crawler.core.request;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Setter;
-import org.apache.http.client.utils.CloneUtils;
-import org.springframework.util.CollectionUtils;
 
 
 import java.io.Serializable;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Setter
 public abstract class AbstractHttpRequest implements HttpRequest, Comparable<HttpRequest>, Serializable {
@@ -49,6 +47,9 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     @Override
     public Map<String, String> getHeaders() {
+        if (Objects.isNull(headers)) {
+            return getDefaultHttpRequestHeader();
+        }
         return this.headers;
     }
 
@@ -98,7 +99,7 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
     @Override
-    public Object clone() {
+    public AbstractHttpRequest clone() {
         /*try {
             AbstractHttpRequest request = (AbstractHttpRequest) super.clone();
             request.setCookies(new HashMap<>(request.getCookies()));
@@ -109,8 +110,18 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
 
         }*/
-        return JSONObject.parse(JSONObject.toJSONString(this));
+        return (AbstractHttpRequest) JSONObject.parse(JSONObject.toJSONString(this));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AbstractHttpRequest request = (AbstractHttpRequest) o;
+
+        return this.url.equals((request.getUrl()));
+    }
+
 
     @Override
     public int compareTo(HttpRequest o) {

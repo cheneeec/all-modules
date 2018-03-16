@@ -17,7 +17,6 @@ public class HttpResponse {
 
     private String contentType;
 
-
     private HttpRequest httpRequest;
 
     private int status;

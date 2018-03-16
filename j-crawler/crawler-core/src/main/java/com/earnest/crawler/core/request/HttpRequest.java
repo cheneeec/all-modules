@@ -4,6 +4,7 @@ package com.earnest.crawler.core.request;
 import lombok.Data;
 import org.apache.http.HttpHost;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -38,8 +39,12 @@ public interface HttpRequest extends Cloneable {
 
     boolean ignoreCss();
 
+    default Map<String, String> getDefaultHttpRequestHeader() {
 
-
+        return new HashMap<String, String>(3) {{
+            put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36");
+        }};
+    }
 
     @Data
     class HttpProxy {

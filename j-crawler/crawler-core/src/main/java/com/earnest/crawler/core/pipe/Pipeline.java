@@ -1,7 +1,8 @@
 package com.earnest.crawler.core.pipe;
 
-@FunctionalInterface
-public interface Pipeline<R, T> {
+import com.earnest.crawler.core.response.HttpResponse;
 
-    T pipe(R r);
+@FunctionalInterface
+public interface Pipeline<T> {
+    T pipe(HttpResponse httpResponse);
 }

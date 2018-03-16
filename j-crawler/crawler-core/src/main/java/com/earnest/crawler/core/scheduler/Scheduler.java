@@ -1,7 +1,8 @@
 package com.earnest.crawler.core.scheduler;
 
-import com.earnest.crawler.core.crawler.CrawlerState;
+import com.earnest.crawler.core.request.HttpRequest;
 
-public interface Scheduler {
-    CrawlerState getCrawlerState();
+import java.util.Queue;
+
+public interface Scheduler extends Queue<HttpRequest> {
 }

@@ -3,23 +3,19 @@ package com.earnest.crawler.core.handler;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 
-
 import java.util.List;
-import java.util.regex.Pattern;
 
-public class DefaultHttpResponseHandler implements HttpResponseHandler {
-
-    private final Pattern scriptPattern = Pattern.compile("<script[^>]*?>.*?</script>");
-
+public abstract class AbstractHttpResponseHandler implements HttpResponseHandler {
     @Override
     public List<HttpRequest> handle(HttpResponse rawResponse) {
-
         HttpRequest httpRequest = rawResponse.getHttpRequest();
         filter(rawResponse, httpRequest);
 
-
-        return null;
+        return extract(rawResponse);
     }
+
+
+    protected abstract List<HttpRequest> extract(HttpResponse httpResponse);
 
     private void filter(HttpResponse rawResponse, HttpRequest httpRequest) {
         String content = rawResponse.getContent();
