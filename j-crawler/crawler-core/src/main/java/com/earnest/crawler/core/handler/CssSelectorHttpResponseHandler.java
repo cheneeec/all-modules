@@ -22,9 +22,10 @@ public class CssSelectorHttpResponseHandler extends AbstractHttpResponseHandler 
     @Override
     protected List<HttpRequest> extract(HttpResponse httpResponse) {
 
-        Iterable<String> newUrls = newHttpRequestExtractor.apply(Jsoup.parse(
-                httpResponse.getContent()
-        ));
+        Iterable<String> newUrls = newHttpRequestExtractor.apply(
+                Jsoup.parse( httpResponse.getContent()));
+
+
 
         HttpRequest httpRequest = httpResponse.getHttpRequest();
 

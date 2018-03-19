@@ -4,7 +4,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.util.concurrent.TimeUnit;
 
-public interface Worker extends Runnable {
+public interface Worker {
 
     /**
      * 暂停
