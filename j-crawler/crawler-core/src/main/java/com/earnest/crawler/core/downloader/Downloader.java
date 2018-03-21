@@ -7,8 +7,8 @@ import com.earnest.crawler.core.response.HttpResponse;
 public interface Downloader {
 
 
-
     HttpResponse download(HttpRequest request);
 
     boolean shutdown();
+
 }

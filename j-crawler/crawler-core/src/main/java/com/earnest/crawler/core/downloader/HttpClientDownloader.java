@@ -8,29 +8,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.CharsetUtils;
 import org.apache.http.util.EntityUtils;
-import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.Objects;
-import java.util.Optional;
 
 @AllArgsConstructor
 @Slf4j
-public class HttpClientDownloader implements Downloader {
+public class HttpClientDownloader implements Downloader, DownloadListener {
 
     private final CloseableHttpClient httpClient;
+
 
     public HttpClientDownloader() {
         this(HttpClients.createDefault());
@@ -51,12 +41,13 @@ public class HttpClientDownloader implements Downloader {
             if (Objects.nonNull(httpEntity.getContentType())) {
                 httpResponse.setContentType(httpEntity.getContentType().getValue());
             }
-
             //关闭响应
             closeableHttpResponse.close();
-            return httpResponse;
 
+            onSuccess(httpResponse);
+            return httpResponse;
         } catch (IOException e) {
+            onFailure(e);
             log.error("An error occurred while downloading {} ,error:{}", request.getUrl(), e.getMessage());
         }
 
@@ -78,5 +69,14 @@ public class HttpClientDownloader implements Downloader {
 
     }
 
+    @Override
+    public void onSuccess(HttpResponse httpResponse) {
 
+
+    }
+
+    @Override
+    public void onFailure(Exception e) {
+
+    }
 }
