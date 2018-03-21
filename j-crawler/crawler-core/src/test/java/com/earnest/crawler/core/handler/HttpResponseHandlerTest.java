@@ -8,6 +8,6 @@ public class HttpResponseHandlerTest {
     public void handle() {
 
 
-        HttpResponseHandler responseHandler=new PatternHttpResponseHandler("(\\w+\\.){2}\\w+");
+        HttpResponseHandler responseHandler=new RegexHttpResponseHandler("(\\w+\\.){2}\\w+");
     }
 }

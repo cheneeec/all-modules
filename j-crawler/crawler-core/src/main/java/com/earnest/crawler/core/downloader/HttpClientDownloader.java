@@ -11,6 +11,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -30,6 +31,10 @@ import java.util.Optional;
 public class HttpClientDownloader implements Downloader {
 
     private final CloseableHttpClient httpClient;
+
+    public HttpClientDownloader() {
+        this(HttpClients.createDefault());
+    }
 
     @Override
     public HttpResponse download(HttpRequest request) {

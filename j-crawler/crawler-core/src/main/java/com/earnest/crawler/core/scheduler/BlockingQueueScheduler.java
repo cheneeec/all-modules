@@ -19,6 +19,7 @@ public class BlockingQueueScheduler extends AbstractQueue<HttpRequest> implement
     private final Set<HttpRequest> historyTaskQueue;
 
     public BlockingQueueScheduler(int size) {
+
         this(new LinkedBlockingQueue<>(size), new ConcurrentSkipListSet<>());
     }
 

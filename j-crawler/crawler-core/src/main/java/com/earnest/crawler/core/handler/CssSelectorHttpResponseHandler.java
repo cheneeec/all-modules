@@ -4,7 +4,6 @@ import com.earnest.crawler.core.request.AbstractHttpRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 import lombok.AllArgsConstructor;
-import org.apache.http.client.utils.CloneUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -18,14 +17,11 @@ public class CssSelectorHttpResponseHandler extends AbstractHttpResponseHandler 
 
     private final Function<Document, Iterable<String>> newHttpRequestExtractor;
 
-
     @Override
     protected List<HttpRequest> extract(HttpResponse httpResponse) {
 
         Iterable<String> newUrls = newHttpRequestExtractor.apply(
                 Jsoup.parse( httpResponse.getContent()));
-
-
 
         HttpRequest httpRequest = httpResponse.getHttpRequest();
 

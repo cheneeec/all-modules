@@ -19,6 +19,9 @@ public class JsoupExample {
                 .header("Upgrade-Insecure-Requests", "1")
                 .get();
         System.out.println(document);
+
+        System.out.println(document.body().select("#body > div.pagination > a:nth-child(3)").attr("abs:href"));
+
         Assert.assertNotNull(document);
 
     }

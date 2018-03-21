@@ -8,8 +8,6 @@ import java.util.List;
 
 public abstract class AbstractHttpResponseHandler implements HttpResponseHandler {
 
-
-
     @Override
     public List<HttpRequest> handle(HttpResponse rawResponse) {
         HttpRequest httpRequest = rawResponse.getHttpRequest();
