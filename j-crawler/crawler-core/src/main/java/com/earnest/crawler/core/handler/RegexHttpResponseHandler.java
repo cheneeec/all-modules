@@ -11,8 +11,8 @@ import org.jsoup.helper.StringUtil;
 import org.springframework.util.Assert;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,16 +31,16 @@ public class RegexHttpResponseHandler extends AbstractHttpResponseHandler {
 
 
     @Override
-    protected List<HttpRequest> extract(HttpResponse httpResponse) {
+    protected Set<String> extract(HttpResponse httpResponse) {
         String content = httpResponse.getContent();
         Matcher matcher = urlPattern.matcher(content);
         AbstractHttpRequest httpRequest = (AbstractHttpRequest) httpResponse.getHttpRequest();
-        List<HttpRequest> newHttpRequests = new ArrayList<>();
+        Set<String> newUrls = new HashSet<>();
         //
         String baseUri = StringUtils.replaceFirst(httpRequest.getUrl(), "/*", "");
 
         while (matcher.find()) {
-            AbstractHttpRequest cloneHttpRequest = httpRequest.clone();
+
             String subUrl = matcher.group();
 
             if (!StringUtils.startsWithAny(subUrl, "http", "https")) {
@@ -48,12 +48,10 @@ public class RegexHttpResponseHandler extends AbstractHttpResponseHandler {
                 subUrl = StringUtil.resolve(baseUri, subUrl);
             }
             //设置跳转
-            cloneHttpRequest.setUrl(subUrl);
-            log.debug("get a new link:{}",subUrl);
-            newHttpRequests.add(cloneHttpRequest);
+           newUrls.add(subUrl);
         }
 
-        return newHttpRequests;
+        return newUrls;
     }
 
 }

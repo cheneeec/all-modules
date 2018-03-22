@@ -1,22 +1,35 @@
 package com.earnest.crawler.core.handler;
 
+import com.earnest.crawler.core.request.AbstractHttpRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
-import org.jsoup.Jsoup;
+import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class AbstractHttpResponseHandler implements HttpResponseHandler {
 
     @Override
-    public List<HttpRequest> handle(HttpResponse rawResponse) {
+    public Set<HttpRequest> handle(HttpResponse rawResponse) {
         HttpRequest httpRequest = rawResponse.getHttpRequest();
         filter(rawResponse, httpRequest);
-        return extract(rawResponse);
+        Set<String> newUrls = extract(rawResponse);
+
+        return newUrls.stream().map(url -> {
+            HttpRequest cloneHttpRequest = ObjectUtils.cloneIfPossible(httpRequest);
+            if (cloneHttpRequest instanceof AbstractHttpRequest) {
+                AbstractHttpRequest abstractHttpRequest = (AbstractHttpRequest) cloneHttpRequest;
+                abstractHttpRequest.setUrl(url);
+                return abstractHttpRequest;
+            } else
+                throw new IllegalStateException("Cannot reset new URL for " + httpRequest.getClass());
+
+        }).collect(Collectors.toSet());
     }
 
 
-    protected abstract List<HttpRequest> extract(HttpResponse httpResponse);
+    protected abstract Set<String> extract(HttpResponse httpResponse);
 
     private void filter(HttpResponse rawResponse, HttpRequest httpRequest) {
         String content = rawResponse.getContent();

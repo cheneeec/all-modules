@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.worker;
 
+import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
@@ -12,11 +13,14 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+
+import static java.util.Objects.nonNull;
 
 @Slf4j
 @Getter
@@ -24,7 +28,6 @@ import java.util.function.Consumer;
 class Worker<T> implements IWorker, Runnable {
 
     private volatile boolean pause = false;
-    private CountDownLatch pauseCountDown;
 
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
@@ -35,23 +38,53 @@ class Worker<T> implements IWorker, Runnable {
 
     private static final String NAME = Thread.currentThread().getName();
 
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private final Condition condition = new ReentrantLock().newCondition();
+
     @Override
     public void pause() {
-        pauseCountDown = new CountDownLatch(1);
-        pause = true;
-        log.info("Thread name:{},has been suspended at {}", NAME, LocalDateTime.now().toString());
+        ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+        try {
+            writeLock.lock();
+            pause = true;
+            log.info("Thread name:{},has been suspended at {}", NAME, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            condition.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            log.error("Thread name:{},An error:[{}] occurred while pausing", e.getMessage());
+        } finally {
+            writeLock.unlock();
+        }
+
     }
 
     @Override
     public boolean isPause() {
-        return pause;
+        ReentrantReadWriteLock.ReadLock readLock = this.lock.readLock();
+
+        try {
+            readLock.lock();
+            return pause;
+        } finally {
+            readLock.unlock();
+        }
+
     }
 
     @Override
     public void restart() {
-        pauseCountDown.countDown();
-        pause = false;
-        log.info("Thread:{},restart running", NAME);
+        ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+
+        try {
+            writeLock.lock();
+            pause = false;
+            condition.signalAll();
+            log.info("Thread:{},restart running", NAME);
+        } finally {
+            writeLock.unlock();
+        }
+
     }
 
     @Override
@@ -59,20 +92,20 @@ class Worker<T> implements IWorker, Runnable {
         log.info("{} is running", NAME);
         while (!scheduler.isEmpty()) {
             //暂停
-            if (pause) {
-                try {
-                    pauseCountDown.await();
-                } catch (InterruptedException e) {
-                    log.error("Thread name:{},An error:[{}] occurred while suspending at {}", NAME, e.getMessage(), LocalDateTime.now().toString());
+            try {
+                if (pause) {
+                    condition.await();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             //1. 获取连接
             HttpRequest httpRequest = this.scheduler.poll();
-            if (Objects.nonNull(httpRequest)) {
+            if (nonNull(httpRequest)) {
                 HttpResponse httpResponse = downloader.download(httpRequest);
                 //2. 处理HttpResponse并且获取新的连接
-                List<HttpRequest> newHttpRequests = responseHandler.handle(httpResponse);
-                log.info("{} get a new url:{}", NAME, newHttpRequests);
+                Set<HttpRequest> newHttpRequests = responseHandler.handle(httpResponse);
+                log.info("{} get a new url:{}", NAME, JSONObject.toJSONString(newHttpRequests));
                 //3. 将新的连接放入
                 scheduler.addAll(newHttpRequests);
                 //4. 将httpResponse转化成实体类
@@ -81,7 +114,6 @@ class Worker<T> implements IWorker, Runnable {
                 persistenceConsumers.parallelStream().forEach(a -> a.accept(pipeResult));
 
             }
-
         }
     }
 

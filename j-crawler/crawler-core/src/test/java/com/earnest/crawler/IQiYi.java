@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class IQiYi {
     private String name;
+    private String url;
+    private String image;
 }

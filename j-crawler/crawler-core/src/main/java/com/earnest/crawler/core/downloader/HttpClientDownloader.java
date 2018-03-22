@@ -4,6 +4,7 @@ import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.request.HttpUriRequestAdapter;
 import com.earnest.crawler.core.response.HttpResponse;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
@@ -13,13 +14,15 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.*;
 
-@AllArgsConstructor
 @Slf4j
-public class HttpClientDownloader implements Downloader, DownloadListener {
+@AllArgsConstructor
 
+public class HttpClientDownloader implements Downloader, DownloadListener {
     private final CloseableHttpClient httpClient;
+    @Getter
+    private final Set<DownloadListener> downloadListeners = new HashSet<>(5);
 
 
     public HttpClientDownloader() {
@@ -43,40 +46,56 @@ public class HttpClientDownloader implements Downloader, DownloadListener {
             }
             //关闭响应
             closeableHttpResponse.close();
-
             onSuccess(httpResponse);
             return httpResponse;
         } catch (IOException e) {
-            onFailure(e);
+            onError(request, e);
             log.error("An error occurred while downloading {} ,error:{}", request.getUrl(), e.getMessage());
         }
 
         return null;
     }
 
-    @Override
-    public boolean shutdown() {
-        if (Objects.nonNull(httpClient)) {
-            try {
-                httpClient.close();
-                return true;
-            } catch (IOException e) {
-                log.error("An error occurred while closing the client,error:{}", e.getMessage());
-                return false;
-            }
-        }
-        return true;
-
-    }
 
     @Override
     public void onSuccess(HttpResponse httpResponse) {
+        if (!downloadListeners.isEmpty()) {
 
-
+            downloadListeners.forEach(s -> s.onSuccess(httpResponse));
+        }
     }
 
     @Override
-    public void onFailure(Exception e) {
+    public void onError(HttpRequest httpRequest, Exception e) {
+        if (!downloadListeners.isEmpty()) {
 
+            downloadListeners.forEach(s -> s.onError(httpRequest, e));
+        }
     }
+
+
+    @Override
+    public void close() {
+        try {
+            if (Objects.nonNull(httpClient)) {
+                httpClient.close();
+            }
+        } catch (IOException e) {
+            log.error("An error occurred while closing the client,error:{}", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public HttpClientDownloader addDownloadListener(DownloadListener downloadListener) {
+        downloadListeners.add(downloadListener);
+        return this;
+    }
+
+
 }

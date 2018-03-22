@@ -6,23 +6,16 @@ import java.util.concurrent.TimeUnit;
 
 public interface IWorker {
 
-    /**
-     * 暂停
-     */
+
     void pause();
 
     boolean isPause();
 
-    /**
-     * 重新开始
-     */
+
+
     void restart();
 
-    /**
-     * 在间隔指定秒数后重新开始
-     *
-     * @param seconds
-     */
+
     default void interval(long seconds) {
         pause();
         try {
@@ -33,13 +26,13 @@ public interface IWorker {
         restart();
     }
 
-    /**
-     * 间隔5到100秒后继续
-     */
-    default void interval() {
-        interval(RandomUtils.nextInt(5, 100));
-    }
 
+    //间隔5到100秒后继续
+    default void interval() {
+        int randomInt = RandomUtils.nextInt(5, 100);
+        System.out.println("暂停" + randomInt + "秒。。。");
+        interval(randomInt);
+    }
 
 
 }

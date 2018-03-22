@@ -1,12 +1,14 @@
 package com.earnest.crawler.core.worker;
 
+import com.earnest.crawler.core.downloader.DownloadListener;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpRequest;
+import javafx.concurrent.Worker;
 
 import java.util.function.Consumer;
 
-public interface ISpider {
+public interface ISpider extends IWorker {
 
     ISpider thread(int num);
 
@@ -18,7 +20,9 @@ public interface ISpider {
 
     ISpider downloader(Downloader downloader);
 
-     <T> ISpider start();
+    ISpider addDownloaderListener(DownloadListener downloadListener);
+
+    <T> ISpider start();
 
     ISpider match(String regex);
 

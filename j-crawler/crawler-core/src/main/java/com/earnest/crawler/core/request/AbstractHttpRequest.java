@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -100,28 +101,28 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     @Override
     public AbstractHttpRequest clone() {
-        /*try {
-            AbstractHttpRequest request = (AbstractHttpRequest) super.clone();
-            request.setCookies(new HashMap<>(request.getCookies()));
-            request.setHeaders(new HashMap<>(request.getHeaders()));
 
-            return request;
-        } catch (CloneNotSupportedException ignored) {
+        return JSONObject.parseObject(JSONObject.toJSONString(this), this.getClass());
 
-
-        }*/
-        return (AbstractHttpRequest) JSONObject.parse(JSONObject.toJSONString(this));
     }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AbstractHttpRequest request = (AbstractHttpRequest) o;
-
-        return this.url.equals((request.getUrl()));
+        return ignoreJavascript == request.ignoreJavascript &&
+                ignoreHTMLHead == request.ignoreHTMLHead &&
+                ignoreCss == request.ignoreCss &&
+                Objects.equals(url, request.url);
     }
 
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(url, ignoreJavascript, ignoreHTMLHead, ignoreCss);
+    }
 
     @Override
     public int compareTo(HttpRequest o) {

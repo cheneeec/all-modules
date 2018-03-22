@@ -4,8 +4,9 @@ import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 
 import java.util.List;
+import java.util.Set;
 
 @FunctionalInterface
 public interface HttpResponseHandler {
-    List<HttpRequest> handle(HttpResponse rawResponse);
+    Set<HttpRequest> handle(HttpResponse rawResponse);
 }
