@@ -21,7 +21,7 @@ import static java.util.Objects.nonNull;
 @Setter(AccessLevel.PROTECTED)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-class BasicCrawler<T> implements Crawler, Runnable {
+class BasicCrawler<T> implements  Runnable {
 
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
@@ -30,8 +30,6 @@ class BasicCrawler<T> implements Crawler, Runnable {
     private Set<Consumer<T>> persistenceConsumers;
 
     private static final String NAME = Thread.currentThread().getName();
-
-
 
 
     @Override

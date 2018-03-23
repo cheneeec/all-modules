@@ -12,6 +12,8 @@ import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.scheduler.BlockingQueueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -27,12 +29,15 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 @Slf4j
-public class BasicSpider extends BasicCrawler implements Spider {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class BasicSpider {
 
     private Scheduler scheduler;
 
     private HttpResponseHandler responseHandler;
+
     private Downloader downloader;
+
     private Pipeline<?> pipeline;
 
     private Set<Consumer<?>> persistenceConsumers;
@@ -40,28 +45,30 @@ public class BasicSpider extends BasicCrawler implements Spider {
     private Set<DownloadListener> downloadListeners;
 
     private ExecutorService threadPool;
+
     private BasicCrawler worker;
 
     private int threadNumber = 1;
 
-    @Override
-    public Spider thread(int num) {
+    public static BasicSpider create() {
+        return new BasicSpider();
+    }
 
+
+    public BasicSpider thread(int num) {
         threadNumber = num;
         //设置最大连接数，系统默认是5x2
         int maxConnectionCount = (int) Math.ceil(((double) num / 2));
         System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));
-        log.info("set SystemProperty value: [http.maxConnections={}]", maxConnectionCount*2);
+        log.info("set SystemProperty value: [http.maxConnections={}]", maxConnectionCount * 2);
         return this;
     }
 
-    @Override
-    public Spider from(String url) {
+    public BasicSpider from(String url) {
         return from(new HttpGetRequest(url));
     }
 
-    @Override
-    public Spider from(HttpRequest httpRequest) {
+    public BasicSpider from(HttpRequest httpRequest) {
         scheduler = new BlockingQueueScheduler();
         scheduler.offer(httpRequest);
         //
@@ -69,8 +76,7 @@ public class BasicSpider extends BasicCrawler implements Spider {
         return this;
     }
 
-    @Override
-    public Spider addRequest(HttpRequest httpRequest) {
+    public BasicSpider addRequest(HttpRequest httpRequest) {
         if (Objects.isNull(scheduler)) {
             return from(httpRequest);
         } else {
@@ -79,14 +85,12 @@ public class BasicSpider extends BasicCrawler implements Spider {
         return this;
     }
 
-    @Override
-    public Spider downloader(Downloader downloader) {
+    public BasicSpider downloader(Downloader downloader) {
         this.downloader = downloader;
         return this;
     }
 
-    @Override
-    public Spider addDownloaderListener(DownloadListener downloadListener) {
+    public BasicSpider addDownloaderListener(DownloadListener downloadListener) {
         if (nonNull(downloadListener)) {
             if (Objects.isNull(downloadListeners)) {
                 downloadListeners = new HashSet<>(5);
@@ -96,8 +100,7 @@ public class BasicSpider extends BasicCrawler implements Spider {
         return this;
     }
 
-    @Override
-    public <T> Spider start() {
+    public <T> BasicSpider start() {
         BasicCrawler worker = this.<T>createWorker();
 
         Integer i = threadNumber;
@@ -115,7 +118,7 @@ public class BasicSpider extends BasicCrawler implements Spider {
     @SuppressWarnings("unchecked")
     private <T> BasicCrawler createWorker() {
         Assert.state(nonNull(scheduler), "The URL that started crawling is not set");
-        worker = new BasicCrawler();
+          worker = new BasicCrawler();
         //set Downloader
         decideDownloader();
         //--set Downloader
@@ -146,7 +149,6 @@ public class BasicSpider extends BasicCrawler implements Spider {
 
         Downloader defaultDownloader = defaultIfNull(this.downloader, new HttpClientDownloader());
 
-
         if (scheduler instanceof DownloadListener) {
             ConcurrentHashMap.KeySetView<DownloadListener, Boolean> downloadListenersSet = ConcurrentHashMap.newKeySet();
             downloadListenersSet.add(((DownloadListener) scheduler));
@@ -164,26 +166,22 @@ public class BasicSpider extends BasicCrawler implements Spider {
         worker.setDownloader(defaultDownloader);
     }
 
-    @Override
-    public Spider match(String regex) {
+    public BasicSpider match(String regex) {
         responseHandler = new RegexHttpResponseHandler(regex);
         return this;
     }
 
-    @Override
-    public Spider stop() {
+    public BasicSpider stop() {
         threadPool.shutdown();
         return this;
     }
 
-    @Override
-    public Spider pipeline(Pipeline pipeline) {
+    public BasicSpider pipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
         return this;
     }
 
-    @Override
-    public <T> Spider addConsumer(Consumer<T> persistenceConsumer) {
+    public <T> BasicSpider addConsumer(Consumer<T> persistenceConsumer) {
         if (nonNull(persistenceConsumer)) {
             if (Objects.isNull(persistenceConsumers)) {
                 persistenceConsumers = new HashSet<>(2);

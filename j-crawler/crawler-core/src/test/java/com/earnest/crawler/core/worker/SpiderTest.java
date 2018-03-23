@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 
 public class SpiderTest {
 
+    public static void main(String[] args) throws Exception {
 
-    public static void main(String[] args) throws InterruptedException {
-        Spider spider = new BasicSpider();
+        BasicSpider spider = BasicSpider.create();
 
-        Spider iSpider = spider.from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
+         spider.from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
                 .match("/www/4/38-------------4-\\d-1-iqiyi--.html")
                 .thread(5)
                 .pipeline(httpResponse -> {
@@ -29,8 +29,6 @@ public class SpiderTest {
                         return new IQiYi(title, href, src);
                     }).collect(Collectors.toList());
                 }).start();
-
-
 
     }
 }
