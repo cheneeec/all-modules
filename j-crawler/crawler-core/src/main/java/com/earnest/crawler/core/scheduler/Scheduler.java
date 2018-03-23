@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public interface Scheduler {
-    Set<HttpRequest> getErrorHttpRequestQueue();
+    Set<HttpRequest> getErrorHttpRequestSet();
 
     boolean isEmpty();
 

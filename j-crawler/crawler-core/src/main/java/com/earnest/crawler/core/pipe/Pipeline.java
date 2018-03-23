@@ -6,5 +6,5 @@ import java.util.Collection;
 
 @FunctionalInterface
 public interface Pipeline<T> {
-    T pipe(HttpResponse httpResponse);
+     T pipe(HttpResponse httpResponse);
 }

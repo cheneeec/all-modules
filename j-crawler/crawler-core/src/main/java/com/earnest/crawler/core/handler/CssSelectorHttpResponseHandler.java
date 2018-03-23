@@ -18,23 +18,9 @@ public class CssSelectorHttpResponseHandler extends AbstractHttpResponseHandler 
     protected Set<String> extract(HttpResponse httpResponse) {
 
         return newHttpRequestExtractor.apply(
-                Jsoup.parse( httpResponse.getContent()));
+                Jsoup.parse( httpResponse.getContent())
+        );
 
-
-       /* Set<String> newUrls = new HashSet<>();
-
-        if (httpRequest instanceof AbstractHttpRequest) {
-            AbstractHttpRequest request = (AbstractHttpRequest) httpRequest;
-            //组件新的httpRequest
-            newUrls.forEach(u -> {
-                AbstractHttpRequest cloneRequest = request.clone();
-                cloneRequest.setUrl(u);
-                newUrls.add(cloneRequest);
-            });
-        } else {
-            //TODO 待添加其他扩展
-            throw new IllegalStateException("class: "+httpRequest.getClass()+" is not supported");
-        }*/
 
     }
 }

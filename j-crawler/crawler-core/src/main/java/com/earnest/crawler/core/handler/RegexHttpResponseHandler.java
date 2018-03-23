@@ -23,12 +23,10 @@ public class RegexHttpResponseHandler extends AbstractHttpResponseHandler {
 
     private final Pattern urlPattern;
 
-
     public RegexHttpResponseHandler(String urlPattern) {
         Assert.hasText(urlPattern, "this String argument:[urlPattern] is empty or null");
         this.urlPattern = Pattern.compile(urlPattern);
     }
-
 
     @Override
     protected Set<String> extract(HttpResponse httpResponse) {

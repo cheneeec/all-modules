@@ -10,23 +10,26 @@ import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.*;
 
+import static java.util.Objects.nonNull;
+
 @Slf4j
 @AllArgsConstructor
-
 public class HttpClientDownloader implements Downloader, DownloadListener {
+
     private final CloseableHttpClient httpClient;
     @Getter
     private final Set<DownloadListener> downloadListeners = new HashSet<>(5);
 
 
     public HttpClientDownloader() {
-        this(HttpClients.createDefault());
+        this(HttpClientBuilder.create().useSystemProperties().build());
     }
 
     @Override
@@ -41,7 +44,7 @@ public class HttpClientDownloader implements Downloader, DownloadListener {
             httpResponse.setStatus(closeableHttpResponse.getStatusLine().getStatusCode());
             httpResponse.setHttpRequest(request);
 
-            if (Objects.nonNull(httpEntity.getContentType())) {
+            if (nonNull(httpEntity.getContentType())) {
                 httpResponse.setContentType(httpEntity.getContentType().getValue());
             }
             //关闭响应
@@ -77,7 +80,7 @@ public class HttpClientDownloader implements Downloader, DownloadListener {
     @Override
     public void close() {
         try {
-            if (Objects.nonNull(httpClient)) {
+            if (nonNull(httpClient)) {
                 httpClient.close();
             }
         } catch (IOException e) {

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HttpResponse {
 
-
     private String content;
 
     private String contentType;
