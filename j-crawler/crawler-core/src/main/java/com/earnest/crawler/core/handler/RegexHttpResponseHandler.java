@@ -1,11 +1,9 @@
 package com.earnest.crawler.core.handler;
 
 import com.earnest.crawler.core.request.AbstractHttpRequest;
-import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.StringUtil;
 import org.springframework.util.Assert;
@@ -18,7 +16,6 @@ import java.util.regex.Pattern;
 
 @Getter
 @Setter
-@Slf4j
 public class RegexHttpResponseHandler extends AbstractHttpResponseHandler {
 
     private final Pattern urlPattern;

@@ -1,6 +1,8 @@
 package com.earnest.crawler.core.worker;
 
 import com.earnest.crawler.IQiYi;
+import com.earnest.crawler.core.crawler.BasicSpider;
+import com.earnest.crawler.core.crawler.Spider;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,6 +14,7 @@ public class SpiderTest {
 
     public static void main(String[] args) throws InterruptedException {
         Spider spider = new BasicSpider();
+
         Spider iSpider = spider.from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
                 .match("/www/4/38-------------4-\\d-1-iqiyi--.html")
                 .thread(5)

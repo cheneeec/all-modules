@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.worker;
+package com.earnest.crawler.core.crawler;
 
 
 import com.alibaba.fastjson.JSONObject;
@@ -27,7 +27,7 @@ import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 @Slf4j
-public class BasicSpider extends BasicWorker implements Spider {
+public class BasicSpider extends BasicCrawler implements Spider {
 
     private Scheduler scheduler;
 
@@ -40,17 +40,18 @@ public class BasicSpider extends BasicWorker implements Spider {
     private Set<DownloadListener> downloadListeners;
 
     private ExecutorService threadPool;
-    private BasicWorker worker;
+    private BasicCrawler worker;
 
     private int threadNumber = 1;
-
 
     @Override
     public Spider thread(int num) {
 
         threadNumber = num;
         //设置最大连接数，系统默认是5x2
-        System.getProperties().setProperty("http.maxConnections", String.valueOf(Math.ceil(num / 2)));
+        int maxConnectionCount = (int) Math.ceil(((double) num / 2));
+        System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));
+        log.info("set SystemProperty value: [http.maxConnections={}]", maxConnectionCount*2);
         return this;
     }
 
@@ -97,7 +98,7 @@ public class BasicSpider extends BasicWorker implements Spider {
 
     @Override
     public <T> Spider start() {
-        BasicWorker worker = this.<T>createWorker();
+        BasicCrawler worker = this.<T>createWorker();
 
         Integer i = threadNumber;
         threadPool = Executors.newFixedThreadPool(threadNumber);
@@ -112,9 +113,9 @@ public class BasicSpider extends BasicWorker implements Spider {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> BasicWorker createWorker() {
+    private <T> BasicCrawler createWorker() {
         Assert.state(nonNull(scheduler), "The URL that started crawling is not set");
-        worker = new BasicWorker();
+        worker = new BasicCrawler();
         //set Downloader
         decideDownloader();
         //--set Downloader
@@ -134,10 +135,10 @@ public class BasicSpider extends BasicWorker implements Spider {
     private void decideHttpResponseHandler() {
         if (Objects.isNull(responseHandler)) {
             //只会爬取一页
-            worker.setResponseHandler(httpResponse -> Collections.emptySet());
+            worker.setHttpResponseHandler(httpResponse -> Collections.emptySet());
             log.warn("Since {} is not set, only {} will be downloaded", HttpResponseHandler.class, JSONObject.toJSONString(scheduler));
         } else {
-            worker.setResponseHandler(responseHandler);
+            worker.setHttpResponseHandler(responseHandler);
         }
     }
 

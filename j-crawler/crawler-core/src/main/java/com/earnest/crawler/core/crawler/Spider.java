@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.worker;
+package com.earnest.crawler.core.crawler;
 
 import com.earnest.crawler.core.downloader.DownloadListener;
 import com.earnest.crawler.core.downloader.Downloader;
@@ -7,7 +7,7 @@ import com.earnest.crawler.core.request.HttpRequest;
 
 import java.util.function.Consumer;
 
-public interface Spider extends Worker {
+public interface Spider extends Crawler {
 
     Spider thread(int num);
 

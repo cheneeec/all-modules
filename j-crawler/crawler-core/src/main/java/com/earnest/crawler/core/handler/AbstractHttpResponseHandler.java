@@ -3,24 +3,26 @@ package com.earnest.crawler.core.handler;
 import com.earnest.crawler.core.request.AbstractHttpRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 public abstract class AbstractHttpResponseHandler implements HttpResponseHandler {
 
     @Override
     public Set<HttpRequest> handle(HttpResponse rawResponse) {
         HttpRequest httpRequest = rawResponse.getHttpRequest();
         filter(rawResponse, httpRequest);
-        Set<String> newUrls = extract(rawResponse);
 
-        return newUrls.stream().map(url -> {
+        return extract(rawResponse).stream().map(url -> {
             HttpRequest cloneHttpRequest = ObjectUtils.cloneIfPossible(httpRequest);
             if (cloneHttpRequest instanceof AbstractHttpRequest) {
                 AbstractHttpRequest abstractHttpRequest = (AbstractHttpRequest) cloneHttpRequest;
                 abstractHttpRequest.setUrl(url);
+                log.info("get a new Url:{} from {}", url, httpRequest.getUrl());
                 return abstractHttpRequest;
             } else
                 throw new IllegalStateException("Cannot reset new URL for " + httpRequest.getClass());
