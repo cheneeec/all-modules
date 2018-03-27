@@ -4,51 +4,50 @@ import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.request.HttpUriRequestAdapter;
 import com.earnest.crawler.core.response.HttpResponse;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.client.HttpClient;
+
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
+
 
 import static java.util.Objects.nonNull;
 
 @Slf4j
 @AllArgsConstructor
-public class HttpClientDownloader implements Downloader, DownloadListener {
+public class HttpClientDownloader extends AbstractDownloader {
 
-    private final CloseableHttpClient httpClient;
-    @Getter
-    private final Set<DownloadListener> downloadListeners = new HashSet<>(5);
-
+    private final HttpClient httpClient;
 
     public HttpClientDownloader() {
-        this(HttpClientBuilder.create().useSystemProperties().build());
+        this(HttpClients.createSystem());
     }
+
 
     @Override
     public HttpResponse download(HttpRequest request) {
         log.info("Start downloading {}", request.getUrl());
         HttpUriRequestAdapter httpUriRequest = new HttpUriRequestAdapter(request);
         try {
-            CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpUriRequest, httpUriRequest.obtainHttpContext());
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
+            org.apache.http.HttpResponse response = httpClient.execute(httpUriRequest, httpUriRequest.obtainHttpContext());
+            HttpEntity httpEntity = response.getEntity();
 
             HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8));
-            httpResponse.setStatus(closeableHttpResponse.getStatusLine().getStatusCode());
+            httpResponse.setStatus(response.getStatusLine().getStatusCode());
             httpResponse.setHttpRequest(request);
 
             if (nonNull(httpEntity.getContentType())) {
                 httpResponse.setContentType(httpEntity.getContentType().getValue());
             }
             //关闭响应
-            closeableHttpResponse.close();
+            if (response instanceof Closeable) {
+                ((Closeable) response).close();
+            }
             onSuccess(httpResponse);
             return httpResponse;
         } catch (IOException e) {
@@ -61,43 +60,21 @@ public class HttpClientDownloader implements Downloader, DownloadListener {
 
 
     @Override
-    public void onSuccess(HttpResponse httpResponse) {
-        if (!downloadListeners.isEmpty()) {
-
-            downloadListeners.forEach(s -> s.onSuccess(httpResponse));
-        }
-    }
-
-    @Override
-    public void onError(HttpRequest httpRequest, Exception e) {
-        if (!downloadListeners.isEmpty()) {
-
-            downloadListeners.forEach(s -> s.onError(httpRequest, e));
-        }
-    }
-
-
-    @Override
     public void close() {
         try {
-            if (nonNull(httpClient)) {
-                httpClient.close();
+            if (nonNull(httpClient) && httpClient instanceof Closeable) {
+                ((Closeable) httpClient).close();
             }
         } catch (IOException e) {
             log.error("An error occurred while closing the client,error:{}", e.getMessage());
             e.printStackTrace();
         } finally {
             try {
-                httpClient.close();
+                ((Closeable) httpClient).close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    public HttpClientDownloader addDownloadListener(DownloadListener downloadListener) {
-        downloadListeners.add(downloadListener);
-        return this;
     }
 
 

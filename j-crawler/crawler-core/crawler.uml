@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="0.0" y="344.0">com.earnest.crawler.core.crawler.BasicCrawler</node>
+    <node x="398.0" y="551.5">com.earnest.crawler.core.crawler.Spiders</node>
+    <node x="626.0" y="0.0">com.earnest.crawler.core.crawler.Spider</node>
+    <node x="277.25" y="0.0">java.lang.Runnable</node>
+    <node x="150.25" y="103.0">com.earnest.crawler.core.crawler.Crawler</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="com.earnest.crawler.core.crawler.Crawler" target="java.lang.Runnable">
+      <point x="0.0" y="-95.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="com.earnest.crawler.core.crawler.BasicCrawler" target="com.earnest.crawler.core.crawler.Crawler">
+      <point x="0.0" y="-268.5" />
+      <point x="189.0" y="319.0" />
+      <point x="244.75" y="319.0" />
+      <point x="-94.5" y="95.5" />
+    </edge>
+    <edge source="com.earnest.crawler.core.crawler.Spiders" target="com.earnest.crawler.core.crawler.Crawler">
+      <point x="0.0" y="-61.0" />
+      <point x="489.5" y="319.0" />
+      <point x="433.75" y="319.0" />
+      <point x="94.5" y="95.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="647.5" y="257.5" />
+  <SelectedNodes>
+    <node>com.earnest.crawler.core.crawler.Spider</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Fields</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

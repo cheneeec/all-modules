@@ -18,9 +18,6 @@ public class JsoupExample {
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36")
                 .header("Upgrade-Insecure-Requests", "1")
                 .get();
-        System.out.println(document);
-
-        System.out.println(document.body().select("#body > div.pagination > a:nth-child(3)").attr("abs:href"));
 
         Assert.assertNotNull(document);
 

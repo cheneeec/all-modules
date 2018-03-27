@@ -5,6 +5,8 @@ import com.earnest.crawler.core.response.HttpResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jsoup.helper.StringUtil;
 import org.springframework.util.Assert;
 
@@ -49,4 +51,23 @@ public class RegexHttpResponseHandler extends AbstractHttpResponseHandler {
         return newUrls;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RegexHttpResponseHandler that = (RegexHttpResponseHandler) o;
+
+        return new EqualsBuilder()
+                .append(urlPattern.pattern(), that.urlPattern.pattern())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(urlPattern.pattern())
+                .toHashCode();
+    }
 }

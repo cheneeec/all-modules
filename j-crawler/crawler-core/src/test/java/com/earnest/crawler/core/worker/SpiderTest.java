@@ -1,11 +1,10 @@
 package com.earnest.crawler.core.worker;
 
 import com.earnest.crawler.IQiYi;
-import com.earnest.crawler.core.crawler.BasicSpider;
-import com.earnest.crawler.core.crawler.Spider;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.junit.Test;
 
 import java.util.stream.Collectors;
 
@@ -13,7 +12,7 @@ public class SpiderTest {
 
     public static void main(String[] args) throws Exception {
 
-        BasicSpider spider = BasicSpider.create();
+       /* BasicSpider spider = BasicSpider.create();
 
          spider.from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
                 .match("/www/4/38-------------4-\\d-1-iqiyi--.html")
@@ -28,7 +27,13 @@ public class SpiderTest {
                         String href = e.select("div.site-piclist_pic > a").attr("href");
                         return new IQiYi(title, href, src);
                     }).collect(Collectors.toList());
-                }).start();
+                }).start();*/
 
     }
+
+    @Test
+    public void aa(){
+
+    }
+
 }

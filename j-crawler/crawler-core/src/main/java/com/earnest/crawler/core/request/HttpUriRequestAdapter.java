@@ -45,6 +45,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
 
         //set Parameters
         setHttpEntity(httpRequest);
+
         //set requestConfig
         setConfig(createRequestConfig(httpRequest));
         //================

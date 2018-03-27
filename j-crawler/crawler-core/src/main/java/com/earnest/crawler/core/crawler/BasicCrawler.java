@@ -9,8 +9,8 @@ import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -18,10 +18,8 @@ import java.util.function.Consumer;
 import static java.util.Objects.nonNull;
 
 @Slf4j
-@Setter(AccessLevel.PROTECTED)
-@Getter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-class BasicCrawler<T> implements  Runnable {
+class BasicCrawler<T> implements Crawler<T> {
 
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
@@ -29,13 +27,14 @@ class BasicCrawler<T> implements  Runnable {
     private Downloader downloader;
     private Set<Consumer<T>> persistenceConsumers;
 
-    private static final String NAME = Thread.currentThread().getName();
+    private final String defaultName = Thread.currentThread().getName();
 
+    private String name;
 
     @Override
     @SuppressWarnings("unchecked")
-    public  void run() {
-        log.info("{} is running", NAME);
+    public void run() {
+        log.info("{} is running", getName());
         while (!scheduler.isEmpty()) {
             //暂停
 
@@ -53,5 +52,65 @@ class BasicCrawler<T> implements  Runnable {
                 persistenceConsumers.parallelStream().forEach(a -> a.accept(pipeResult));
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return StringUtils.defaultString(name, defaultName);
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void setScheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
+
+    @Override
+    public void setPipeline(Pipeline<T> pipeline) {
+        this.pipeline = pipeline;
+    }
+
+    @Override
+    public void setHttpResponseHandler(HttpResponseHandler httpResponseHandler) {
+        this.httpResponseHandler = httpResponseHandler;
+    }
+
+    @Override
+    public void setDownloader(Downloader downloader) {
+        this.downloader = downloader;
+    }
+
+    @Override
+    public void setPersistenceConsumers(Set<Consumer<T>> persistenceConsumers) {
+        this.persistenceConsumers = persistenceConsumers;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
+    }
+
+    @Override
+    public Pipeline<T> getPipeline() {
+        return pipeline;
+    }
+
+    @Override
+    public HttpResponseHandler getHttpResponseHandler() {
+        return httpResponseHandler;
+    }
+
+    @Override
+    public Downloader getDownloader() {
+        return downloader;
+    }
+
+    @Override
+    public Set<Consumer<T>> getPersistenceConsumers() {
+        return persistenceConsumers;
     }
 }
