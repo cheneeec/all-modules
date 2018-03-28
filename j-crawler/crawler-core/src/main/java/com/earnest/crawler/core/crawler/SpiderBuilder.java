@@ -1,6 +1,5 @@
 package com.earnest.crawler.core.crawler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.downloader.DownloadListener;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.downloader.HttpClientDownloader;
@@ -12,13 +11,12 @@ import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.scheduler.BlockingQueueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 import static java.util.Collections.singleton;
@@ -40,16 +38,13 @@ public class SpiderBuilder {
 
     private Set<DownloadListener> downloadListeners;
 
-    private ExecutorService threadPool;
-
-    private BasicCrawler crawler;
 
     private int threadNumber = 1;
 
     SpiderBuilder() {
     }
 
-    public static  SpiderBuilder create() {
+    public static SpiderBuilder create() {
         return new SpiderBuilder();
     }
 
@@ -98,27 +93,22 @@ public class SpiderBuilder {
         return this;
     }
 
-    public <T> SpiderBuilder start() {
-        BasicCrawler worker = this.<T>createWorker();
 
-        Integer i = threadNumber;
-        threadPool = Executors.newFixedThreadPool(threadNumber);
+    public <T> Switcher build() {
+        Crawler crawler = this.<T>createCrawler();
+        Spider spider = new BasicSpider();
 
-        while (i > 0) {
-            Thread thread = new Thread(worker);
-            threadPool.execute(thread);
-            i--;
-            log.info("Thread {} is turned on", thread.getName());
-        }
-        return this;
+        spider.<T>setCrawler(crawler);
+        spider.setThread(threadNumber);
+        return spider;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> BasicCrawler createWorker() {
+    private <T> Crawler createCrawler() {
         Assert.state(nonNull(scheduler), "The URL that started crawling is not set");
-        crawler = new BasicCrawler();
+        Crawler crawler = new BasicCrawler<T>();
         //set Downloader
-        decideDownloader();
+        crawler.setDownloader(decideDownloader());
         //--set Downloader
 
         crawler.setPipeline(defaultIfNull(pipeline, (Pipeline<T>) httpResponse -> (T) httpResponse));
@@ -127,23 +117,17 @@ public class SpiderBuilder {
 
         crawler.setScheduler(scheduler);
         //set HttpResponseHandler
-        decideHttpResponseHandler();
+        crawler.setHttpResponseHandler(decideHttpResponseHandler());
         //--set HttpResponseHandler
 
         return crawler;
     }
 
-    private void decideHttpResponseHandler() {
-        if (Objects.isNull(responseHandler)) {
-            //只会爬取一页
-            crawler.setHttpResponseHandler(httpResponse -> Collections.emptySet());
-            log.warn("Since {} is not set, only {} will be downloaded", HttpResponseHandler.class, JSONObject.toJSONString(scheduler));
-        } else {
-            crawler.setHttpResponseHandler(responseHandler);
-        }
+    private HttpResponseHandler decideHttpResponseHandler() {
+        return ObjectUtils.defaultIfNull(responseHandler, httpResponse -> Collections.emptySet());
     }
 
-    private void decideDownloader() {
+    private Downloader decideDownloader() {
 
         Downloader defaultDownloader = defaultIfNull(this.downloader, new HttpClientDownloader());
 
@@ -160,8 +144,7 @@ public class SpiderBuilder {
             }
         }
 
-
-        crawler.setDownloader(defaultDownloader);
+        return defaultDownloader;
     }
 
     public SpiderBuilder match(String regex) {
@@ -169,10 +152,11 @@ public class SpiderBuilder {
         return this;
     }
 
-    public SpiderBuilder stop() {
-        threadPool.shutdown();
+    public SpiderBuilder httpResponseHandler(HttpResponseHandler responseHandler) {
+        this.responseHandler = responseHandler;
         return this;
     }
+
 
     public SpiderBuilder pipeline(Pipeline pipeline) {
         this.pipeline = pipeline;

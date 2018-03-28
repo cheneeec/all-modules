@@ -17,6 +17,11 @@ public interface Parser extends Closeable {
 
     Set<HttpRequest> getHttpRequests();
 
+    <T> Set<T> getPersistenceConsumers();
+
+
+    int getThreadNumber();
+
     default Downloader getDownloader() {
         return new HttpClientDownloader();
     }

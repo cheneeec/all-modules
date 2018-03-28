@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 
 public class ParserTest {
@@ -18,7 +19,7 @@ public class ParserTest {
     @Test
     public void getHttpResponseHandler() {
         HttpResponseHandler responseHandler = parser.getHttpResponseHandler();
-        Assert.assertEquals(responseHandler,new RegexHttpResponseHandler("/www/4/38-------------4-\\d-1-iqiyi--.html"));
+        Assert.assertEquals(responseHandler, new RegexHttpResponseHandler("/www/4/38-------------4-\\d-1-iqiyi--.html"));
     }
 
     @Test
@@ -37,6 +38,13 @@ public class ParserTest {
     @Test
     public void getDownloader() {
 
+
+    }
+
+    @Test
+    public void getPersistenceConsumers() {
+        Set<Consumer<?>> persistenceConsumers = parser.getPersistenceConsumers();
+        Assert.assertTrue(persistenceConsumers.size() == 0);
 
     }
 }

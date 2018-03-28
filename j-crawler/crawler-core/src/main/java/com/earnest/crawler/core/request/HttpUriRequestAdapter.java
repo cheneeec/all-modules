@@ -10,6 +10,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -125,11 +126,20 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
         //set Cookies
         Map<String, String> cookies = httpRequest.getCookies();
         if (!CollectionUtils.isEmpty(cookies)) {
-            CookieStore cookieStore = new BasicCookieStore();
+            BasicCookieStore cookieStore = new BasicCookieStore();
 
-            cookies.keySet().stream()
-                    .map(k -> new BasicClientCookie(k, cookies.get(k)))
-                    .forEach(cookieStore::addCookie);
+            cookieStore.addCookies(
+                    cookies.keySet().stream()
+                            .map(k -> {
+                                BasicClientCookie cookie = new BasicClientCookie(k, cookies.get(k));
+                                if (StringUtils.isBlank(cookie.getDomain())) {
+                                    cookie.setDomain(URI.create(httpRequest.getUrl()).getHost());
+                                }
+                                return cookie;
+                            })
+                            .toArray(Cookie[]::new)
+            );
+
             clientContext.setCookieStore(cookieStore);
         }
         //

@@ -7,6 +7,8 @@ import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.AbstractHttpRequest;
 import com.earnest.crawler.core.request.HttpCustomRequest;
 import com.earnest.crawler.core.request.HttpRequest;
+import lombok.Cleanup;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import org.jsoup.Jsoup;
@@ -18,12 +20,11 @@ import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 
 public class JsonConfigurationParser implements Parser {
@@ -31,15 +32,17 @@ public class JsonConfigurationParser implements Parser {
     private HttpResponseHandler httpResponseHandler;
     private Pipeline<?> pipeline;
     private Set<HttpRequest> httpRequests = new HashSet<>(6);
+    private Set<?> persistenceConsumers;
+    private int threadNumber;
 
 
     public JsonConfigurationParser(String jsonConfigurationPath) {
         Resource pathResource = new ClassPathResource(jsonConfigurationPath);
         try {
-            InputStream jsonConfigurationInputStream = new ClassPathResource(jsonConfigurationPath).getInputStream();
+            @Cleanup InputStream jsonConfigurationInputStream = new ClassPathResource(jsonConfigurationPath).getInputStream();
             doParse(jsonConfigurationInputStream);
         } catch (IOException e) {
-            throw new IllegalArgumentException(pathResource.getFilename() + "is not found");
+            throw new IllegalArgumentException(pathResource.getFilename() + "is not found,error" + e.getMessage());
         }
 
     }
@@ -48,21 +51,54 @@ public class JsonConfigurationParser implements Parser {
 
         JSONObject jsonConfiguration = JSONObject.parseObject(jsonConfigurationInputStream, JSONObject.class);
         //get from
-        extractHttpRequest(jsonConfiguration);
+        httpRequests.add(extractHttpRequest(jsonConfiguration));
 
-        extractHttpResponseHandler(jsonConfiguration.getString("match"));
+        httpResponseHandler = extractHttpResponseHandler(jsonConfiguration.getString("match"));
 
-        extractPipeline(jsonConfiguration.getJSONObject("pipeline"));
+        pipeline = extractPipeline(jsonConfiguration.getJSONObject("pipeline"));
 
+        threadNumber = extractThreadNumber(jsonConfiguration.getIntValue("thread"));
+
+        persistenceConsumers = extractPersistenceConsumers(jsonConfiguration.get("consumer"));
 
     }
 
+    private Set<?> extractPersistenceConsumers(Object consumer) {
+        try {
+            if (isNull(consumer)) {
+                return null;
+            }
+            if (consumer instanceof String && StringUtils.isNotBlank(((String) consumer))) {
+                return Collections.singleton(ClassUtils.getClass(((String) consumer)).newInstance());
+            }
+            if (consumer instanceof Iterable) {
+                Set<Consumer> temp = new HashSet<>();
+                for (Object o : ((Iterable) consumer)) {
+                    String s = (String) o;
+                    if (StringUtils.isNotBlank(s)) {
+                        temp.add(((Consumer) ClassUtils.getClass(s).newInstance()));
+                    }
+                }
+                return temp;
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Error in configuration file,error:" + e.getMessage());
+        }
+
+        return null;
+    }
+
+    private int extractThreadNumber(int thread) {
+        return thread == 0 ? 1 : thread;
+    }
+
+
     @SuppressWarnings("unchecked")
-    private void extractPipeline(JSONObject pipelineJsonObject) {
+    private Pipeline<?> extractPipeline(JSONObject pipelineJsonObject) {
         String strip = pipelineJsonObject.getString("strip");
         Map<String, String> entityMap = pipelineJsonObject.getObject("entity", Map.class);
 
-        pipeline = httpResponse -> {
+        return httpResponse -> {
             Element element = Jsoup.parse(httpResponse.getContent(), httpResponse.getHttpRequest().getCharset())
                     .body();
             if (StringUtils.isNotBlank(strip)) {
@@ -91,12 +127,12 @@ public class JsonConfigurationParser implements Parser {
     }
 
 
-    private void extractHttpResponseHandler(String match) {
-        httpResponseHandler = new RegexHttpResponseHandler(match);
+    private HttpResponseHandler extractHttpResponseHandler(String match) {
+        return new RegexHttpResponseHandler(match);
     }
 
     @SuppressWarnings("unchecked")
-    private void extractHttpRequest(JSONObject jsonConfiguration) {
+    private HttpRequest extractHttpRequest(JSONObject jsonConfiguration) {
         //set HttpRequest
         JSONObject requestJsonObject = jsonConfiguration.getJSONObject("request");
         AbstractHttpRequest request = new HttpCustomRequest(requestJsonObject.getString("method"));
@@ -106,7 +142,7 @@ public class JsonConfigurationParser implements Parser {
         request.setCookies(requestJsonObject.getObject("cookies", Map.class));
         request.setCharset(requestJsonObject.getString("charset"));
 
-        httpRequests.add(request);
+        return request;
     }
 
 
@@ -124,6 +160,17 @@ public class JsonConfigurationParser implements Parser {
     @Override
     public Set<HttpRequest> getHttpRequests() {
         return httpRequests;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Set<T> getPersistenceConsumers() {
+        return (Set<T>) persistenceConsumers;
+    }
+
+    @Override
+    public int getThreadNumber() {
+        return threadNumber;
     }
 
     @Override

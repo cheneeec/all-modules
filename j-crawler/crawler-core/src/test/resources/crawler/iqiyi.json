@@ -2,9 +2,12 @@
   "from": "http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html",
   "thread": 5,
   "match": "/www/4/38-------------4-\\d-1-iqiyi--.html",
+  "consumer": [
+    ""
+  ],
   "request": {
     "method": "GET",
-    "charset":"UTF-8",
+    "charset": "UTF-8",
     "cookies": {
       "__uuid": "48c04310-fe61-4b7e-d7ba-2178d31b2ea5"
     },
