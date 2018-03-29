@@ -17,6 +17,8 @@ public interface Scheduler {
 
     HttpRequest peek();
 
+    HttpRequest take();
+
     boolean offer(HttpRequest httpRequest);
 
     boolean offer(HttpRequest httpRequest, long timeout, TimeUnit unit) throws InterruptedException;

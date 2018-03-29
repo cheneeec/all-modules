@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface Crawler<T> extends Runnable {
-    String getName();
+    String getId();
 
-    void setName(String name);
+    void setId(String id);
 
     void setScheduler(Scheduler scheduler);
 
@@ -32,5 +32,7 @@ public interface Crawler<T> extends Runnable {
     Downloader getDownloader();
 
     Set<Consumer<T>> getPersistenceConsumers();
+
+    void destroy();
 
 }

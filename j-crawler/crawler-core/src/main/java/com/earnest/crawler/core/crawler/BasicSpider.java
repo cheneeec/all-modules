@@ -1,9 +1,12 @@
 package com.earnest.crawler.core.crawler;
 
+import org.springframework.util.Assert;
+
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class BasicSpider implements Spider {
+public class BasicSpider implements SpiderSetter {
 
     private Crawler<?> crawler;
     private int threadNumber = 1;
@@ -21,10 +24,13 @@ public class BasicSpider implements Spider {
 
     @Override
     public void start() {
-        threadPool = Executors.newFixedThreadPool(5);
+        Assert.state(Objects.nonNull(crawler), "crawler is neo set");
+
+        threadPool = Executors.newFixedThreadPool(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
             threadPool.execute(crawler);
         }
+
     }
 
     @Override

@@ -22,7 +22,6 @@ public abstract class AbstractHttpResponseHandler implements HttpResponseHandler
             if (cloneHttpRequest instanceof AbstractHttpRequest) {
                 AbstractHttpRequest abstractHttpRequest = (AbstractHttpRequest) cloneHttpRequest;
                 abstractHttpRequest.setUrl(url);
-                log.info("get a new Url:{} from {}", url, httpRequest.getUrl());
                 return abstractHttpRequest;
             } else
                 throw new IllegalStateException("Cannot reset new URL for " + httpRequest.getClass());

@@ -10,6 +10,8 @@ import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.scheduler.BlockingQueueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
@@ -20,10 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static java.util.Collections.singleton;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("unchecked")
 public class SpiderBuilder {
 
     private Scheduler scheduler;
@@ -41,8 +46,6 @@ public class SpiderBuilder {
 
     private int threadNumber = 1;
 
-    SpiderBuilder() {
-    }
 
     public static SpiderBuilder create() {
         return new SpiderBuilder();
@@ -70,7 +73,7 @@ public class SpiderBuilder {
     }
 
     public SpiderBuilder addRequest(HttpRequest httpRequest) {
-        if (Objects.isNull(scheduler)) {
+        if (isNull(scheduler)) {
             return from(httpRequest);
         } else {
             scheduler.offer(httpRequest);
@@ -85,7 +88,7 @@ public class SpiderBuilder {
 
     public SpiderBuilder addDownloaderListener(DownloadListener downloadListener) {
         if (nonNull(downloadListener)) {
-            if (Objects.isNull(downloadListeners)) {
+            if (isNull(downloadListeners)) {
                 downloadListeners = new HashSet<>(5);
             }
             downloadListeners.add(downloadListener);
@@ -94,16 +97,17 @@ public class SpiderBuilder {
     }
 
 
-    public <T> Switcher build() {
+    public <T> Spider build() {
         Crawler crawler = this.<T>createCrawler();
-        Spider spider = new BasicSpider();
+        SpiderSetter spider = new BasicSpider();
 
         spider.<T>setCrawler(crawler);
         spider.setThread(threadNumber);
+
         return spider;
     }
 
-    @SuppressWarnings("unchecked")
+
     private <T> Crawler createCrawler() {
         Assert.state(nonNull(scheduler), "The URL that started crawling is not set");
         Crawler crawler = new BasicCrawler<T>();
@@ -143,7 +147,6 @@ public class SpiderBuilder {
                 downloadListeners.forEach(((HttpClientDownloader) defaultDownloader)::addDownloadListener);
             }
         }
-
         return defaultDownloader;
     }
 
@@ -165,7 +168,7 @@ public class SpiderBuilder {
 
     public <T> SpiderBuilder addConsumer(Consumer<T> persistenceConsumer) {
         if (nonNull(persistenceConsumer)) {
-            if (Objects.isNull(persistenceConsumers)) {
+            if (isNull(persistenceConsumers)) {
                 persistenceConsumers = new HashSet<>(2);
             }
             persistenceConsumers.add(persistenceConsumer);

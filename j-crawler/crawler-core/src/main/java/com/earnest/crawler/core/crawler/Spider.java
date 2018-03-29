@@ -1,9 +1,8 @@
 package com.earnest.crawler.core.crawler;
 
-public interface Spider extends Switcher {
-    <T> void setCrawler(Crawler<T> crawler);
+public interface Spider {
+    void start();
 
-    void setThread(int threadNumber);
-
+    void shutdown();
 
 }

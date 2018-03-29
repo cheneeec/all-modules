@@ -3,38 +3,40 @@
   <ID>JAVA</ID>
   <OriginalElement />
   <nodes>
-    <node x="0.0" y="344.0">com.earnest.crawler.core.crawler.BasicCrawler</node>
-    <node x="398.0" y="551.5">com.earnest.crawler.core.crawler.Spiders</node>
-    <node x="626.0" y="0.0">com.earnest.crawler.core.crawler.Spider</node>
-    <node x="277.25" y="0.0">java.lang.Runnable</node>
-    <node x="150.25" y="103.0">com.earnest.crawler.core.crawler.Crawler</node>
+    <node x="0.0" y="459.0">com.earnest.crawler.core.crawler.BasicCrawler</node>
+    <node x="703.0" y="0.0">com.earnest.crawler.core.crawler.Spiders</node>
+    <node x="423.0" y="252.0">com.earnest.crawler.core.crawler.BasicSpider</node>
+    <node x="460.0" y="0.0">com.earnest.crawler.core.crawler.Spider</node>
+    <node x="127.0" y="0.0">java.lang.Runnable</node>
+    <node x="423.0" y="126.0">com.earnest.crawler.core.crawler.SpiderSetter</node>
+    <node x="0.0" y="103.0">com.earnest.crawler.core.crawler.Crawler</node>
   </nodes>
   <notes />
   <edges>
+    <edge source="com.earnest.crawler.core.crawler.SpiderSetter" target="com.earnest.crawler.core.crawler.Spider">
+      <point x="0.0" y="-38.0" />
+      <point x="0.0" y="38.0" />
+    </edge>
     <edge source="com.earnest.crawler.core.crawler.Crawler" target="java.lang.Runnable">
-      <point x="0.0" y="-95.5" />
+      <point x="0.0" y="-153.0" />
       <point x="0.0" y="26.5" />
     </edge>
-    <edge source="com.earnest.crawler.core.crawler.BasicCrawler" target="com.earnest.crawler.core.crawler.Crawler">
-      <point x="0.0" y="-268.5" />
-      <point x="189.0" y="319.0" />
-      <point x="244.75" y="319.0" />
-      <point x="-94.5" y="95.5" />
+    <edge source="com.earnest.crawler.core.crawler.BasicSpider" target="com.earnest.crawler.core.crawler.SpiderSetter">
+      <point x="0.0" y="-96.0" />
+      <point x="0.0" y="38.0" />
     </edge>
-    <edge source="com.earnest.crawler.core.crawler.Spiders" target="com.earnest.crawler.core.crawler.Crawler">
-      <point x="0.0" y="-61.0" />
-      <point x="489.5" y="319.0" />
-      <point x="433.75" y="319.0" />
-      <point x="94.5" y="95.5" />
+    <edge source="com.earnest.crawler.core.crawler.BasicCrawler" target="com.earnest.crawler.core.crawler.Crawler">
+      <point x="0.0" y="-245.5" />
+      <point x="0.0" y="153.0" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="1.0" x="647.5" y="257.5" />
+  <settings layout="Hierarchic Group" zoom="1.0" x="469.0" y="258.0" />
   <SelectedNodes>
-    <node>com.earnest.crawler.core.crawler.Spider</node>
+    <node>com.earnest.crawler.core.crawler.SpiderSetter</node>
   </SelectedNodes>
   <Categories>
-    <Category>Methods</Category>
     <Category>Fields</Category>
+    <Category>Methods</Category>
   </Categories>
   <SCOPE>All</SCOPE>
   <VISIBILITY>private</VISIBILITY>

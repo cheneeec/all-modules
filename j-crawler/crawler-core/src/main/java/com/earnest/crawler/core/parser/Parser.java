@@ -9,7 +9,7 @@ import com.earnest.crawler.core.request.HttpRequest;
 import java.io.Closeable;
 import java.util.Set;
 
-public interface Parser extends Closeable {
+public interface Parser extends Closeable{
 
     HttpResponseHandler getHttpResponseHandler();
 
@@ -25,4 +25,6 @@ public interface Parser extends Closeable {
     default Downloader getDownloader() {
         return new HttpClientDownloader();
     }
+
+
 }

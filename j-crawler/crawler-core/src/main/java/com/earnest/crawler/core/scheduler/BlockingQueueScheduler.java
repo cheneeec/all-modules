@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -26,9 +27,7 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
 
 
     public BlockingQueueScheduler(int size) {
-
         this(new LinkedBlockingQueue<>(size));
-
     }
 
     public BlockingQueueScheduler() {
@@ -43,6 +42,17 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
     @Override
     public HttpRequest peek() {
         return taskQueue.peek();
+    }
+
+    @Override
+    public HttpRequest take() {
+        try {
+            return taskQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            log.error("Interrupted when getting a httpRequest,error:{}", e.getMessage());
+        }
+        return null;
     }
 
 
@@ -85,7 +95,9 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
 
     @Override
     public boolean addAll(Collection<HttpRequest> c) {
-        return taskQueue.addAll(c);
+        return taskQueue.addAll(c.parallelStream().filter(h -> !historyUrlSet.contains(h))
+                .peek(i -> log.info("get a new Url:{}", i.getUrl()))
+                .collect(Collectors.toSet()));
     }
 
 

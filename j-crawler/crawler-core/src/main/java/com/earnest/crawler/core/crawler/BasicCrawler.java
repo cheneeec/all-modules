@@ -7,11 +7,12 @@ import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ReflectionUtils;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -20,26 +21,22 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 class BasicCrawler<T> implements Crawler<T> {
-
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
     private HttpResponseHandler httpResponseHandler;
     private Downloader downloader;
     private Set<Consumer<T>> persistenceConsumers;
 
-    private final String defaultName = Thread.currentThread().getName();
-
-    private String name;
+    private String id;
 
     @Override
-    @SuppressWarnings("unchecked")
     public void run() {
-        log.info("{} is running", getName());
-        while (!scheduler.isEmpty()) {
+        log.info("start running,id={}", getId());
+        while (Thread.currentThread().isAlive()) {
             //暂停
 
             //1. 获取连接
-            HttpRequest httpRequest = this.scheduler.poll();
+            HttpRequest httpRequest = this.scheduler.take();
             if (nonNull(httpRequest)) {
                 HttpResponse httpResponse = downloader.download(httpRequest);
                 //2. 处理HttpResponse并且获取新的连接
@@ -55,13 +52,13 @@ class BasicCrawler<T> implements Crawler<T> {
     }
 
     @Override
-    public String getName() {
-        return StringUtils.defaultString(name, defaultName);
+    public String getId() {
+        return StringUtils.defaultString(id, String.valueOf(Thread.currentThread().getId()));
     }
 
     @Override
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -112,5 +109,20 @@ class BasicCrawler<T> implements Crawler<T> {
     @Override
     public Set<Consumer<T>> getPersistenceConsumers() {
         return persistenceConsumers;
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            downloader.close();
+            
+        } catch (IOException e) {
+            log.error("An error occurred while invoking destroy,error:" + e.getMessage());
+        } finally {
+            try {
+                downloader.close();
+            } catch (IOException ignore) {
+            }
+        }
     }
 }

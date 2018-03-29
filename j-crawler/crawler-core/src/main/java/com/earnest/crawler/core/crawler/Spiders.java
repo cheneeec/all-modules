@@ -5,8 +5,8 @@ import com.earnest.crawler.core.parser.JsonConfigurationParser;
 import com.earnest.crawler.core.parser.Parser;
 import com.earnest.crawler.core.request.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -21,7 +21,7 @@ public class Spiders {
         return SpiderBuilder.create();
     }
 
-    public static Switcher createJsonConfigurable(String jsonConfiguration) {
+    public static Spider createJsonConfigurable(String jsonConfiguration) {
         Parser parser = new JsonConfigurationParser(jsonConfiguration);
         SpiderBuilder spiderBuilder = createCustom();
         //set HttpRequest
@@ -31,11 +31,16 @@ public class Spiders {
         Set<Consumer> persistenceConsumers = parser.getPersistenceConsumers();
         if (!isEmpty(persistenceConsumers)) persistenceConsumers.forEach(spiderBuilder::addConsumer);
         //set ...
-        return spiderBuilder
+        SpiderBuilder setOtherSpiderBuilder = spiderBuilder
                 .thread(parser.getThreadNumber())
                 .pipeline(parser.getPipeline())
                 .httpResponseHandler(parser.getHttpResponseHandler())
-                .downloader(parser.getDownloader())
+                .downloader(parser.getDownloader());
+        //destroy...
+        try { parser.close();} catch (IOException ignored) {}
+
+        //build
+        return setOtherSpiderBuilder
                 .build();
     }
 }

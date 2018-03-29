@@ -177,5 +177,4 @@ public class JsonConfigurationParser implements Parser {
     public void close() throws IOException {
 
     }
-
 }

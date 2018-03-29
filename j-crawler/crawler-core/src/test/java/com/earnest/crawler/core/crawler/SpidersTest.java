@@ -2,6 +2,7 @@ package com.earnest.crawler.core.crawler;
 
 import com.earnest.crawler.IQiYi;
 import com.earnest.crawler.core.request.HttpGetRequest;
+import org.apache.commons.lang3.ThreadUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -46,5 +47,6 @@ public class SpidersTest {
 
     public static void main(String[] args) {
         createCustom();
+        System.out.println("当前活动的线程：" + Thread.activeCount());
     }
 }
