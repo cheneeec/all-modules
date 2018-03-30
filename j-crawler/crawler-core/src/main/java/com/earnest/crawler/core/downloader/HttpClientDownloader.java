@@ -61,18 +61,18 @@ public class HttpClientDownloader extends AbstractDownloader implements MaxConne
 
     @Override
     public void close() {
-        try {
-            if (nonNull(httpClient) && httpClient instanceof Closeable) {
-                ((Closeable) httpClient).close();
-            }
-        } catch (IOException e) {
-            log.error("An error occurred while closing the client,error:{}", e.getMessage());
-            e.printStackTrace();
-        } finally {
+        if (nonNull(httpClient) && httpClient instanceof Closeable) {
             try {
                 ((Closeable) httpClient).close();
             } catch (IOException e) {
+                log.error("An error occurred while closing the client,error:{}", e.getMessage());
                 e.printStackTrace();
+            } finally {
+                try {
+                    ((Closeable) httpClient).close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
