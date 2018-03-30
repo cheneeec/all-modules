@@ -1,9 +1,10 @@
-package com.earnest.crawler.core.parser;
+package com.earnest.core.parser;
 
 import com.earnest.crawler.IQiYi;
-import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
+import com.earnest.crawler.core.parser.JsonConfigurationParser;
+import com.earnest.crawler.core.parser.Parser;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpRequest;
 import org.junit.Assert;

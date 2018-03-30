@@ -41,7 +41,6 @@ public abstract class AbstractDownloader implements Downloader, DownloadListener
     @Override
     public void onError(HttpRequest httpRequest, Exception e) {
         if (!downloadListeners.isEmpty()) {
-
             downloadListeners.forEach(s -> s.onError(httpRequest, e));
         }
     }

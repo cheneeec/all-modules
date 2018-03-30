@@ -24,7 +24,7 @@ public class BasicSpider implements SpiderSetter {
 
     @Override
     public void start() {
-        Assert.state(Objects.nonNull(crawler), "crawler is neo set");
+        Assert.state(Objects.nonNull(crawler), "crawler is not set");
 
         threadPool = Executors.newFixedThreadPool(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
@@ -35,6 +35,7 @@ public class BasicSpider implements SpiderSetter {
 
     @Override
     public void shutdown() {
+        crawler.destroy();
         threadPool.shutdownNow();
     }
 

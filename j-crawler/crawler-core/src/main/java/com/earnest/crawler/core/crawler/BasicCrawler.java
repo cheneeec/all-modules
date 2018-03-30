@@ -115,7 +115,7 @@ class BasicCrawler<T> implements Crawler<T> {
     public void destroy() {
         try {
             downloader.close();
-            
+
         } catch (IOException e) {
             log.error("An error occurred while invoking destroy,error:" + e.getMessage());
         } finally {

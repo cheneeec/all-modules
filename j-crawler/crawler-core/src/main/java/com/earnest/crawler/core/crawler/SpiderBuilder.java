@@ -1,8 +1,6 @@
 package com.earnest.crawler.core.crawler;
 
-import com.earnest.crawler.core.downloader.DownloadListener;
-import com.earnest.crawler.core.downloader.Downloader;
-import com.earnest.crawler.core.downloader.HttpClientDownloader;
+import com.earnest.crawler.core.downloader.*;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
@@ -18,7 +16,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static java.util.Collections.singleton;
@@ -52,11 +49,9 @@ public class SpiderBuilder {
     }
 
     public SpiderBuilder thread(int num) {
+        Assert.isTrue(num > 0, "num must be greater than 0");
         threadNumber = num;
-        //设置最大连接数，系统默认是5x2
-        int maxConnectionCount = (int) Math.ceil(((double) num / 2));
-        System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));
-        log.info("set SystemProperty value: [http.maxConnections={}]", maxConnectionCount * 2);
+
         return this;
     }
 
@@ -136,10 +131,11 @@ public class SpiderBuilder {
         Downloader defaultDownloader = defaultIfNull(this.downloader, new HttpClientDownloader());
 
         if (scheduler instanceof DownloadListener) {
-            ConcurrentHashMap.KeySetView<DownloadListener, Boolean> downloadListenersSet = ConcurrentHashMap.newKeySet();
-            downloadListenersSet.add(((DownloadListener) scheduler));
-            downloadListeners = Optional.ofNullable(downloadListeners)
-                    .orElse(downloadListenersSet);
+            if (!CollectionUtils.isEmpty(downloadListeners)) {
+                downloadListeners.add((DownloadListener) scheduler);
+            } else {
+                downloadListeners = Collections.singleton((DownloadListener) scheduler);
+            }
         }
 
         if (!CollectionUtils.isEmpty(downloadListeners)) {
@@ -147,6 +143,14 @@ public class SpiderBuilder {
                 downloadListeners.forEach(((HttpClientDownloader) defaultDownloader)::addDownloadListener);
             }
         }
+
+        if (defaultDownloader instanceof MaxConnectionsSetter && threadNumber > 1) {
+            ((MaxConnectionsSetter) defaultDownloader).setMaxConnections(threadNumber);
+        } else {
+            throw new IllegalStateException(String.format("cannot set the threadNumber for %s ,this class must implement %s",
+                    defaultDownloader.getClass(), MaxConnectionsSetter.class));
+        }
+
         return defaultDownloader;
     }
 

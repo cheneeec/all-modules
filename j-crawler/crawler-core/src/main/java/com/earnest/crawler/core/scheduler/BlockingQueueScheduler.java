@@ -46,8 +46,11 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
 
     @Override
     public HttpRequest take() {
+
         try {
-            return taskQueue.take();
+            HttpRequest httpRequest = taskQueue.take();
+            historyUrlSet.add(httpRequest.getUrl());
+            return httpRequest;
         } catch (InterruptedException e) {
             e.printStackTrace();
             log.error("Interrupted when getting a httpRequest,error:{}", e.getMessage());
@@ -58,7 +61,7 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
 
     @Override
     public void onSuccess(HttpResponse httpResponse) {
-        historyUrlSet.add(httpResponse.getHttpRequest().getUrl());
+
     }
 
     @Override

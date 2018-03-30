@@ -20,7 +20,7 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @AllArgsConstructor
-public class HttpClientDownloader extends AbstractDownloader {
+public class HttpClientDownloader extends AbstractDownloader implements MaxConnectionsSetter {
 
     private final HttpClient httpClient;
 
@@ -75,6 +75,14 @@ public class HttpClientDownloader extends AbstractDownloader {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void setMaxConnections(int num) {
+        //设置最大连接数，系统默认是5x2
+        int maxConnectionCount = (int) Math.ceil(((double) num / 2));
+        System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));
+        log.info("set SystemProperty value: [http.maxConnections={}]", maxConnectionCount * 2);
     }
 
 

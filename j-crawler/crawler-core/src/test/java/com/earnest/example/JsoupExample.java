@@ -1,4 +1,4 @@
-package com.earnest.crawler.example;
+package com.earnest.example;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

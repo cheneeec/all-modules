@@ -120,7 +120,6 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     @Override
     public int hashCode() {
-
         return Objects.hash(url, ignoreJavascript, ignoreHTMLHead, ignoreCss);
     }
 
