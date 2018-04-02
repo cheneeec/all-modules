@@ -7,19 +7,41 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public interface Scheduler {
+    /**
+     * 获取请求失败的集合
+     *
+     * @return
+     */
     Set<HttpRequest> getErrorHttpRequestSet();
 
+    /**
+     * 判断任务队列是否为空
+     *
+     * @return
+     */
     boolean isEmpty();
 
-    boolean addAll(Collection<HttpRequest> c);
+    /**
+     * 添加所有请求
+     *
+     * @param httpRequests
+     * @return
+     */
+    boolean addAll(Collection<HttpRequest> httpRequests);
 
-    HttpRequest poll();
-
-    HttpRequest peek();
-
+    /**
+     * 获取一个请求
+     *
+     * @return
+     */
     HttpRequest take();
 
-    boolean offer(HttpRequest httpRequest);
+    /**
+     * 加入一个请求
+     *
+     * @param httpRequest
+     * @return
+     */
+    boolean put(HttpRequest httpRequest);
 
-    boolean offer(HttpRequest httpRequest, long timeout, TimeUnit unit) throws InterruptedException;
 }

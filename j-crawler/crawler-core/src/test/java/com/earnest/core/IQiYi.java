@@ -1,4 +1,4 @@
-package com.earnest.crawler;
+package com.earnest.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

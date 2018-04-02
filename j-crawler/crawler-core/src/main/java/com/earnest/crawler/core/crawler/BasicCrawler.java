@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ReflectionUtils;
 
 import java.io.IOException;
 import java.util.Set;
@@ -27,12 +26,12 @@ class BasicCrawler<T> implements Crawler<T> {
     private Downloader downloader;
     private Set<Consumer<T>> persistenceConsumers;
 
-    private String id;
+    private String name;
 
     @Override
     public void run() {
-        log.info("start running,id={}", getId());
-        while (Thread.currentThread().isAlive()) {
+        log.info("start running,name={}", getName());
+        while (!Thread.currentThread().isInterrupted()) {
             //暂停
 
             //1. 获取连接
@@ -43,6 +42,7 @@ class BasicCrawler<T> implements Crawler<T> {
                 Set<HttpRequest> newHttpRequests = httpResponseHandler.handle(httpResponse);
                 //3. 将新的连接放入
                 scheduler.addAll(newHttpRequests);
+
                 //4. 将httpResponse转化成实体类
                 T pipeResult = pipeline.pipe(httpResponse);
                 //5. 将结果进行消化
@@ -52,13 +52,13 @@ class BasicCrawler<T> implements Crawler<T> {
     }
 
     @Override
-    public String getId() {
-        return StringUtils.defaultString(id, String.valueOf(Thread.currentThread().getId()));
+    public String getName() {
+        return StringUtils.defaultString(name, String.valueOf(Thread.currentThread().getName()));
     }
 
     @Override
-    public void setId(String id) {
-        this.id = id;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

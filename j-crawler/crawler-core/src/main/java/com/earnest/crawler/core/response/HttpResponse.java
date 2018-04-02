@@ -18,6 +18,7 @@ public class HttpResponse {
 
     private HttpRequest httpRequest;
 
+
     private int status;
 
     public HttpResponse(String content) {

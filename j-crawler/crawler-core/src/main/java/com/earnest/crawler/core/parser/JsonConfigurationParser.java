@@ -50,7 +50,7 @@ public class JsonConfigurationParser implements Parser {
     private void doParse(InputStream jsonConfigurationInputStream) throws IOException {
 
         JSONObject jsonConfiguration = JSONObject.parseObject(jsonConfigurationInputStream, JSONObject.class);
-        //get from
+        //take from
         httpRequests.add(extractHttpRequest(jsonConfiguration));
 
         httpResponseHandler = extractHttpResponseHandler(jsonConfiguration.getString("match"));

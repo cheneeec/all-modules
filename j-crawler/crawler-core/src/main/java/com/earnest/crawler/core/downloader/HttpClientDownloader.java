@@ -53,9 +53,12 @@ public class HttpClientDownloader extends AbstractDownloader implements MaxConne
         } catch (IOException e) {
             onError(request, e);
             log.error("An error occurred while downloading {} ,error:{}", request.getUrl(), e.getMessage());
+            HttpResponse httpResponse = new HttpResponse(e.getMessage());
+            httpResponse.setStatus(500);
+            return httpResponse;
         }
 
-        return null;
+
     }
 
 

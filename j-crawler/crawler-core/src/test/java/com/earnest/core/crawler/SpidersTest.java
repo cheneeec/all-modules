@@ -1,6 +1,6 @@
 package com.earnest.core.crawler;
 
-import com.earnest.crawler.IQiYi;
+import com.earnest.core.IQiYi;
 import com.earnest.crawler.core.crawler.Spiders;
 import com.earnest.crawler.core.request.HttpGetRequest;
 import org.jsoup.Jsoup;

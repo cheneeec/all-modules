@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface Crawler<T> extends Runnable {
-    String getId();
+    String getName();
 
-    void setId(String id);
+    void setName(String name);
 
     void setScheduler(Scheduler scheduler);
 

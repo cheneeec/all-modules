@@ -28,7 +28,7 @@ public class BasicSpider implements SpiderSetter {
 
         threadPool = Executors.newFixedThreadPool(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
-            threadPool.execute(crawler);
+            threadPool.execute(new Thread(crawler, "crawler" + i));
         }
 
     }

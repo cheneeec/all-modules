@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -21,9 +20,10 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
 
     private final BlockingQueue<HttpRequest> taskQueue;
 
-    private final Set<String> historyUrlSet = new HashSet<>();
+    private final Set<String> historyUrlSet = new HashSet<>(10000);
 
-    private final Set<HttpRequest> errorHttpRequestSet = new HashSet<>();
+    private final Set<HttpRequest> errorHttpRequestSet = new HashSet<>(100);
+
 
 
     public BlockingQueueScheduler(int size) {
@@ -34,19 +34,9 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
         this(10000);
     }
 
-    @Override
-    public HttpRequest poll() {
-        return taskQueue.poll();
-    }
-
-    @Override
-    public HttpRequest peek() {
-        return taskQueue.peek();
-    }
 
     @Override
     public HttpRequest take() {
-
         try {
             HttpRequest httpRequest = taskQueue.take();
             historyUrlSet.add(httpRequest.getUrl());
@@ -64,19 +54,16 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
 
     }
 
-    @Override
-    public boolean offer(HttpRequest httpRequest, long timeout, TimeUnit unit) throws InterruptedException {
-        if (!historyUrlSet.contains(httpRequest.getUrl())) {
-            log.info("get a new link:{}", httpRequest.getUrl());
-            return taskQueue.offer(httpRequest, timeout, unit);
-        }
-        return false;
-    }
 
-    public boolean offer(HttpRequest httpRequest) {
+    public boolean put(HttpRequest httpRequest) {
         if (!historyUrlSet.contains(httpRequest.getUrl())) {
-            log.info("get a new link:{}", httpRequest.getUrl());
-            return taskQueue.offer(httpRequest);
+            log.info("take a new link:{}", httpRequest.getUrl());
+            try {
+                taskQueue.put(httpRequest);
+                return true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
@@ -97,9 +84,9 @@ public class BlockingQueueScheduler implements Scheduler, DownloadListener {
     }
 
     @Override
-    public boolean addAll(Collection<HttpRequest> c) {
-        return taskQueue.addAll(c.parallelStream().filter(h -> !historyUrlSet.contains(h))
-                .peek(i -> log.info("get a new Url:{}", i.getUrl()))
+    public boolean addAll(Collection<HttpRequest> httpRequests) {
+        return taskQueue.addAll(httpRequests.parallelStream().filter(h -> !historyUrlSet.contains(h.getUrl()))
+                .peek(i -> log.info("take a new Url:{}", i.getUrl()))
                 .collect(Collectors.toSet()));
     }
 

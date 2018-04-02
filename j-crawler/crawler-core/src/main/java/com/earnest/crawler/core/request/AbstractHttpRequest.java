@@ -2,6 +2,7 @@ package com.earnest.crawler.core.request;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Setter;
+import lombok.ToString;
 
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Setter
+@ToString
 public abstract class AbstractHttpRequest implements HttpRequest, Comparable<HttpRequest>, Serializable {
 
     private static final long serialVersionUID = -7284636094595149962L;

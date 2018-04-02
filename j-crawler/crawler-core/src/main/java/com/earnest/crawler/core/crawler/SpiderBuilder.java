@@ -6,6 +6,7 @@ import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
+import com.earnest.crawler.core.scheduler.BlockingLinkedHashSetScheduler;
 import com.earnest.crawler.core.scheduler.BlockingQueueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
@@ -60,8 +61,8 @@ public class SpiderBuilder {
     }
 
     public SpiderBuilder from(HttpRequest httpRequest) {
-        scheduler = new BlockingQueueScheduler();
-        scheduler.offer(httpRequest);
+        scheduler = new BlockingLinkedHashSetScheduler();
+        scheduler.put(httpRequest);
         //
 
         return this;
@@ -71,7 +72,7 @@ public class SpiderBuilder {
         if (isNull(scheduler)) {
             return from(httpRequest);
         } else {
-            scheduler.offer(httpRequest);
+            scheduler.put(httpRequest);
         }
         return this;
     }
@@ -143,13 +144,15 @@ public class SpiderBuilder {
                 downloadListeners.forEach(((HttpClientDownloader) defaultDownloader)::addDownloadListener);
             }
         }
-
-        if (defaultDownloader instanceof MaxConnectionsSetter && threadNumber > 1) {
-            ((MaxConnectionsSetter) defaultDownloader).setMaxConnections(threadNumber);
-        } else {
-            throw new IllegalStateException(String.format("cannot set the threadNumber for %s ,this class must implement %s",
-                    defaultDownloader.getClass(), MaxConnectionsSetter.class));
+        if (threadNumber > 1) {
+            if (defaultDownloader instanceof MaxConnectionsSetter) {
+                ((MaxConnectionsSetter) defaultDownloader).setMaxConnections(threadNumber);
+            } else {
+                throw new IllegalStateException(String.format("cannot set the threadNumber for %s ,this class must implement %s",
+                        defaultDownloader.getClass(), MaxConnectionsSetter.class));
+            }
         }
+
 
         return defaultDownloader;
     }

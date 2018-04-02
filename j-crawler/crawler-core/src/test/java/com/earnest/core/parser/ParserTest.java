@@ -1,6 +1,6 @@
 package com.earnest.core.parser;
 
-import com.earnest.crawler.IQiYi;
+import com.earnest.core.IQiYi;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
 import com.earnest.crawler.core.parser.JsonConfigurationParser;
