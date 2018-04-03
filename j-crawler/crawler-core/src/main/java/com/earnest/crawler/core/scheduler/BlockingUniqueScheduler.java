@@ -55,6 +55,7 @@ public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
     public boolean addAll(Collection<HttpRequest> httpRequests) {
         if (CollectionUtils.isEmpty(httpRequests)) return true;
         Set<HttpRequest> filterHistoryHttpRequests = filterHistoryHttpRequests(httpRequests);
+        if (CollectionUtils.isEmpty(filterHistoryHttpRequests)) return true;
         try {
             lock.lock();
             int originalTaskSize = taskSet.size();
@@ -85,8 +86,7 @@ public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
     public HttpRequest take() {
         try {
             lock.lock();
-            if (taskSet.isEmpty())  getCondition.await();
-
+            if (taskSet.isEmpty()) getCondition.await();
             Iterator<HttpRequest> iterator = taskSet.iterator();
             HttpRequest next = iterator.next();
             iterator.remove();

@@ -2,9 +2,10 @@ package com.earnest.crawler.core.crawler;
 
 import org.springframework.util.Assert;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static java.util.Objects.nonNull;
 
 public class BasicSpider implements SpiderSetter {
 
@@ -22,15 +23,15 @@ public class BasicSpider implements SpiderSetter {
         this.threadNumber = threadNumber;
     }
 
+
     @Override
     public void start() {
-        Assert.state(Objects.nonNull(crawler), "crawler is not set");
+        Assert.state(nonNull(crawler), "crawler is not set");
 
         threadPool = Executors.newFixedThreadPool(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
             threadPool.execute(new Thread(crawler, "crawler" + i));
         }
-
     }
 
     @Override

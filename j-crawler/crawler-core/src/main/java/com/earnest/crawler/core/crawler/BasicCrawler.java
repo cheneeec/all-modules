@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static java.util.Objects.nonNull;
 
@@ -25,6 +27,7 @@ class BasicCrawler<T> implements Crawler<T> {
     private HttpResponseHandler httpResponseHandler;
     private Downloader downloader;
     private Set<Consumer<T>> persistenceConsumers;
+    private Predicate<HttpResponse> stop;
 
     private String name;
 
@@ -47,6 +50,11 @@ class BasicCrawler<T> implements Crawler<T> {
                 T pipeResult = pipeline.pipe(httpResponse);
                 //5. 将结果进行消化
                 persistenceConsumers.parallelStream().forEach(a -> a.accept(pipeResult));
+
+                //退出条件
+                if (nonNull(stop) && stop.test(httpResponse)) {
+                    break;
+                }
             }
         }
     }
@@ -84,6 +92,11 @@ class BasicCrawler<T> implements Crawler<T> {
     @Override
     public void setPersistenceConsumers(Set<Consumer<T>> persistenceConsumers) {
         this.persistenceConsumers = persistenceConsumers;
+    }
+
+    @Override
+    public void setStopWhen(Predicate<HttpResponse> stopPredicate) {
+        this.stop = stopPredicate;
     }
 
     @Override
