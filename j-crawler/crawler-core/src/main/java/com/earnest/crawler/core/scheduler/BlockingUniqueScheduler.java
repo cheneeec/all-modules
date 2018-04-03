@@ -7,36 +7,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class BlockingLinkedHashSetScheduler implements Scheduler, DownloadListener {
-    private final Map<HttpRequest, Object> taskSet;
+public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
+
+    private final Set<HttpRequest> taskSet;
     private final Set<String> historyTaskSet;
     private final Set<HttpRequest> errorTaskSet;
 
-    private final ReentrantReadWriteLock readWriteLock;
+    private final ReentrantLock lock = new ReentrantLock();
     //取值条件
     private final Condition getCondition;
 
-    private final Object dumpValue = new Object();
 
-
-    public BlockingLinkedHashSetScheduler(int initialCapacity) {
-
-        taskSet = new ConcurrentHashMap<>(initialCapacity);
+    public BlockingUniqueScheduler(int initialCapacity) {
+        taskSet = new HashSet<>(initialCapacity);
         historyTaskSet = new HashSet<>(initialCapacity * 10);
-        errorTaskSet = new LinkedHashSet<>(initialCapacity / 10);
-
-        readWriteLock = new ReentrantReadWriteLock();
-        getCondition = readWriteLock.writeLock().newCondition();
+        errorTaskSet = new HashSet<>(initialCapacity / 10);
+        getCondition = lock.newCondition();
 
     }
 
-    public BlockingLinkedHashSetScheduler() {
+    public BlockingUniqueScheduler() {
         this(10000);
     }
 
@@ -47,20 +42,23 @@ public class BlockingLinkedHashSetScheduler implements Scheduler, DownloadListen
 
     @Override
     public boolean isEmpty() {
-        return taskSet.isEmpty();
+        try {
+            lock.lock();
+            return taskSet.isEmpty();
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     @Override
     public boolean addAll(Collection<HttpRequest> httpRequests) {
         if (CollectionUtils.isEmpty(httpRequests)) return true;
-
-        Map<HttpRequest, Object> filterHistoryHttpRequests = filterHistoryHttpRequests(httpRequests);
-
-        ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
-        writeLock.lock();
+        Set<HttpRequest> filterHistoryHttpRequests = filterHistoryHttpRequests(httpRequests);
         try {
+            lock.lock();
             int originalTaskSize = taskSet.size();
-            taskSet.putAll(filterHistoryHttpRequests);
+            taskSet.addAll(filterHistoryHttpRequests);
             int newTaskSize = taskSet.size();
             while (newTaskSize != originalTaskSize) {
                 getCondition.signal();
@@ -68,31 +66,28 @@ public class BlockingLinkedHashSetScheduler implements Scheduler, DownloadListen
             }
             return Objects.equals(originalTaskSize, newTaskSize);
         } finally {
-            writeLock.unlock();
+            lock.unlock();
         }
     }
 
-    private Map<HttpRequest, Object> filterHistoryHttpRequests(Collection<HttpRequest> httpRequests) {
-        ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
-        readLock.lock();
+    private Set<HttpRequest> filterHistoryHttpRequests(Collection<HttpRequest> httpRequests) {
         try {
+            lock.lock();
             return httpRequests.parallelStream()
                     .filter(httpRequest -> !historyTaskSet.contains(httpRequest.getUrl()))
-                    .collect(Collectors.toConcurrentMap(h -> h, h -> dumpValue));
+                    .collect(Collectors.toSet());
         } finally {
-            readLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public HttpRequest take() {
-        ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
-        writeLock.lock();
         try {
-            if (isEmpty()) {
-                getCondition.await();
-            }
-            Iterator<HttpRequest> iterator = taskSet.keySet().iterator();
+            lock.lock();
+            if (taskSet.isEmpty())  getCondition.await();
+
+            Iterator<HttpRequest> iterator = taskSet.iterator();
             HttpRequest next = iterator.next();
             iterator.remove();
             //
@@ -103,23 +98,22 @@ public class BlockingLinkedHashSetScheduler implements Scheduler, DownloadListen
             log.error("Interrupted when getting a httpRequest,error:{}", e.getMessage());
             return null;
         } finally {
-            writeLock.unlock();
+            lock.unlock();
         }
     }
 
     @Override
     public boolean put(HttpRequest httpRequest) {
-        ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
-        writeLock.lock();
 
         try {
-            boolean put = Objects.isNull(taskSet.put(httpRequest, dumpValue));
-            if (put) {
+            lock.lock();
+            boolean add = taskSet.add(httpRequest);
+            if (add) {
                 getCondition.signal();
             }
-            return put;
+            return add;
         } finally {
-            writeLock.unlock();
+            lock.unlock();
         }
 
 
@@ -132,12 +126,11 @@ public class BlockingLinkedHashSetScheduler implements Scheduler, DownloadListen
 
     @Override
     public void onError(HttpRequest httpRequest, Exception e) {
-        ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
-        writeLock.lock();
         try {
+            lock.lock();
             errorTaskSet.add(httpRequest);
         } finally {
-            writeLock.unlock();
+            lock.unlock();
         }
     }
 

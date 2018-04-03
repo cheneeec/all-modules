@@ -27,7 +27,10 @@ public interface Scheduler {
      * @param httpRequests
      * @return
      */
-    boolean addAll(Collection<HttpRequest> httpRequests);
+    default boolean addAll(Collection<HttpRequest> httpRequests) {
+        httpRequests.forEach(this::put);
+        return true;
+    }
 
     /**
      * 获取一个请求

@@ -2,7 +2,7 @@ package com.earnest.core.scheduler;
 
 
 import com.earnest.crawler.core.request.HttpGetRequest;
-import com.earnest.crawler.core.scheduler.BlockingLinkedHashSetScheduler;
+import com.earnest.crawler.core.scheduler.BlockingUniqueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class BlockingLinkedHashSetSchedulerTest {
 
     public static void main(String[] args) {
-        Scheduler scheduler = new BlockingLinkedHashSetScheduler();
+        Scheduler scheduler = new BlockingUniqueScheduler();
         Thread t1 = new Thread(() -> {
           /*  scheduler.put(new HttpGetRequest("1"));
             System.out.println(name() + "已经放入数据：1");*/

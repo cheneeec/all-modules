@@ -6,8 +6,7 @@ import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.scheduler.BlockingLinkedHashSetScheduler;
-import com.earnest.crawler.core.scheduler.BlockingQueueScheduler;
+import com.earnest.crawler.core.scheduler.BlockingUniqueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -61,7 +60,7 @@ public class SpiderBuilder {
     }
 
     public SpiderBuilder from(HttpRequest httpRequest) {
-        scheduler = new BlockingLinkedHashSetScheduler();
+        scheduler = new BlockingUniqueScheduler();
         scheduler.put(httpRequest);
         //
 
