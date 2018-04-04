@@ -1,10 +1,9 @@
 package com.earnest.crawler.core.downloader;
 
 
+import com.earnest.crawler.core.downloader.listener.DownloadListener;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.protocol.HttpContext;
 
 
 import java.io.Closeable;

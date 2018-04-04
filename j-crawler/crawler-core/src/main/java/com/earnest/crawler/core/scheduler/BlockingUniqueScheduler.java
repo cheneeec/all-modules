@@ -1,8 +1,9 @@
 package com.earnest.crawler.core.scheduler;
 
-import com.earnest.crawler.core.downloader.DownloadListener;
+import com.earnest.crawler.core.downloader.listener.DownloadListener;
+import com.earnest.crawler.core.event.DownloadErrorEvent;
+import com.earnest.crawler.core.event.DownloadSuccessEvent;
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -16,7 +17,7 @@ public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
 
     private final Set<HttpRequest> taskSet;
     private final Set<String> historyTaskSet;
-    private final Set<HttpRequest> errorTaskSet;
+    private final Set<DownloadErrorEvent> errorTaskSet;
 
     private final ReentrantLock lock = new ReentrantLock();
     //取值条件
@@ -36,7 +37,7 @@ public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
     }
 
     @Override
-    public Set<HttpRequest> getErrorHttpRequestSet() {
+    public Set<DownloadErrorEvent> getDownloadErrorEventSet() {
         return errorTaskSet;
     }
 
@@ -120,18 +121,19 @@ public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
     }
 
     @Override
-    public void onSuccess(HttpResponse httpResponse) {
-        //忽略这个方法
+    public void onSuccess(DownloadSuccessEvent successEvent) {
+        //ignored
     }
 
     @Override
-    public void onError(HttpRequest httpRequest, Exception e) {
+    public void onError(DownloadErrorEvent errorEvent) {
         try {
             lock.lock();
-            errorTaskSet.add(httpRequest);
+            errorTaskSet.add(errorEvent);
         } finally {
             lock.unlock();
         }
     }
+
 
 }

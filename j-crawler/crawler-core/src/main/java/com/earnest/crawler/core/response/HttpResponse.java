@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-
-
 @Data
 @NoArgsConstructor
 public class HttpResponse {
@@ -23,6 +21,11 @@ public class HttpResponse {
 
     public HttpResponse(String content) {
         this.content = content;
+    }
+
+    public HttpResponse(String content, HttpRequest httpRequest) {
+        this(content);
+        this.httpRequest = httpRequest;
     }
 
 }

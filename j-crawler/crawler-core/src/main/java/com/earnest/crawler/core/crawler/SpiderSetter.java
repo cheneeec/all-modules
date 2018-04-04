@@ -6,5 +6,4 @@ public interface SpiderSetter extends Spider {
 
     void setThread(int threadNumber);
 
-//    void stopWhen(Predicate<HttpResponse> predicate);
 }

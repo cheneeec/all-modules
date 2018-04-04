@@ -23,8 +23,12 @@ public class SpidersTest {
         }});
         Spiders.createCustom()
                 .from(httpGetRequest)
-                .match("/www/4/38-------------4-\\d-1-iqiyi--.html")
+                .match("/www/4/38-------------4-\\d+-1-iqiyi--.html")
                 .thread(5)
+                .stopWhen(httpResponse -> {
+                    Element body = Jsoup.parse(httpResponse.getContent()).body();
+                    return body.select("body > div.mod-page > span.noPage").attr("class").equals("noPage");
+                })
                 .pipeline(httpResponse -> {
                     Element body = Jsoup.parse(httpResponse.getContent()).body();
                     Elements elements = body.select("body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li");

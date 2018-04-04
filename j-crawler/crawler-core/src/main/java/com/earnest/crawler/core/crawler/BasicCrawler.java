@@ -1,6 +1,8 @@
 package com.earnest.crawler.core.crawler;
 
+import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.downloader.Downloader;
+import com.earnest.crawler.core.event.CrawlerStopEvent;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpRequest;
@@ -12,7 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -27,9 +30,11 @@ class BasicCrawler<T> implements Crawler<T> {
     private HttpResponseHandler httpResponseHandler;
     private Downloader downloader;
     private Set<Consumer<T>> persistenceConsumers;
-    private Predicate<HttpResponse> stop;
+    private Predicate<HttpResponse> stopWhen;
 
     private String name;
+
+    private List<StopListener> stopListeners = new ArrayList<>();
 
     @Override
     public void run() {
@@ -50,9 +55,10 @@ class BasicCrawler<T> implements Crawler<T> {
                 T pipeResult = pipeline.pipe(httpResponse);
                 //5. 将结果进行消化
                 persistenceConsumers.parallelStream().forEach(a -> a.accept(pipeResult));
-
                 //退出条件
-                if (nonNull(stop) && stop.test(httpResponse)) {
+                if (nonNull(stopWhen) && stopWhen.test(httpResponse)) {
+                    CrawlerStopEvent event = new CrawlerStopEvent(httpRequest);
+                    stopListeners.forEach(stopListener -> stopListener.onStop(event));
                     break;
                 }
             }
@@ -96,8 +102,13 @@ class BasicCrawler<T> implements Crawler<T> {
 
     @Override
     public void setStopWhen(Predicate<HttpResponse> stopPredicate) {
-        this.stop = stopPredicate;
+        this.stopWhen = stopPredicate;
     }
+
+    @Override
+    public void addStopListener(StopListener stopListener) {
+        this.stopListeners.add(stopListener);
+;    }
 
     @Override
     public Scheduler getScheduler() {
@@ -118,6 +129,7 @@ class BasicCrawler<T> implements Crawler<T> {
     public Downloader getDownloader() {
         return downloader;
     }
+
 
     @Override
     public Set<Consumer<T>> getPersistenceConsumers() {

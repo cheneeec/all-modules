@@ -1,5 +1,8 @@
 package com.earnest.crawler.core.downloader;
 
+import com.earnest.crawler.core.downloader.listener.DownloadListener;
+import com.earnest.crawler.core.event.DownloadErrorEvent;
+import com.earnest.crawler.core.event.DownloadSuccessEvent;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 
@@ -31,17 +34,14 @@ public abstract class AbstractDownloader implements Downloader, DownloadListener
 
 
     @Override
-    public void onSuccess(HttpResponse httpResponse) {
-        if (!downloadListeners.isEmpty()) {
-
-            downloadListeners.forEach(s -> s.onSuccess(httpResponse));
-        }
+    public void onSuccess(DownloadSuccessEvent successEvent) {
+        if (!downloadListeners.isEmpty())
+            downloadListeners.forEach(downloadListener -> downloadListener.onSuccess(successEvent));
     }
 
     @Override
-    public void onError(HttpRequest httpRequest, Exception e) {
-        if (!downloadListeners.isEmpty()) {
-            downloadListeners.forEach(s -> s.onError(httpRequest, e));
-        }
+    public void onError(DownloadErrorEvent errorEvent) {
+        if (!downloadListeners.isEmpty())
+            downloadListeners.forEach(downloadListener -> downloadListener.onError(errorEvent));
     }
 }

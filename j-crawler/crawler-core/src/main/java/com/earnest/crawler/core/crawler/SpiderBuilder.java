@@ -1,6 +1,7 @@
 package com.earnest.crawler.core.crawler;
 
 import com.earnest.crawler.core.downloader.*;
+import com.earnest.crawler.core.downloader.listener.DownloadListener;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;

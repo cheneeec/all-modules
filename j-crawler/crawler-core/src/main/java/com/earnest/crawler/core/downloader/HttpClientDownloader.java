@@ -1,5 +1,7 @@
 package com.earnest.crawler.core.downloader;
 
+import com.earnest.crawler.core.event.DownloadErrorEvent;
+import com.earnest.crawler.core.event.DownloadSuccessEvent;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.request.HttpUriRequestAdapter;
 import com.earnest.crawler.core.response.HttpResponse;
@@ -37,9 +39,9 @@ public class HttpClientDownloader extends AbstractDownloader implements MaxConne
             org.apache.http.HttpResponse response = httpClient.execute(httpUriRequest, httpUriRequest.obtainHttpContext());
             HttpEntity httpEntity = response.getEntity();
 
-            HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8));
+            HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8),request);
             httpResponse.setStatus(response.getStatusLine().getStatusCode());
-            httpResponse.setHttpRequest(request);
+
 
             if (nonNull(httpEntity.getContentType())) {
                 httpResponse.setContentType(httpEntity.getContentType().getValue());
@@ -48,10 +50,10 @@ public class HttpClientDownloader extends AbstractDownloader implements MaxConne
             if (response instanceof Closeable) {
                 ((Closeable) response).close();
             }
-            onSuccess(httpResponse);
+            onSuccess(new DownloadSuccessEvent(httpResponse));
             return httpResponse;
         } catch (IOException e) {
-            onError(request, e);
+            onError(new DownloadErrorEvent(request, e));
             log.error("An error occurred while downloading {} ,error:{}", request.getUrl(), e.getMessage());
             HttpResponse httpResponse = new HttpResponse(e.getMessage());
             httpResponse.setStatus(500);

@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.scheduler;
 
+import com.earnest.crawler.core.event.DownloadErrorEvent;
 import com.earnest.crawler.core.request.HttpRequest;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ public interface Scheduler {
      *
      * @return
      */
-    Set<HttpRequest> getErrorHttpRequestSet();
+    Set<DownloadErrorEvent> getDownloadErrorEventSet();
 
     /**
      * 判断任务队列是否为空
