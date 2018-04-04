@@ -39,7 +39,7 @@ class BasicCrawler<T> implements Crawler<T> {
     @Override
     public void run() {
         log.info("start running,name={}", getName());
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted()&&Thread.currentThread().isAlive()) {
             //暂停
 
             //1. 获取连接

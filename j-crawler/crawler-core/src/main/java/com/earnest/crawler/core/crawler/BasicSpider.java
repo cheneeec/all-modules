@@ -44,7 +44,7 @@ public class BasicSpider implements SpiderSetter, StopListener {
 
     @Override
     public void shutdown() {
-        crawler.destroy();
+//        crawler.destroy();
         threadPool.shutdown();
     }
 
@@ -58,6 +58,6 @@ public class BasicSpider implements SpiderSetter, StopListener {
     @Override
     public void onStop(CrawlerStopEvent stop) {
         log.info("the spider is stopping at {}", stop.getTime());
-
+        shutdown();
     }
 }
