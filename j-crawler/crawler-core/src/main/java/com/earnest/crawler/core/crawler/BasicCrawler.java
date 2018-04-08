@@ -38,7 +38,7 @@ class BasicCrawler<T> implements Crawler<T> {
 
     @Override
     public void run() {
-        log.info("start running,name={}", getName());
+        log.info("start isRunning,name={}", getName());
         while (!Thread.currentThread().isInterrupted()&&Thread.currentThread().isAlive()) {
             //暂停
 
@@ -136,8 +136,9 @@ class BasicCrawler<T> implements Crawler<T> {
         return persistenceConsumers;
     }
 
+
     @Override
-    public void destroy() {
+    public void close(){
         try {
             downloader.close();
 

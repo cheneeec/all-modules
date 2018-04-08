@@ -32,7 +32,7 @@ public class ParserTest {
     @Test
     public void getHttpRequests() {
         Set<HttpRequest> requests = parser.getHttpRequests();
-        Assert.assertTrue(requests.size() == 1);
+        Assert.assertEquals(1, requests.size());
         Assert.assertEquals(requests.iterator().next().getUrl(), "http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html");
     }
 
@@ -45,7 +45,7 @@ public class ParserTest {
     @Test
     public void getPersistenceConsumers() {
         Set<Consumer<?>> persistenceConsumers = parser.getPersistenceConsumers();
-        Assert.assertTrue(persistenceConsumers.size() == 0);
+        Assert.assertEquals(0, persistenceConsumers.size());
 
     }
 }

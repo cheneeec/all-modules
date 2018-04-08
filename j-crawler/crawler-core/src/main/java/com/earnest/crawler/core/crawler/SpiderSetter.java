@@ -1,9 +1,10 @@
 package com.earnest.crawler.core.crawler;
 
 
-public interface SpiderSetter extends Spider {
+import com.earnest.crawler.core.MultiThreadBean;
+
+public interface SpiderSetter extends Spider, MultiThreadBean {
     <T> void setCrawler(Crawler<T> crawler);
 
-    void setThread(int threadNumber);
 
 }

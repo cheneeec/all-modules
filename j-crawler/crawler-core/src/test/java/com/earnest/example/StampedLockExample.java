@@ -1,5 +1,8 @@
 package com.earnest.example;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.StampedLock;
 
 public class StampedLockExample {
@@ -56,8 +59,12 @@ public class StampedLockExample {
         lock.unlock(stamp);
     }
 
-    public static void main(String[] args) {
-        StampedLockExample stampedLockExample = new StampedLockExample();
-
+    public static void main(String[] args) throws InterruptedException {
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
+        threadPool.execute(() -> System.out.println("1"));
+        threadPool.execute(() -> System.out.println("2"));
+        threadPool.execute(() -> System.out.println("3"));
+        TimeUnit.SECONDS.sleep(10);
+        threadPool.shutdown();
     }
 }

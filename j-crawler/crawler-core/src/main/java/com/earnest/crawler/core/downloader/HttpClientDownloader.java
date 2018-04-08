@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.downloader;
 
+import com.earnest.crawler.core.MultiThreadBean;
 import com.earnest.crawler.core.event.DownloadErrorEvent;
 import com.earnest.crawler.core.event.DownloadSuccessEvent;
 import com.earnest.crawler.core.request.HttpRequest;
@@ -22,7 +23,7 @@ import static java.util.Objects.nonNull;
 
 @Slf4j
 @AllArgsConstructor
-public class HttpClientDownloader extends AbstractDownloader implements MaxConnectionsSetter {
+public class HttpClientDownloader extends AbstractDownloader implements MultiThreadBean {
 
     private final HttpClient httpClient;
 
@@ -83,7 +84,7 @@ public class HttpClientDownloader extends AbstractDownloader implements MaxConne
     }
 
     @Override
-    public void setMaxConnections(int num) {
+    public void setThread(int num) {
         //设置最大连接数，系统默认是5x2
         int maxConnectionCount = (int) Math.ceil(((double) num / 2));
         System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));

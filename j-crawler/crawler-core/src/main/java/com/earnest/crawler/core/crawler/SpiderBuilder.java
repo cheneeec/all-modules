@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.crawler;
 
+import com.earnest.crawler.core.MultiThreadBean;
 import com.earnest.crawler.core.downloader.*;
 import com.earnest.crawler.core.downloader.listener.DownloadListener;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
@@ -151,11 +152,11 @@ public class SpiderBuilder {
             }
         }
         if (threadNumber > 1) {
-            if (defaultDownloader instanceof MaxConnectionsSetter) {
-                ((MaxConnectionsSetter) defaultDownloader).setMaxConnections(threadNumber);
+            if (defaultDownloader instanceof MultiThreadBean) {
+                ((MultiThreadBean) defaultDownloader).setThread(threadNumber);
             } else {
                 throw new IllegalStateException(String.format("cannot set the threadNumber for %s ,this class must implement %s",
-                        defaultDownloader.getClass(), MaxConnectionsSetter.class));
+                        defaultDownloader.getClass(), MultiThreadBean.class));
             }
         }
 

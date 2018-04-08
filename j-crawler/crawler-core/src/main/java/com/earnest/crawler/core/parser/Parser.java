@@ -20,7 +20,7 @@ public interface Parser extends Closeable{
     <T> Set<T> getPersistenceConsumers();
 
 
-    int getThreadNumber();
+    int getThread();
 
     default Downloader getDownloader() {
         return new HttpClientDownloader();

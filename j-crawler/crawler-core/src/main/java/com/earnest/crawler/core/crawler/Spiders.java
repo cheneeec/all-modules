@@ -32,7 +32,7 @@ public class Spiders {
         if (!isEmpty(persistenceConsumers)) persistenceConsumers.forEach(spiderBuilder::addConsumer);
         //set ...
         SpiderBuilder setOtherSpiderBuilder = spiderBuilder
-                .thread(parser.getThreadNumber())
+                .thread(parser.getThread())
                 .pipeline(parser.getPipeline())
                 .httpResponseHandler(parser.getHttpResponseHandler())
                 .downloader(parser.getDownloader());

@@ -7,12 +7,13 @@ import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.response.HttpResponse;
 import com.earnest.crawler.core.scheduler.Scheduler;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public interface Crawler<T> extends Runnable {
+public interface Crawler<T> extends Runnable,Closeable {
     String getName();
 
     void setName(String name);
@@ -41,7 +42,6 @@ public interface Crawler<T> extends Runnable {
 
     Set<Consumer<T>> getPersistenceConsumers();
 
-    void destroy();
 
 
 }

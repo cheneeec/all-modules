@@ -1,6 +1,7 @@
 package com.earnest.core.crawler;
 
 import com.earnest.core.IQiYi;
+import com.earnest.crawler.core.crawler.Spider;
 import com.earnest.crawler.core.crawler.Spiders;
 import com.earnest.crawler.core.request.HttpGetRequest;
 import org.jsoup.Jsoup;
@@ -16,12 +17,12 @@ public class SpidersTest {
     private static final String jsonFileLocation = "crawler/iqiyi.json";
 
 
-    public static void createCustom() {
+    public static Spider createCustom() {
         HttpGetRequest httpGetRequest = new HttpGetRequest("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html");
         httpGetRequest.setCookies(new HashMap<String, String>() {{
             put("__uuid", "48c04310-fe61-4b7e-d7ba-2178d31b2ea5");
         }});
-        Spiders.createCustom()
+        return Spiders.createCustom()
                 .from(httpGetRequest)
                 .match("/www/4/38-------------4-\\d+-1-iqiyi--.html")
                 .thread(5)
@@ -39,8 +40,8 @@ public class SpidersTest {
                         String href = e.select("div.site-piclist_pic > a").attr("href");
                         return new IQiYi(title, href, src);
                     }).collect(Collectors.toList());
-                }).build()
-                .start();
+                }).build();
+
 
     }
 
@@ -50,7 +51,10 @@ public class SpidersTest {
     }
 
     public static void main(String[] args) {
-        createCustom();
+        Spider spider = createCustom();
         System.out.println("当前活动的线程：" + Thread.activeCount());
+        spider.start();
+
+
     }
 }

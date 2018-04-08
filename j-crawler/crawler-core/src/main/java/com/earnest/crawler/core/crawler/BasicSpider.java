@@ -3,8 +3,13 @@ package com.earnest.crawler.core.crawler;
 import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.event.CrawlerStopEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ThreadUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +23,7 @@ public class BasicSpider implements SpiderSetter, StopListener {
     private Crawler<?> crawler;
     private int threadNumber = 1;
     private ExecutorService threadPool;
+    private boolean running = true;
 
     @Override
     public <T> void setCrawler(Crawler<T> crawler) {
@@ -37,21 +43,37 @@ public class BasicSpider implements SpiderSetter, StopListener {
         crawler.addStopListener(this);
         threadPool = Executors.newFixedThreadPool(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
-            threadPool.execute(new Thread(crawler, "crawler" + i));
+            threadPool.execute(new Thread(crawler));
         }
 
     }
 
     @Override
     public void shutdown() {
-//        crawler.destroy();
         threadPool.shutdown();
+        while (true) {
+            if (crawler.getScheduler().isEmpty()) {
+                Collection<Thread> threads = ThreadUtils.findThreads(t -> StringUtils.startsWith(t.getName(), "pool-1-thread"));
+                if (!CollectionUtils.isEmpty(threads)) {
+                    threads.stream().filter(Thread::isAlive).forEach(Thread::interrupt);
+                }
+                running = false;
+                break;
+            }
+        }
+
+
     }
 
     @Override
     public List<Runnable> stopNow() {
-        crawler.destroy();
+        running = false;
         return threadPool.shutdownNow();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 
 
@@ -59,5 +81,10 @@ public class BasicSpider implements SpiderSetter, StopListener {
     public void onStop(CrawlerStopEvent stop) {
         log.info("the spider is stopping at {}", stop.getTime());
         shutdown();
+    }
+
+    @Override
+    public void close() throws IOException {
+        crawler.close();
     }
 }
