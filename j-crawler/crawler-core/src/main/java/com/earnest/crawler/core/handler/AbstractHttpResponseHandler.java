@@ -1,6 +1,5 @@
 package com.earnest.crawler.core.handler;
 
-import com.earnest.crawler.core.request.AbstractHttpRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +17,9 @@ public abstract class AbstractHttpResponseHandler implements HttpResponseHandler
         filter(rawResponse, httpRequest);
 
         return extract(rawResponse).stream().map(url -> {
-            HttpRequest cloneHttpRequest = ObjectUtils.cloneIfPossible(httpRequest);
-            if (cloneHttpRequest instanceof AbstractHttpRequest) {
-                AbstractHttpRequest abstractHttpRequest = (AbstractHttpRequest) cloneHttpRequest;
-                abstractHttpRequest.setUrl(url);
-                return abstractHttpRequest;
-            } else
-                throw new IllegalStateException("Cannot reset new URL for " + httpRequest.getClass());
+            HttpRequest cloneHttpRequest =ObjectUtils.cloneIfPossible(httpRequest);
+            cloneHttpRequest.setUrl(url);
+            return cloneHttpRequest;
 
         }).collect(Collectors.toSet());
     }
@@ -35,16 +30,16 @@ public abstract class AbstractHttpResponseHandler implements HttpResponseHandler
     private void filter(HttpResponse rawResponse, HttpRequest httpRequest) {
         String content = rawResponse.getContent();
         //过滤
-        if (httpRequest.ignoreHTMLHead()) {
+        if (httpRequest.isIgnoreHTMLHead()) {
             content = content.replaceAll("<head[^>]*?>[\\s\\S]*?</head>", "");
         }
         //去掉注释
         content = content.replaceAll("<!--[\\w\\W\\r\\n]*?-->", "");
-        if (httpRequest.ignoreJavascript()) {
+        if (httpRequest.isIgnoreJavascript()) {
             content = content.replaceAll("<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>", "");
         }
         //去掉CSS
-        if (httpRequest.ignoreCss()) {
+        if (httpRequest.isIgnoreCss()) {
             content = content.replaceAll("<style[^>]*?>[\\s\\S]*?</style>", "");
         }
         rawResponse.setContent(content);

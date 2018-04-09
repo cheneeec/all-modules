@@ -18,12 +18,16 @@ public class SpidersTest {
 
 
     public static Spider createCustom() {
-        HttpGetRequest httpGetRequest = new HttpGetRequest("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html");
-        httpGetRequest.setCookies(new HashMap<String, String>() {{
+        HttpGetRequest iqiyiHttpGetRequest = new HttpGetRequest("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html");
+        iqiyiHttpGetRequest.setCookies(new HashMap<String, String>() {{
             put("__uuid", "48c04310-fe61-4b7e-d7ba-2178d31b2ea5");
         }});
+
+        HttpGetRequest httpGetRequest1 = new HttpGetRequest("https://github.com/angular/angular-cli");
+
+
         return Spiders.createCustom()
-                .from(httpGetRequest)
+                .from(iqiyiHttpGetRequest)
                 .match("/www/4/38-------------4-\\d+-1-iqiyi--.html")
                 .thread(5)
                 .stopWhen(httpResponse -> {
@@ -40,7 +44,8 @@ public class SpidersTest {
                         String href = e.select("div.site-piclist_pic > a").attr("href");
                         return new IQiYi(title, href, src);
                     }).collect(Collectors.toList());
-                }).build();
+                })
+                .build();
 
 
     }

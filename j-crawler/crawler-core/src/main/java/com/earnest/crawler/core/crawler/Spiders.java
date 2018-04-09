@@ -21,8 +21,9 @@ public class Spiders {
         return SpiderBuilder.create();
     }
 
-    public static Spider createJsonConfigurable(String jsonConfiguration) {
-        Parser parser = new JsonConfigurationParser(jsonConfiguration);
+    public static Spider createJsonConfigurable(String jsonConfigurationFilePath) {
+
+        Parser parser = new JsonConfigurationParser(jsonConfigurationFilePath);
         SpiderBuilder spiderBuilder = createCustom();
         //set HttpRequest
         Set<HttpRequest> httpRequests = parser.getHttpRequests();
@@ -37,10 +38,19 @@ public class Spiders {
                 .httpResponseHandler(parser.getHttpResponseHandler())
                 .downloader(parser.getDownloader());
         //destroy...
-        try { parser.close();} catch (IOException ignored) {}
+        try {
+            parser.close();
+        } catch (IOException ignored) {
+            //ignored
+        }
 
         //build
         return setOtherSpiderBuilder
                 .build();
+    }
+
+    public static Spider copyFrom(Spider spider) {
+        
+        return null;
     }
 }

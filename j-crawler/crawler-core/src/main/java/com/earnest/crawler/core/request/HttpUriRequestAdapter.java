@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -14,7 +13,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
@@ -25,8 +24,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.nonNull;
 
 
 public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
@@ -61,7 +61,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
             //判断content-type
             Map<String, String> headers = httpRequest.getHeaders();
             String contentType = null;
-            if (Objects.nonNull(headers)) {
+            if (nonNull(headers)) {
                 contentType = headers.getOrDefault("content-type", ContentType.APPLICATION_FORM_URLENCODED.toString());
             }
 
@@ -91,7 +91,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         //set Proxy
         HttpRequest.HttpProxy httpProxy = httpRequest.getHttpProxy();
-        if (Objects.nonNull(httpProxy)) {
+        if (nonNull(httpProxy)) {
             requestConfigBuilder.setProxy(httpProxy.getHttpHost());
         }
         //set connectTimeout
@@ -142,7 +142,14 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
 
             clientContext.setCookieStore(cookieStore);
         }
-        //
+        //set proxy Credentials
+        HttpRequest.HttpProxy httpProxy = httpRequest.getHttpProxy();
+        if (nonNull(httpProxy) && !StringUtils.isAnyBlank(httpProxy.getUsername()
+                , httpProxy.getPassword())) {
+
+
+        }
+
 
         return clientContext;
     }

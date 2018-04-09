@@ -23,7 +23,6 @@ public class BlockingUniqueScheduler implements Scheduler, DownloadListener {
     //取值条件
     private final Condition getCondition;
 
-
     public BlockingUniqueScheduler(int initialCapacity) {
         taskSet = new HashSet<>(initialCapacity);
         historyTaskSet = new HashSet<>(initialCapacity * 10);

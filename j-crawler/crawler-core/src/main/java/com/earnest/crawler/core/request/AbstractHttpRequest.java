@@ -1,18 +1,19 @@
 package com.earnest.crawler.core.request;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 
 import java.io.Serializable;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@Setter
 @ToString
+@Getter
+@Setter
 public abstract class AbstractHttpRequest implements HttpRequest, Comparable<HttpRequest>, Serializable {
 
     private static final long serialVersionUID = -7284636094595149962L;
@@ -57,49 +58,7 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
 
-    @Override
-    public String getCharset() {
-        return this.charset;
-    }
-
-    @Override
-    public Map<String, String> getCookies() {
-        return this.cookies;
-    }
-
-    @Override
-    public long getPriority() {
-        return this.priority;
-    }
-
-    @Override
-    public HttpProxy getHttpProxy() {
-        return this.httpProxy;
-    }
-
-    @Override
-    public int getConnectTimeout() {
-        return this.connectTimeout;
-    }
-
-
-    @Override
-    public boolean ignoreJavascript() {
-        return ignoreJavascript;
-    }
-
-    @Override
-    public boolean ignoreHTMLHead() {
-        return ignoreHTMLHead;
-    }
-
     public abstract String getMethod();
-
-
-    @Override
-    public boolean ignoreCss() {
-        return ignoreCss;
-    }
 
     @Override
     public AbstractHttpRequest clone() {
@@ -129,4 +88,5 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     public int compareTo(HttpRequest o) {
         return Long.compare(this.priority, o.getPriority());
     }
+
 }

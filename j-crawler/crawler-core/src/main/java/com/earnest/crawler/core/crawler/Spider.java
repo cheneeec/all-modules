@@ -9,7 +9,7 @@ public interface Spider extends Closeable {
 
     void shutdown();
 
-    List<Runnable> stopNow();
+    List<Runnable> shutdownNow();
 
     boolean isRunning();
 }

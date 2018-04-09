@@ -24,6 +24,7 @@ public class BasicSpider implements SpiderSetter, StopListener {
     private int threadNumber = 1;
     private ExecutorService threadPool;
     private boolean running = true;
+    private boolean closed;
 
     @Override
     public <T> void setCrawler(Crawler<T> crawler) {
@@ -39,13 +40,13 @@ public class BasicSpider implements SpiderSetter, StopListener {
     @Override
     public void start() {
         Assert.state(nonNull(crawler), "crawler is not set");
-
+        Assert.state(!closed, "spider has been closed");
+        Assert.state(!running, "spider has been running");
         crawler.addStopListener(this);
         threadPool = Executors.newFixedThreadPool(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
             threadPool.execute(new Thread(crawler));
         }
-
     }
 
     @Override
@@ -61,12 +62,10 @@ public class BasicSpider implements SpiderSetter, StopListener {
                 break;
             }
         }
-
-
     }
 
     @Override
-    public List<Runnable> stopNow() {
+    public List<Runnable> shutdownNow() {
         running = false;
         return threadPool.shutdownNow();
     }
@@ -86,5 +85,7 @@ public class BasicSpider implements SpiderSetter, StopListener {
     @Override
     public void close() throws IOException {
         crawler.close();
+        closed = true;
     }
+
 }

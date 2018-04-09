@@ -5,11 +5,11 @@ import lombok.Getter;
 
 public class DownloadErrorEvent extends BasicEvent {
     @Getter
-    private final Exception error;
+    private final String error;
 
     public DownloadErrorEvent(HttpRequest httpRequest, Exception error) {
         super(httpRequest);
-        this.error = error;
+        this.error = error.getMessage();
     }
 
     @Override
