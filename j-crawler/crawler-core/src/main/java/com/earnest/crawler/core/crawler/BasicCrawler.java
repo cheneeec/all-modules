@@ -41,7 +41,6 @@ class BasicCrawler<T> implements Crawler<T> {
     public void run() {
         log.info("start isRunning,name={}", getName());
         while (!Thread.currentThread().isInterrupted()) {
-            //暂停
 
             //1. 获取连接
             HttpRequest httpRequest = this.scheduler.take();
@@ -62,10 +61,9 @@ class BasicCrawler<T> implements Crawler<T> {
                     stopListeners.forEach(stopListener -> stopListener.onStop(event));
                     break;
                 }
-            } else {
-
+            } else
                 break;
-            }
+
         }
     }
 

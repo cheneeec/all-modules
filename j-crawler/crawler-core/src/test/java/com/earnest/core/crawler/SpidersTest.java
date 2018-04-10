@@ -25,7 +25,6 @@ public class SpidersTest {
 
         HttpGetRequest httpGetRequest1 = new HttpGetRequest("https://github.com/angular/angular-cli");
 
-
         return Spiders.createCustom()
                 .from(iqiyiHttpGetRequest)
                 .match("/www/4/38-------------4-\\d+-1-iqiyi--.html")
@@ -59,7 +58,5 @@ public class SpidersTest {
         Spider spider = createCustom();
         System.out.println("当前活动的线程：" + Thread.activeCount());
         spider.start();
-
-
     }
 }

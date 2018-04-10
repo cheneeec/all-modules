@@ -99,7 +99,7 @@ public class SpiderBuilder {
 
     public <T> Spider build() {
         Crawler crawler = this.<T>createCrawler();
-        SpiderSetter spider = new DefaultSpider();
+        BasicSpider spider = new DefaultSpider();
 
         spider.<T>setCrawler(crawler);
         spider.setThread(threadNumber);
