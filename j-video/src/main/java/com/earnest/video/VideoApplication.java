@@ -1,9 +1,7 @@
-package com.earnest;
+package com.earnest.video;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-
 
 @SpringBootApplication
 public class VideoApplication {

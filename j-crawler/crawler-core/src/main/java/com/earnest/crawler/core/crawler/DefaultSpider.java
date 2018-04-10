@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
 import static java.util.Objects.nonNull;
 
 @Slf4j
-public class BasicSpider implements SpiderSetter, StopListener {
+public class DefaultSpider implements SpiderSetter, StopListener {
 
     private Crawler<?> crawler;
     private int threadNumber = 1;

@@ -25,6 +25,7 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 class BasicCrawler<T> implements Crawler<T> {
+
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
     private HttpResponseHandler httpResponseHandler;
@@ -39,7 +40,7 @@ class BasicCrawler<T> implements Crawler<T> {
     @Override
     public void run() {
         log.info("start isRunning,name={}", getName());
-        while (!Thread.currentThread().isInterrupted()&&Thread.currentThread().isAlive()) {
+        while (!Thread.currentThread().isInterrupted()) {
             //暂停
 
             //1. 获取连接
@@ -61,6 +62,9 @@ class BasicCrawler<T> implements Crawler<T> {
                     stopListeners.forEach(stopListener -> stopListener.onStop(event));
                     break;
                 }
+            } else {
+
+                break;
             }
         }
     }
@@ -108,7 +112,8 @@ class BasicCrawler<T> implements Crawler<T> {
     @Override
     public void addStopListener(StopListener stopListener) {
         this.stopListeners.add(stopListener);
-;    }
+        ;
+    }
 
     @Override
     public Scheduler getScheduler() {
@@ -136,9 +141,14 @@ class BasicCrawler<T> implements Crawler<T> {
         return persistenceConsumers;
     }
 
+    @Override
+    public Predicate<HttpResponse> getStopWhen() {
+        return stopWhen;
+    }
+
 
     @Override
-    public void close(){
+    public void close() {
         try {
             downloader.close();
 

@@ -50,7 +50,7 @@ public class Spiders {
     }
 
     public static Spider copyFrom(Spider spider) {
-        
+
         return null;
     }
 }

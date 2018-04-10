@@ -42,6 +42,6 @@ public interface Crawler<T> extends Runnable,Closeable {
 
     Set<Consumer<T>> getPersistenceConsumers();
 
-
+    Predicate<HttpResponse>  getStopWhen();
 
 }

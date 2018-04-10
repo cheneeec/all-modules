@@ -1,19 +1,24 @@
 package com.earnest.crawler.core.scheduler;
 
+import com.earnest.crawler.core.downloader.listener.DownloadListener;
 import com.earnest.crawler.core.event.DownloadErrorEvent;
+import com.earnest.crawler.core.event.DownloadSuccessEvent;
 import com.earnest.crawler.core.request.HttpRequest;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-public interface Scheduler {
+
+public interface Scheduler extends DownloadListener {
     /**
      * 获取请求失败的集合
      *
      * @return
      */
     Set<DownloadErrorEvent> getDownloadErrorEventSet();
+
+
+    Set<DownloadSuccessEvent> getDownloadSuccessEventSet();
 
     /**
      * 判断任务队列是否为空

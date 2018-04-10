@@ -18,6 +18,7 @@ public class ProxyHttpClientDownloader extends HttpClientDownloader {
     }
 
     public ProxyHttpClientDownloader(Supplier<HttpRequest.HttpProxy> httpProxySupplier) {
+        super();
         this.httpProxySupplier = httpProxySupplier;
     }
 
