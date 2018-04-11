@@ -32,6 +32,11 @@ public class DefaultSpider implements BasicSpider, StopListener {
     }
 
     @Override
+    public Crawler getCrawler() {
+        return crawler;
+    }
+
+    @Override
     public void setThread(int threadNumber) {
         this.threadNumber = threadNumber;
     }

@@ -5,4 +5,6 @@ import com.earnest.crawler.core.MultiThreadBean;
 
 public interface BasicSpider extends Spider, MultiThreadBean {
     <T> void setCrawler(Crawler<T> crawler);
+
+    Crawler getCrawler();
 }

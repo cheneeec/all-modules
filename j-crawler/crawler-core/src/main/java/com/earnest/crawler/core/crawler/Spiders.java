@@ -39,6 +39,7 @@ public class Spiders {
                 .downloader(parser.getDownloader());
         //destroy...
         try {
+
             parser.close();
         } catch (IOException ignored) {
             //ignored
@@ -49,9 +50,5 @@ public class Spiders {
                 .build();
     }
 
-    public static Spider copyFrom(Spider spider) {
-
-        return null;
-    }
 
 }

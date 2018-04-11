@@ -8,12 +8,11 @@ import com.earnest.crawler.core.response.HttpResponse;
 import com.earnest.crawler.core.scheduler.Scheduler;
 
 import java.io.Closeable;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public interface Crawler<T> extends Runnable,Closeable {
+public interface Crawler<T> extends Runnable,Closeable,Cloneable {
     String getName();
 
     void setName(String name);
@@ -43,5 +42,7 @@ public interface Crawler<T> extends Runnable,Closeable {
     Set<Consumer<T>> getPersistenceConsumers();
 
     Predicate<HttpResponse>  getStopWhen();
+
+    Set<StopListener> getStopListeners();
 
 }

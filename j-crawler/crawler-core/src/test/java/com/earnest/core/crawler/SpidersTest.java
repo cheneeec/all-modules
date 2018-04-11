@@ -45,8 +45,6 @@ public class SpidersTest {
                     }).collect(Collectors.toList());
                 })
                 .build();
-
-
     }
 
     public static void createJsonConfigurable() {
@@ -56,7 +54,5 @@ public class SpidersTest {
 
     public static void main(String[] args) {
         Spider spider = createCustom();
-        System.out.println("当前活动的线程：" + Thread.activeCount());
-        spider.start();
     }
 }

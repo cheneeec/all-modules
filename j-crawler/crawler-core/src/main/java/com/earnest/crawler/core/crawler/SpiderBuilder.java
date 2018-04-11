@@ -138,11 +138,11 @@ public class SpiderBuilder {
 
         Downloader defaultDownloader = defaultIfNull(this.downloader, new HttpClientDownloader());
 
-        if (scheduler instanceof DownloadListener) {
+        if (nonNull(scheduler)) {
             if (!CollectionUtils.isEmpty(downloadListeners)) {
-                downloadListeners.add((DownloadListener) scheduler);
+                downloadListeners.add( scheduler);
             } else {
-                downloadListeners = Collections.singleton((DownloadListener) scheduler);
+                downloadListeners = Collections.singleton(scheduler);
             }
         }
 

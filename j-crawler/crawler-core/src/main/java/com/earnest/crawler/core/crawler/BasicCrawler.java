@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.crawler;
 
+import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.event.CrawlerStopEvent;
@@ -14,8 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -35,7 +35,7 @@ class BasicCrawler<T> implements Crawler<T> {
 
     private String name;
 
-    private List<StopListener> stopListeners = new ArrayList<>();
+    private Set<StopListener> stopListeners = new HashSet<>();
 
     @Override
     public void run() {
@@ -110,7 +110,7 @@ class BasicCrawler<T> implements Crawler<T> {
     @Override
     public void addStopListener(StopListener stopListener) {
         this.stopListeners.add(stopListener);
-        ;
+
     }
 
     @Override
@@ -144,6 +144,11 @@ class BasicCrawler<T> implements Crawler<T> {
         return stopWhen;
     }
 
+    @Override
+    public Set<StopListener> getStopListeners() {
+        return stopListeners;
+    }
+
 
     @Override
     public void close() {
@@ -158,5 +163,18 @@ class BasicCrawler<T> implements Crawler<T> {
             } catch (IOException ignore) {
             }
         }
+    }
+
+    @Override
+    public Crawler clone() {
+        try {
+            BasicCrawler crawler = (BasicCrawler) super.clone();
+            //set a new scheduler
+            crawler.setScheduler(JSONObject.parseObject(JSONObject.toJSONString(scheduler), Scheduler.class));
+            return crawler;
+        } catch (CloneNotSupportedException ignored) {
+            //ignored
+        }
+        return null;
     }
 }
