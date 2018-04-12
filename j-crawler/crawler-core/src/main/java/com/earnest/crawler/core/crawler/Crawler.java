@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public interface Crawler<T> extends Runnable,Closeable,Cloneable {
+public interface Crawler<T> extends Runnable, Closeable {
     String getName();
 
     void setName(String name);
@@ -41,7 +41,7 @@ public interface Crawler<T> extends Runnable,Closeable,Cloneable {
 
     Set<Consumer<T>> getPersistenceConsumers();
 
-    Predicate<HttpResponse>  getStopWhen();
+    Predicate<HttpResponse> getStopWhen();
 
     Set<StopListener> getStopListeners();
 

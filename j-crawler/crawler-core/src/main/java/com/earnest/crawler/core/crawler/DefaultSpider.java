@@ -23,7 +23,7 @@ public class DefaultSpider implements BasicSpider, StopListener {
     private Crawler<?> crawler;
     private int threadNumber = 1;
     private ExecutorService threadPool;
-    private boolean running = true;
+    private boolean running;
     private boolean closed;
 
     @Override
@@ -52,10 +52,12 @@ public class DefaultSpider implements BasicSpider, StopListener {
         for (int i = 0; i < threadNumber; i++) {
             threadPool.execute(new Thread(crawler));
         }
+        running = true;
     }
 
     @Override
     public void shutdown() {
+        Assert.state(running,"spider has not been running yet");
         threadPool.shutdown();
         while (true) {
             if (crawler.getScheduler().isEmpty()) {

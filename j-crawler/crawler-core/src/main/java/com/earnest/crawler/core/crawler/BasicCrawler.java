@@ -1,6 +1,5 @@
 package com.earnest.crawler.core.crawler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.event.CrawlerStopEvent;
@@ -25,7 +24,6 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 class BasicCrawler<T> implements Crawler<T> {
-
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
     private HttpResponseHandler httpResponseHandler;
@@ -41,7 +39,6 @@ class BasicCrawler<T> implements Crawler<T> {
     public void run() {
         log.info("start isRunning,name={}", getName());
         while (!Thread.currentThread().isInterrupted()) {
-
             //1. 获取连接
             HttpRequest httpRequest = this.scheduler.take();
             if (nonNull(httpRequest)) {
@@ -54,7 +51,7 @@ class BasicCrawler<T> implements Crawler<T> {
                 //4. 将httpResponse转化成实体类
                 T pipeResult = pipeline.pipe(httpResponse);
                 //5. 将结果进行消化
-                persistenceConsumers.parallelStream().forEach(a -> a.accept(pipeResult));
+                persistenceConsumers.forEach(a -> a.accept(pipeResult));
                 //退出条件
                 if (nonNull(stopWhen) && stopWhen.test(httpResponse)) {
                     CrawlerStopEvent event = new CrawlerStopEvent(httpRequest);
@@ -165,16 +162,4 @@ class BasicCrawler<T> implements Crawler<T> {
         }
     }
 
-    @Override
-    public Crawler clone() {
-        try {
-            BasicCrawler crawler = (BasicCrawler) super.clone();
-            //set a new scheduler
-            crawler.setScheduler(JSONObject.parseObject(JSONObject.toJSONString(scheduler), Scheduler.class));
-            return crawler;
-        } catch (CloneNotSupportedException ignored) {
-            //ignored
-        }
-        return null;
-    }
 }

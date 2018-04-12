@@ -16,7 +16,6 @@ public class SpidersTest {
 
     private static final String jsonFileLocation = "crawler/iqiyi.json";
 
-
     public static Spider createCustom() {
         HttpGetRequest iqiyiHttpGetRequest = new HttpGetRequest("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html");
         iqiyiHttpGetRequest.setCookies(new HashMap<String, String>() {{
@@ -52,7 +51,6 @@ public class SpidersTest {
 
     }
 
-    public static void main(String[] args) {
-        Spider spider = createCustom();
-    }
+
+
 }

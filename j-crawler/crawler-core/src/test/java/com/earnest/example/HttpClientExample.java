@@ -1,6 +1,5 @@
 package com.earnest.example;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.OutputUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
