@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -140,7 +141,7 @@ public class SpiderBuilder {
 
         if (nonNull(scheduler)) {
             if (!CollectionUtils.isEmpty(downloadListeners)) {
-                downloadListeners.add( scheduler);
+                downloadListeners.add(scheduler);
             } else {
                 downloadListeners = Collections.singleton(scheduler);
             }
@@ -160,12 +161,12 @@ public class SpiderBuilder {
             }
         }
 
-
         return defaultDownloader;
     }
 
     public SpiderBuilder match(String regex) {
-        responseHandler = new RegexHttpResponseHandler(regex);
+        if (StringUtils.isNotBlank(regex))
+            responseHandler = new RegexHttpResponseHandler(regex);
         return this;
     }
 
@@ -176,6 +177,11 @@ public class SpiderBuilder {
 
     public SpiderBuilder stopWhen(Predicate<HttpResponse> stopPredicate) {
         this.stopPredicate = stopPredicate;
+        return this;
+    }
+
+    public SpiderBuilder scheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
         return this;
     }
 

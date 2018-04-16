@@ -3,10 +3,13 @@ package com.earnest.crawler.core.crawler;
 import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.event.CrawlerStopEvent;
+import com.earnest.crawler.core.exception.TakeTimeoutException;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
+import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.scheduler.BlockingScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,6 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -24,6 +29,7 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 class BasicCrawler<T> implements Crawler<T> {
+
     private Scheduler scheduler;
     private Pipeline<T> pipeline;
     private HttpResponseHandler httpResponseHandler;
@@ -33,14 +39,20 @@ class BasicCrawler<T> implements Crawler<T> {
 
     private String name;
 
-    private Set<StopListener> stopListeners = new HashSet<>();
+    private volatile boolean running;
+    private volatile boolean closed;
+
+    private final Set<StopListener> stopListeners = new HashSet<>();
+    private final AtomicBoolean ranStopListeners = new AtomicBoolean();
+
 
     @Override
     public void run() {
-        log.info("start isRunning,name={}", getName());
-        while (!Thread.currentThread().isInterrupted()) {
+        log.info("the crawler:[{}] is running", getName());
+        running = true;
+        while (running && !closed) {
             //1. 获取连接
-            HttpRequest httpRequest = this.scheduler.take();
+            HttpRequest httpRequest = takeHttpRequest();
             if (nonNull(httpRequest)) {
                 HttpResponse httpResponse = downloader.download(httpRequest);
                 //2. 处理HttpResponse并且获取新的连接
@@ -52,16 +64,39 @@ class BasicCrawler<T> implements Crawler<T> {
                 T pipeResult = pipeline.pipe(httpResponse);
                 //5. 将结果进行消化
                 persistenceConsumers.forEach(a -> a.accept(pipeResult));
-                //退出条件
-                if (nonNull(stopWhen) && stopWhen.test(httpResponse)) {
-                    CrawlerStopEvent event = new CrawlerStopEvent(httpRequest);
-                    stopListeners.forEach(stopListener -> stopListener.onStop(event));
+                //退出条件(只应该运行一次)
+                if (nonNull(stopWhen) && running && stopWhen.test(httpResponse)) {
+                    invokeStopListeners(httpRequest);
                     break;
                 }
             } else
                 break;
-
         }
+    }
+
+    private void invokeStopListeners(HttpRequest httpRequest) {
+        if (!ranStopListeners.getAndSet(true)) {
+            CrawlerStopEvent event = new CrawlerStopEvent(httpRequest);
+            stopListeners.forEach(stopListener -> stopListener.onStop(event));
+            running = false;
+        }
+    }
+
+    private HttpRequest takeHttpRequest() {
+        HttpRequest httpRequest = null;
+        try {
+            if (scheduler instanceof BlockingScheduler)
+                //默认一分钟拿不到，就抛出TakeTimeoutException
+                httpRequest = ((BlockingScheduler) scheduler).take(60, TimeUnit.SECONDS);
+            else
+                httpRequest = scheduler.take();
+        } catch (InterruptedException e) {
+            log.error("An error:[{}] occurred while getting a httpRequest", e.getMessage());
+        } catch (TakeTimeoutException e) {
+            log.info("Waiting time is too long, crawler:[{}] is about to stop", getName());
+            invokeStopListeners(new HttpGetRequest());
+        }
+        return httpRequest;
     }
 
     @Override
@@ -159,6 +194,7 @@ class BasicCrawler<T> implements Crawler<T> {
                 downloader.close();
             } catch (IOException ignore) {
             }
+            closed = true;
         }
     }
 

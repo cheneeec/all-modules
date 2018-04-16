@@ -3,14 +3,14 @@ package com.earnest.crawler.core.crawler;
 import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.event.CrawlerStopEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.ThreadUtils;
+import org.apache.commons.lang3.*;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,8 +23,11 @@ public class DefaultSpider implements BasicSpider, StopListener {
     private Crawler<?> crawler;
     private int threadNumber = 1;
     private ExecutorService threadPool;
-    private boolean running;
-    private boolean closed;
+    private volatile boolean running;
+    private volatile boolean closed;
+    private String name;
+
+    private Map<Integer, Thread> crawlerMap;
 
     @Override
     public <T> void setCrawler(Crawler<T> crawler) {
@@ -49,23 +52,24 @@ public class DefaultSpider implements BasicSpider, StopListener {
         Assert.state(!running, "spider has been running");
         crawler.addStopListener(this);
         threadPool = Executors.newFixedThreadPool(threadNumber);
+        crawlerMap = new HashMap<>(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
-            threadPool.execute(new Thread(crawler));
+            Thread crawlerThread = new Thread(crawler);
+            crawlerMap.put(i, crawlerThread);
+            threadPool.execute(crawlerThread);
         }
         running = true;
     }
 
     @Override
     public void shutdown() {
-        Assert.state(running,"spider has not been running yet");
+        Assert.state(running, String.format("spider:[%s] has not been running yet", name));
         threadPool.shutdown();
         while (true) {
             if (crawler.getScheduler().isEmpty()) {
-                Collection<Thread> threads = ThreadUtils.findThreads(t -> StringUtils.startsWith(t.getName(), "pool-1-thread"));
-                if (!CollectionUtils.isEmpty(threads)) {
-                    threads.stream().filter(Thread::isAlive).forEach(Thread::interrupt);
-                }
+                crawlerMap.values().forEach(Thread::interrupt);
                 running = false;
+                log.info("The spider:[{}] has stopped at {}", name, LocalDateTime.now());
                 break;
             }
         }
@@ -82,10 +86,23 @@ public class DefaultSpider implements BasicSpider, StopListener {
         return running;
     }
 
+    @Override
+    public String getName() {
+        if (StringUtils.isBlank(name)) {
+            name = RandomStringUtils.random(6);
+        }
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
 
     @Override
     public void onStop(CrawlerStopEvent stop) {
-        log.info("the spider is stopping at {}", stop.getTime());
+        log.info("the spider:[{}] is stopping at {}", name, stop.getTime());
         shutdown();
     }
 
@@ -94,5 +111,4 @@ public class DefaultSpider implements BasicSpider, StopListener {
         crawler.close();
         closed = true;
     }
-
 }

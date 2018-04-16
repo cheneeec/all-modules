@@ -1,17 +1,21 @@
 package com.earnest.crawler.core.scheduler;
 
+import com.earnest.crawler.core.exception.TakeTimeoutException;
 import com.earnest.crawler.core.request.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @Slf4j
-public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler {
+public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler implements BlockingScheduler {
 
     private final Set<HttpRequest> taskSet;
     private final Set<String> historyTaskSet;
@@ -77,21 +81,14 @@ public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler {
     @Override
     public HttpRequest take() {
         try {
-            lock.lock();
-            if (taskSet.isEmpty()) getCondition.await();
-            Iterator<HttpRequest> iterator = taskSet.iterator();
-            HttpRequest next = iterator.next();
-            iterator.remove();
-            //
-            //将其也添加到historyTaskSet中
-            historyTaskSet.add(next.getUrl());
-            return next;
+            return take(0, null);
         } catch (InterruptedException e) {
+            e.printStackTrace();
             log.error("Interrupted when getting a httpRequest,error:{}", e.getMessage());
-            return null;
-        } finally {
-            lock.unlock();
+        } catch (TakeTimeoutException ignored) {
+            //ignored,it is not happened
         }
+        return null;
     }
 
     @Override
@@ -107,9 +104,32 @@ public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler {
         } finally {
             lock.unlock();
         }
-
-
     }
 
 
+    @Override
+    public HttpRequest take(long time, TimeUnit unit) throws InterruptedException, TakeTimeoutException {
+        try {
+            lock.lock();
+            if (taskSet.isEmpty()) {
+                if (isNull(unit)) {
+                    getCondition.await();
+                } else {
+                    boolean await = getCondition.await(time, unit);
+                    if (!await) {
+                        throw new TakeTimeoutException("the time is out");
+                    }
+                }
+            }
+            Iterator<HttpRequest> iterator = taskSet.iterator();
+            HttpRequest next = iterator.next();
+            iterator.remove();
+            //
+            //将其也添加到historyTaskSet中
+            historyTaskSet.add(next.getUrl());
+            return next;
+        } finally {
+            lock.unlock();
+        }
+    }
 }

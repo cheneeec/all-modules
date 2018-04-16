@@ -1,13 +1,16 @@
 package com.earnest.video.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 public abstract class BaseVideoEntity {
     //
-    protected String id;
+    protected long id;
     //标题
     protected String title;
     //获取时间
@@ -24,5 +27,6 @@ public abstract class BaseVideoEntity {
     protected String playValue;
     //
     protected String parseValue;
+
 
 }

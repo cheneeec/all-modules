@@ -12,4 +12,8 @@ public interface Spider extends Closeable {
     List<Runnable> shutdownNow();
 
     boolean isRunning();
+
+    String getName();
+
+    void setName(String name);
 }
