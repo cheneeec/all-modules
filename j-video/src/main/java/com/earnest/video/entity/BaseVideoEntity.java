@@ -15,6 +15,8 @@ public abstract class BaseVideoEntity {
     protected String title;
     //获取时间
     protected Date collectTime;
+    //播放时长
+    protected String playInfo;
     //图片
     protected String image;
     //来源地

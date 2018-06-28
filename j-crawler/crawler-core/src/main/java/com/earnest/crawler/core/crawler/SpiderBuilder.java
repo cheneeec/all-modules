@@ -136,7 +136,6 @@ public class SpiderBuilder {
     }
 
     private Downloader decideDownloader() {
-
         Downloader defaultDownloader = defaultIfNull(this.downloader, new HttpClientDownloader());
 
         if (nonNull(scheduler)) {

@@ -54,11 +54,13 @@ public class IQiYiSpider implements Spider, CommandLineRunner {
         return httpResponse -> {
             Element element = Jsoup.parse(httpResponse.getContent()).body();
             Elements elements = element.select("#widget-tab-0 > div.piclist-scroll.piclist-scroll-h290 > div > div:nth-child(1) > ul > li:not(li.J_videoLi.first_bigImg)");
+            final int[] i = {1};
             return elements.stream().map(e -> {
                 IQiYi iQiYi = newIQiYi(httpResponse.getHttpRequest());
                 Elements a = e.select("div.site-piclist_pic > a");
                 iQiYi.setPlayValue(a.attr("href"));
                 iQiYi.setTitle(a.attr("title"));
+//                iQiYi.setPlayInfo(a.select("span.icon-vInfo").text());
                 iQiYi.setImage(a.select("img").attr("src"));
                 iQiYi.setCategory("电影");
                 return iQiYi;
@@ -85,6 +87,7 @@ public class IQiYiSpider implements Spider, CommandLineRunner {
                 iQiYi.setPlayValue("http:" + a.attr("href"));
                 iQiYi.setImage("http:" + a.select("img").attr("src"));
                 iQiYi.setTitle(a.select("img").attr("title"));
+                iQiYi.setPlayInfo(a.select("span.icon-vInfo").text());
                 iQiYi.setCategory("动漫");
                 return iQiYi;
             }).collect(Collectors.toList());

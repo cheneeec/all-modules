@@ -34,11 +34,14 @@ public class IQiYiVideoService implements VideoService<IQiYi> {
 
     @Override
     public Page<IQiYi> findAll(Pageable pageRequest) {
+        Assert.notNull(pageRequest, "pageRequest is null");
         Collection<IQiYi> values = iQiYiMap.values();
 
         return new PageImpl<>(
                 //获得内容
-                values.stream().skip(pageRequest.getPageSize() * pageRequest.getPageNumber()).collect(Collectors.toList()),
+                values.stream().skip(pageRequest.getPageSize() * pageRequest.getPageNumber())
+                        .limit(pageRequest.getPageSize())
+                        .collect(Collectors.toList()),
                 pageRequest, iQiYiMap.size());
 
     }

@@ -36,7 +36,6 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
 
     public HttpUriRequestAdapter(HttpRequest httpRequest) {
         this.httpRequest = httpRequest;
-        //
 
         //set URI
         setURI(URI.create(httpRequest.getUrl()));
@@ -52,7 +51,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
         //================
     }
 
-    private void setHttpEntity(HttpRequest httpRequest) {
+    private  void setHttpEntity(HttpRequest httpRequest) {
         Map<String, String> parameters = httpRequest.getParameters();
 
         if (!StringUtils.equalsAnyIgnoreCase("GET", "DELETE")
@@ -87,7 +86,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
     }
 
 
-    private RequestConfig createRequestConfig(HttpRequest httpRequest) {
+    private static RequestConfig createRequestConfig(HttpRequest httpRequest) {
         RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         //set Proxy
         HttpRequest.HttpProxy httpProxy = httpRequest.getHttpProxy();

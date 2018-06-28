@@ -122,12 +122,14 @@ public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler i
                 }
             }
             Iterator<HttpRequest> iterator = taskSet.iterator();
-            HttpRequest next = iterator.next();
-            iterator.remove();
-            //
-            //将其也添加到historyTaskSet中
-            historyTaskSet.add(next.getUrl());
-            return next;
+            if (iterator.hasNext()) {
+                HttpRequest next = iterator.next();
+                iterator.remove();
+                //将其也添加到historyTaskSet中
+                historyTaskSet.add(next.getUrl());
+                return next;
+            }
+            return null;
         } finally {
             lock.unlock();
         }

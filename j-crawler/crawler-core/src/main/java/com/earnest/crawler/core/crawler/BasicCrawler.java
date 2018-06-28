@@ -14,6 +14,7 @@ import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -65,8 +66,8 @@ class BasicCrawler<T> implements Crawler<T> {
                 //5. 将结果进行消化
                 persistenceConsumers.forEach(a -> a.accept(pipeResult));
                 //退出条件(只应该运行一次)
-                if (nonNull(stopWhen) && running && stopWhen.test(httpResponse)) {
-                    invokeStopListeners(httpRequest);
+                if (nonNull(stopWhen) && ranStopListeners.get()&& stopWhen.test(httpResponse)) {
+                    callStopListeners(httpRequest);
                     break;
                 }
             } else
@@ -74,7 +75,7 @@ class BasicCrawler<T> implements Crawler<T> {
         }
     }
 
-    private void invokeStopListeners(HttpRequest httpRequest) {
+    private  void callStopListeners(HttpRequest httpRequest) {
         if (!ranStopListeners.getAndSet(true)) {
             CrawlerStopEvent event = new CrawlerStopEvent(httpRequest);
             stopListeners.forEach(stopListener -> stopListener.onStop(event));
@@ -94,7 +95,7 @@ class BasicCrawler<T> implements Crawler<T> {
             log.error("An error:[{}] occurred while getting a httpRequest", e.getMessage());
         } catch (TakeTimeoutException e) {
             log.info("Waiting time is too long, crawler:[{}] is about to stop", getName());
-            invokeStopListeners(new HttpGetRequest());
+            callStopListeners(new HttpGetRequest());
         }
         return httpRequest;
     }

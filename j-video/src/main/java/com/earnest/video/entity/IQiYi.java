@@ -33,9 +33,4 @@ public class IQiYi extends BaseVideoEntity {
                 .toHashCode();
     }
 
-    public static void main(String[] args) {
-        BaseVideoEntity a = new IQiYi();
-
-        System.out.println(a.getOrigin());
-    }
 }
