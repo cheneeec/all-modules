@@ -7,10 +7,13 @@ import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 import com.earnest.video.entity.IQiYi;
-import com.earnest.video.service.VideoService;
+import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
+import com.earnest.video.service.IQiYiAnimationCachedVideoService;
+import com.earnest.video.service.IQiYiMovieCachedVideoService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -23,24 +26,31 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
-public class IQiYiSpider implements Spider, CommandLineRunner {
+public class IQiYiListSpider implements Spider, CommandLineRunner {
     //动漫的爬虫
     private final Spider animationSpider;
     //电影爬虫
     private final Spider movieSpider;
 
-    private final VideoService videoService;
 
     private final AtomicLong atomicLong = new AtomicLong();
 
-    public IQiYiSpider(VideoService videoService) {
+    @SuppressWarnings("unchecked")
+    public IQiYiListSpider(IQiYiAnimationCachedVideoService animationCachedVideoService, IQiYiMovieCachedVideoService movieCachedVideoService) {
+        //animationSpider
         animationSpider = createSpider(createAnimationPipeline(), "http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html", "/www/4/38-------------4-\\d+-1-iqiyi--.html", 5)
                 .stopWhen(createAnimationStopWhenPredicate())
+                .addConsumer(o -> animationCachedVideoService.save((List<IQiYi>) o))
                 .build();
+
         animationSpider.setName("iQiYi-animation");
-        movieSpider = createSpider(createMoviePipeline(), "http://www.iqiyi.com/dianying_new/i_list_paihangbang.html", null, 1).build();
+        //movieSpider
+        movieSpider = createSpider(createMoviePipeline(), "http://www.iqiyi.com/dianying_new/i_list_paihangbang.html", null, 1)
+                .addConsumer(o -> movieCachedVideoService.save((List<IQiYi>) o))
+                .build();
         movieSpider.setName("iQiYi-movie");
-        this.videoService = videoService;
+
+
     }
 
     private Predicate<HttpResponse> createAnimationStopWhenPredicate() {
@@ -84,7 +94,7 @@ public class IQiYiSpider implements Spider, CommandLineRunner {
             return elements.stream().map(e -> {
                 IQiYi iQiYi = newIQiYi(httpResponse.getHttpRequest());
                 Elements a = e.select("div.site-piclist_pic > a");
-                iQiYi.setPlayValue("http:" + a.attr("href"));
+                iQiYi.setPlayValue(a.attr("href"));
                 iQiYi.setImage("http:" + a.select("img").attr("src"));
                 iQiYi.setTitle(a.select("img").attr("title"));
                 iQiYi.setPlayInfo(a.select("span.icon-vInfo").text());
@@ -99,7 +109,6 @@ public class IQiYiSpider implements Spider, CommandLineRunner {
                 .from(from)
                 .match(match)
                 .pipeline(pipeline)
-                .addConsumer(o -> videoService.save(((List<IQiYi>) o)))
                 .thread(threadNumber);
 
     }
@@ -125,7 +134,7 @@ public class IQiYiSpider implements Spider, CommandLineRunner {
 
     @Override
     public boolean isRunning() {
-        return animationSpider.isRunning()||movieSpider.isRunning();
+        return animationSpider.isRunning() || movieSpider.isRunning();
     }
 
     @Override

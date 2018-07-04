@@ -3,7 +3,7 @@ package com.earnest.video.controller;
 
 import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.entity.IQiYi;
-import com.earnest.video.service.VideoService;
+import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/video")
-@AllArgsConstructor
+@RequestMapping("/api/v1")
 public class VideoController {
-    private final VideoService<IQiYi> iQiYiVideoService;
+
+    private  BasicQueryAndPersistenceVideoService<IQiYi> iQiYiVideoService;
 
     @GetMapping
     public Page<? extends BaseVideoEntity> listAll(Pageable pageRequest) {

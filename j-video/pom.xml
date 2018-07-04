@@ -8,6 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>j-video</name>
+
 	<parent>
 		<groupId>com.earnest</groupId>
 		<artifactId>all-modules</artifactId>
@@ -41,6 +42,7 @@
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
 		</dependency>
+
 
 	</dependencies>
 
