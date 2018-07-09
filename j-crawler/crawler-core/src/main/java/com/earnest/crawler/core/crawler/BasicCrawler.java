@@ -60,7 +60,6 @@ class BasicCrawler<T> implements Crawler<T> {
                 Set<HttpRequest> newHttpRequests = httpResponseHandler.handle(httpResponse);
                 //3. 将新的连接放入
                 scheduler.addAll(newHttpRequests);
-
                 //4. 将httpResponse转化成实体类
                 T pipeResult = pipeline.pipe(httpResponse);
                 //5. 将结果进行消化

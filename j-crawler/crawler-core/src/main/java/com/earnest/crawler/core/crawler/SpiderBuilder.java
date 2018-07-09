@@ -57,7 +57,6 @@ public class SpiderBuilder {
     public SpiderBuilder thread(int num) {
         Assert.isTrue(num > 0, "num must be greater than 0");
         threadNumber = num;
-
         return this;
     }
 
