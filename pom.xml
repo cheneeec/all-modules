@@ -10,6 +10,8 @@
     <modules>
         <module>j-crawler</module>
         <module>j-video</module>
+        <module>j-security</module>
+        <module>j-core</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -21,17 +23,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <fastjson.version>1.2.41</fastjson.version>
-        <htmlunit.version>2.31</htmlunit.version>
-        <okhttp.version>2.7.5</okhttp.version>
+       
     </properties>
 
 
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-    </dependencies>
+
 
     <dependencyManagement>
         <dependencies>

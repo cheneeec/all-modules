@@ -13,6 +13,8 @@
 
     <properties>
         <jsoup.version>1.8.3</jsoup.version>
+        <htmlunit.version>2.31</htmlunit.version>
+        <okhttp.version>2.7.5</okhttp.version>
     </properties>
 
     <modules>

@@ -1,4 +1,7 @@
 logging:
   level:
     com.earnest: debug
-
+security:
+  user:
+    name: user
+    password: default

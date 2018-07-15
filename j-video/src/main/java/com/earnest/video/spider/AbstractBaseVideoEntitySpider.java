@@ -85,7 +85,7 @@ public abstract class AbstractBaseVideoEntitySpider<T extends BaseVideoEntity> i
 
     @Override
     public void start() {
-        spider.start();
+//        spider.start();
     }
 
     @Override
