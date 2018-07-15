@@ -4,6 +4,7 @@ import com.earnest.security.core.validate.ValidateCodeException;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -24,6 +25,9 @@ import java.time.LocalDateTime;
 public class VerificationCodeFilter extends OncePerRequestFilter {
 
     private final AuthenticationFailureHandler authenticationFailureHandler;
+
+    //路径匹配器
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
