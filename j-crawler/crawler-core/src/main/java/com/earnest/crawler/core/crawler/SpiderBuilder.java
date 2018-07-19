@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.crawler;
 
+import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.MultiThreadBean;
 import com.earnest.crawler.core.downloader.*;
 import com.earnest.crawler.core.downloader.listener.DownloadListener;
@@ -11,11 +12,13 @@ import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.response.HttpResponse;
 import com.earnest.crawler.core.scheduler.BlockingUniqueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
+import com.oracle.webservices.internal.api.message.ContentType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.Builder;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -31,7 +34,7 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("unchecked")
-public class SpiderBuilder {
+public class SpiderBuilder{
 
     private Scheduler scheduler;
 
@@ -108,6 +111,7 @@ public class SpiderBuilder {
     }
 
 
+
     private <T> Crawler createCrawler() {
         Assert.state(nonNull(scheduler), "The URL that started crawling is not set");
         Crawler crawler = new BasicCrawler<T>();
@@ -117,7 +121,7 @@ public class SpiderBuilder {
 
         crawler.setPipeline(defaultIfNull(pipeline, (Pipeline<T>) httpResponse -> (T) httpResponse));
 
-        crawler.setPersistenceConsumers(defaultIfNull(persistenceConsumers, singleton((Consumer<T>) System.out::println)));
+        crawler.setPersistenceConsumers(defaultIfNull(persistenceConsumers, singleton((Consumer<T>) JSONObject::toJSONString)));
 
         crawler.setScheduler(scheduler);
 
@@ -198,4 +202,6 @@ public class SpiderBuilder {
         }
         return this;
     }
+
+
 }

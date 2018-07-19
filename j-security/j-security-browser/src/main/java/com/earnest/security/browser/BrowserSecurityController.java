@@ -1,6 +1,5 @@
 package com.earnest.security.browser;
 
-import com.earnest.security.core.properties.BrowserProperties;
 import com.earnest.security.core.properties.SecurityProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,4 +52,6 @@ public class BrowserSecurityController {
         return Collections.singletonMap("message", "Access to content requires authentication");
 
     }
+
+
 }

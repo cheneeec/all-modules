@@ -46,7 +46,7 @@ public abstract class AbstractBaseVideoEntitySpider<T extends BaseVideoEntity> i
     private Spider createSpider(HttpRequest fromUrl, String match, int threadNumber) {
         Spider spider;
         SpiderBuilder spiderBuilder = createSpiderBuilder(createPipeline(), fromUrl, match, threadNumber).addConsumer(getSpiderConsumer());
-        enhanceSpider(spiderBuilder);
+        additionalSpiderSetting(spiderBuilder);
         spider = spiderBuilder.build();
         return spider;
     }
@@ -55,8 +55,7 @@ public abstract class AbstractBaseVideoEntitySpider<T extends BaseVideoEntity> i
         return null;
     }
 
-    protected void enhanceSpider(SpiderBuilder spiderBuilder) {
-    }
+    protected void additionalSpiderSetting(SpiderBuilder spiderBuilder) {}
 
 
     protected abstract Pipeline<List<T>> createPipeline();
@@ -85,7 +84,7 @@ public abstract class AbstractBaseVideoEntitySpider<T extends BaseVideoEntity> i
 
     @Override
     public void start() {
-//        spider.start();
+        spider.start();
     }
 
     @Override

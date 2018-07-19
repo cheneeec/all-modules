@@ -16,7 +16,6 @@ public class GlobalWebMvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        super.configureMessageConverters(converters);
         FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
@@ -25,7 +24,6 @@ public class GlobalWebMvcConfig extends WebMvcConfigurerAdapter {
         fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
         fastJsonHttpMessageConverter.setSupportedMediaTypes(fastMediaTypes);
         fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
-
         converters.add(fastJsonHttpMessageConverter);
     }
 }

@@ -31,7 +31,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider<IQiYi> i
     }
 
     @Override
-    protected void enhanceSpider(SpiderBuilder spiderBuilder) {
+    protected void additionalSpiderSetting(SpiderBuilder spiderBuilder) {
         spiderBuilder.stopWhen(httpResponse -> {
             Element body = Jsoup.parse(httpResponse.getContent()).body();
             return body.select("body > div.mod-page > span.noPage").attr("class").equals("noPage");
