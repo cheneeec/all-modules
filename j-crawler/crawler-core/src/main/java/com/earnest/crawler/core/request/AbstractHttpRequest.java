@@ -4,10 +4,12 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.util.CollectionUtils;
 
 
 import java.io.Serializable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,8 +53,8 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     @Override
     public Map<String, String> getHeaders() {
-        if (Objects.isNull(headers)) {
-            return getDefaultHttpRequestHeader();
+        if (CollectionUtils.isEmpty(headers)) {
+            headers = Collections.singletonMap(Browser.USER_AGENT, Browser.GOOGLE.userAgent());
         }
         return this.headers;
     }

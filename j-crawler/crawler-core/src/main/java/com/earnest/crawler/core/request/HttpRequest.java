@@ -5,9 +5,7 @@ import lombok.Data;
 import org.apache.http.HttpHost;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 public interface HttpRequest extends Cloneable {
 
@@ -63,10 +61,6 @@ public interface HttpRequest extends Cloneable {
 
     void setIgnoreCss(boolean ignoreCss);
 
-    default Map<String, String> getDefaultHttpRequestHeader() {
-
-        return Collections.singletonMap(BrowserUserAgent.HEADER, BrowserUserAgent.GOOGLE.name());
-    }
 
     @Data
     class HttpProxy {

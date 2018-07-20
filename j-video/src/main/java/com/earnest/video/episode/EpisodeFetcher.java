@@ -2,6 +2,7 @@ package com.earnest.video.episode;
 
 import com.earnest.video.entity.Episode;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -15,5 +16,5 @@ public interface EpisodeFetcher {
      * @param size 抓取的页面尺寸。
      * @return 封装成响应的对象。
      */
-    List<Episode> fetch(String url, int page, int size);
+    List<Episode> fetch(String url, int page, int size) throws IOException;
 }

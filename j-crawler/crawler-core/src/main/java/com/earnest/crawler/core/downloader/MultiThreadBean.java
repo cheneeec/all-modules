@@ -1,4 +1,4 @@
-package com.earnest.crawler.core;
+package com.earnest.crawler.core.downloader;
 
 public interface MultiThreadBean {
 
