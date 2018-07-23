@@ -9,7 +9,7 @@ import com.earnest.crawler.core.handler.RegexHttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import com.earnest.crawler.core.scheduler.BlockingUniqueScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
@@ -46,7 +46,7 @@ public class SpiderBuilder{
 
     private Set<DownloadListener> downloadListeners;
 
-    private Predicate<HttpResponse> stopPredicate;
+    private Predicate<PageResponse> stopPredicate;
 
     private int threadNumber = 1;
 
@@ -175,7 +175,7 @@ public class SpiderBuilder{
         return this;
     }
 
-    public SpiderBuilder stopWhen(Predicate<HttpResponse> stopPredicate) {
+    public SpiderBuilder stopWhen(Predicate<PageResponse> stopPredicate) {
         this.stopPredicate = stopPredicate;
         return this;
     }

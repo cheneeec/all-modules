@@ -4,7 +4,7 @@ import com.earnest.crawler.core.crawler.listener.StopListener;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import com.earnest.crawler.core.scheduler.Scheduler;
 
 import java.io.Closeable;
@@ -27,7 +27,7 @@ public interface Crawler<T> extends Runnable, Closeable {
 
     void setPersistenceConsumers(Set<Consumer<T>> persistenceConsumers);
 
-    void setStopWhen(Predicate<HttpResponse> stopPredicate);
+    void setStopWhen(Predicate<PageResponse> stopPredicate);
 
     void addStopListener(StopListener stopListener);
 
@@ -41,7 +41,7 @@ public interface Crawler<T> extends Runnable, Closeable {
 
     Set<Consumer<T>> getPersistenceConsumers();
 
-    Predicate<HttpResponse> getStopWhen();
+    Predicate<PageResponse> getStopWhen();
 
     Set<StopListener> getStopListeners();
 

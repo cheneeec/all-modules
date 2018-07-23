@@ -6,15 +6,15 @@ import java.io.IOException;
 import java.util.List;
 
 
-@FunctionalInterface
 public interface EpisodeFetcher {
     /**
      * 对指定的{@code url}进行抓取，并且获得集数。
      *
-     * @param url  指定的url
-     * @param page 抓取的页数。
-     * @param size 抓取的页面尺寸。
+     * @param url         指定的url
+     * @param episodePage 抓取的页面描述。
      * @return 封装成响应的对象。
      */
-    List<Episode> fetch(String url, int page, int size) throws IOException;
+    List<Episode> fetch(String url, EpisodePage episodePage) throws IOException;
+
+    boolean support(String url);
 }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class HttpResponse {
+public class PageResponse {
 
     private String content;
 
@@ -16,14 +16,13 @@ public class HttpResponse {
 
     private HttpRequest httpRequest;
 
-
     private int status;
 
-    public HttpResponse(String content) {
+    public PageResponse(String content) {
         this.content = content;
     }
 
-    public HttpResponse(String content, HttpRequest httpRequest) {
+    public PageResponse(String content, HttpRequest httpRequest) {
         this(content);
         this.httpRequest = httpRequest;
     }

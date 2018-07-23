@@ -1,7 +1,7 @@
 package com.earnest.crawler.core.handler;
 
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -14,7 +14,7 @@ import static java.util.Objects.nonNull;
 public abstract class AbstractHttpResponseHandler implements HttpResponseHandler {
 
     @Override
-    public Set<HttpRequest> handle(HttpResponse rawResponse) {
+    public Set<HttpRequest> handle(PageResponse rawResponse) {
         HttpRequest httpRequest = rawResponse.getHttpRequest();
         filter(rawResponse, httpRequest);
 
@@ -27,9 +27,9 @@ public abstract class AbstractHttpResponseHandler implements HttpResponseHandler
     }
 
 
-    protected abstract Set<String> extract(HttpResponse httpResponse);
+    protected abstract Set<String> extract(PageResponse pageResponse);
 
-    private void filter(HttpResponse rawResponse, HttpRequest httpRequest) {
+    private void filter(PageResponse rawResponse, HttpRequest httpRequest) {
         String content = rawResponse.getContent();
 
         if (nonNull(httpRequest)) {

@@ -16,10 +16,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.springframework.util.Assert;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,11 +42,13 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
     private static final Pattern episodeExtractPattern = Pattern.compile("\"vlist\":(\\[\\{.+\\}\\])");
 
     @Override
-    public List<Episode> fetch(String url, int page, int size) throws IOException {
+    public List<Episode> fetch(String url, EpisodePage episodePage) throws IOException {
+
+        episodePage = Optional.ofNullable(episodePage).orElse(new EpisodePage(1, 50));
 
         String requestUrl = StringUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(url))
-                .replaceAll("\\$\\{page}", String.valueOf(page))
-                .replaceAll("\\$\\{size}", String.valueOf(size))
+                .replaceAll("\\$\\{page}", String.valueOf(episodePage.getPage()))
+                .replaceAll("\\$\\{size}", String.valueOf(episodePage.getSize()))
                 + generateRandomJsCallback();
 
         log.info("Get the API request address:{},start sending http request", requestUrl);
@@ -56,7 +61,7 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
         String entityString = EntityUtils.toString(entity);
 
-        log.debug("Request successful, get results:{}", entityString);
+        log.debug("connect {} is  successful", httpGet.getURI());
 
         List<Episode> episodes = extractJsonStringAndReturn(entityString);
 
@@ -65,6 +70,12 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
         closeableHttpResponse.close();
 
         return episodes;
+    }
+
+    @Override
+    public boolean support(String url) {
+        Assert.hasText(url, "url is empty or null");
+        return URI.create(url).getHost().contains("iqiyi.com");
     }
 
     /**

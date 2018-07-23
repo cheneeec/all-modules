@@ -1,16 +1,16 @@
 package com.earnest.crawler.core.event;
 
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 
 public class DownloadSuccessEvent extends BasicEvent {
 
-    public DownloadSuccessEvent(HttpResponse httpResponse) {
-        super(httpResponse);
+    public DownloadSuccessEvent(PageResponse pageResponse) {
+        super(pageResponse);
     }
 
     @Override
-    public HttpResponse getSource() {
-        return (HttpResponse) source;
+    public PageResponse getSource() {
+        return (PageResponse) source;
     }
 
 

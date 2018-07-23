@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 
@@ -20,7 +21,7 @@ public class IQiYiEpisodeFetcherTest {
     @Test
     public void fetch() throws Exception {
 
-        List<Episode> episodes = episodeFetcher.fetch("http://www.iqiyi.com/a_19rrh6yhid.html#vfrm=2-4-0-1", 1, 50);
+        List<Episode> episodes = episodeFetcher.fetch("http://www.iqiyi.com/a_19rrh6yhid.html#vfrm=2-4-0-1", null);
         Assert.assertNotNull(episodes);
     }
 
@@ -31,4 +32,13 @@ public class IQiYiEpisodeFetcherTest {
         HttpEntity entity = httpResponse.getEntity();
         System.out.println(EntityUtils.toString(entity));
     }
+
+    @Test
+    public void bb(){
+        System.out.println(URI.create("http://www.iqiyi.com/a_19rrgzldkl.html#vfrm=2-4-0-1").getHost());
+        System.out.println(URI.create("http://list.iqiyi.com/www/4/-------------4-1-1-iqiyi--.html").getHost());
+        System.out.println(URI.create("http://list.iqiyi.com/www/4/-------------4-1-1-iqiyi--.html").getPath());
+        System.out.println(URI.create("http://list.iqiyi.com/www/4/-------------4-1-1-iqiyi--.html").resolve("a"));
+    }
+
 }

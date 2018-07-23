@@ -3,8 +3,6 @@ package com.earnest.crawler.core.downloader;
 import com.earnest.crawler.core.downloader.listener.DownloadListener;
 import com.earnest.crawler.core.event.DownloadErrorEvent;
 import com.earnest.crawler.core.event.DownloadSuccessEvent;
-import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
 
 import java.util.HashSet;
 import java.util.Set;

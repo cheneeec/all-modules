@@ -4,7 +4,7 @@ import com.earnest.crawler.core.event.DownloadErrorEvent;
 import com.earnest.crawler.core.event.DownloadSuccessEvent;
 import com.earnest.crawler.core.request.HttpRequest;
 import com.earnest.crawler.core.request.HttpUriRequestAdapter;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Consts;
@@ -32,32 +32,32 @@ public class HttpClientDownloader extends AbstractDownloader implements MultiThr
 
 
     @Override
-    public HttpResponse download(HttpRequest request) {
+    public PageResponse download(HttpRequest request) {
         log.info("Start downloading {}", request.getUrl());
         HttpUriRequestAdapter httpUriRequest = new HttpUriRequestAdapter(request);
         try {
             org.apache.http.HttpResponse response = httpClient.execute(httpUriRequest, httpUriRequest.obtainHttpContext());
             HttpEntity httpEntity = response.getEntity();
 
-            HttpResponse httpResponse = new HttpResponse(EntityUtils.toString(httpEntity, Consts.UTF_8),request);
-            httpResponse.setStatus(response.getStatusLine().getStatusCode());
+            PageResponse pageResponse = new PageResponse(EntityUtils.toString(httpEntity, Consts.UTF_8),request);
+            pageResponse.setStatus(response.getStatusLine().getStatusCode());
 
 
             if (nonNull(httpEntity.getContentType())) {
-                httpResponse.setContentType(httpEntity.getContentType().getValue());
+                pageResponse.setContentType(httpEntity.getContentType().getValue());
             }
             //关闭响应
             if (response instanceof Closeable) {
                 ((Closeable) response).close();
             }
-            onSuccess(new DownloadSuccessEvent(httpResponse));
-            return httpResponse;
+            onSuccess(new DownloadSuccessEvent(pageResponse));
+            return pageResponse;
         } catch (IOException e) {
             onError(new DownloadErrorEvent(request, e));
             log.error("An error occurred while downloading {} ,error:{}", request.getUrl(), e.getMessage());
-            HttpResponse httpResponse = new HttpResponse(e.getMessage());
-            httpResponse.setStatus(500);
-            return httpResponse;
+            PageResponse pageResponse = new PageResponse(e.getMessage());
+            pageResponse.setStatus(500);
+            return pageResponse;
         }
 
 
@@ -88,7 +88,7 @@ public class HttpClientDownloader extends AbstractDownloader implements MultiThr
         int maxConnectionCount = (int) Math.ceil(((double) num / 2));
 
         System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));
-        log.info("set SystemProperty userAgent: [http.maxConnections={}]", maxConnectionCount * 2);
+        log.info("set SystemProperty: [http.maxConnections={}]", maxConnectionCount * 2);
     }
 
 

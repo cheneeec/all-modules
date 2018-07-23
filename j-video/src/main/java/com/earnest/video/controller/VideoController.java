@@ -18,26 +18,35 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/api")
+@SuppressWarnings("unchecked")
 public class VideoController {
 
     private final Map<String, BasicQueryAndPersistenceVideoService> videoServiceMap;
 
+
     public VideoController(IQiYiMovieCachedVideoService movieVideoService, IQiYiAnimationCachedVideoService animationVideoService) {
+        this.videoServiceMap=initializeVideoServiceMap(movieVideoService, animationVideoService);
+
+    }
+
+
+    private Map<String, BasicQueryAndPersistenceVideoService> initializeVideoServiceMap(IQiYiMovieCachedVideoService movieVideoService, IQiYiAnimationCachedVideoService animationVideoService) {
         Map<String, BasicQueryAndPersistenceVideoService> tempMap = new HashMap<>();
         tempMap.put("movie", movieVideoService);
         tempMap.put("animation", animationVideoService);
-        this.videoServiceMap = Collections.unmodifiableMap(tempMap);
+        return  Collections.unmodifiableMap(tempMap);
     }
 
-    @GetMapping("/{type}")
+    @GetMapping("/{type:movie|animation}")
     public Page<? extends BaseVideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
         return videoServiceMap.get(type).findAll(pageRequest);
     }
 
 
-    @GetMapping("/{type}/{id:\\d+}")
-    public BaseVideoEntity get(@PathVariable long id,@PathVariable String type) {
+    @GetMapping("/{id:\\d+}")
+    public BaseVideoEntity get(@PathVariable long id, @PathVariable String type) {
         return videoServiceMap.get(type).get(id);
     }
+
 
 }

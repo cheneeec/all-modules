@@ -1,7 +1,7 @@
 package com.earnest.crawler.core.handler;
 
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -28,10 +28,10 @@ public class RegexHttpResponseHandler extends AbstractHttpResponseHandler {
     }
 
     @Override
-    protected Set<String> extract(HttpResponse httpResponse) {
-        String content = httpResponse.getContent();
+    protected Set<String> extract(PageResponse pageResponse) {
+        String content = pageResponse.getContent();
         Matcher matcher = urlPattern.matcher(content);
-        HttpRequest httpRequest =  httpResponse.getHttpRequest();
+        HttpRequest httpRequest =  pageResponse.getHttpRequest();
         Set<String> newUrls = new HashSet<>();
         //
         String baseUri = StringUtils.replaceFirst(httpRequest.getUrl(), "/*", "");

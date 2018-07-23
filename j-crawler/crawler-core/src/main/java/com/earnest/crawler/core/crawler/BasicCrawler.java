@@ -8,13 +8,12 @@ import com.earnest.crawler.core.handler.HttpResponseHandler;
 import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.HttpGetRequest;
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import com.earnest.crawler.core.scheduler.BlockingScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -36,7 +35,7 @@ class BasicCrawler<T> implements Crawler<T> {
     private HttpResponseHandler httpResponseHandler;
     private Downloader downloader;
     private Set<Consumer<T>> persistenceConsumers;
-    private Predicate<HttpResponse> stopWhen;
+    private Predicate<PageResponse> stopWhen;
 
     private String name;
 
@@ -55,17 +54,17 @@ class BasicCrawler<T> implements Crawler<T> {
             //1. 获取连接
             HttpRequest httpRequest = takeHttpRequest();
             if (nonNull(httpRequest)) {
-                HttpResponse httpResponse = downloader.download(httpRequest);
+                PageResponse pageResponse = downloader.download(httpRequest);
                 //2. 处理HttpResponse并且获取新的连接
-                Set<HttpRequest> newHttpRequests = httpResponseHandler.handle(httpResponse);
+                Set<HttpRequest> newHttpRequests = httpResponseHandler.handle(pageResponse);
                 //3. 将新的连接放入
                 scheduler.addAll(newHttpRequests);
                 //4. 将httpResponse转化成实体类
-                T pipeResult = pipeline.pipe(httpResponse);
+                T pipeResult = pipeline.pipe(pageResponse);
                 //5. 将结果进行消化
                 persistenceConsumers.forEach(a -> a.accept(pipeResult));
                 //退出条件(只应该运行一次)
-                if (nonNull(stopWhen) && ranStopListeners.get()&& stopWhen.test(httpResponse)) {
+                if (nonNull(stopWhen) && ranStopListeners.get()&& stopWhen.test(pageResponse)) {
                     callStopListeners(httpRequest);
                     break;
                 }
@@ -135,7 +134,7 @@ class BasicCrawler<T> implements Crawler<T> {
     }
 
     @Override
-    public void setStopWhen(Predicate<HttpResponse> stopPredicate) {
+    public void setStopWhen(Predicate<PageResponse> stopPredicate) {
         this.stopWhen = stopPredicate;
     }
 
@@ -172,7 +171,7 @@ class BasicCrawler<T> implements Crawler<T> {
     }
 
     @Override
-    public Predicate<HttpResponse> getStopWhen() {
+    public Predicate<PageResponse> getStopWhen() {
         return stopWhen;
     }
 

@@ -3,7 +3,7 @@ package com.earnest.crawler.core.downloader.proxy;
 import com.earnest.crawler.core.downloader.HttpClientDownloader;
 
 import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.response.HttpResponse;
+import com.earnest.crawler.core.response.PageResponse;
 import org.apache.http.client.HttpClient;
 
 import java.util.function.Supplier;
@@ -23,7 +23,7 @@ public class ProxyHttpClientDownloader extends HttpClientDownloader {
     }
 
     @Override
-    public HttpResponse download(HttpRequest request) {
+    public PageResponse download(HttpRequest request) {
         request.setHttpProxy(httpProxySupplier.get());
         return super.download(request);
     }
