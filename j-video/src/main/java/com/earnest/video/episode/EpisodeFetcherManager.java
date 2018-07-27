@@ -13,7 +13,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
     private final List<EpisodeFetcher> episodeFetchers = new ArrayList<>();
 
     public EpisodeFetcherManager() {
-        this.episodeFetchers.add(new IQiYiEpisodeFetcher());
+        episodeFetchers.add(new IQiYiEpisodeFetcher());
     }
 
 
@@ -25,7 +25,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
                 return episodeFetcher.fetch(url, episodePage);
             }
         }
-        log.warn("{} dose not support,you need add the implementation of com.earnest.video.episode.EpisodeFetcher", url);
+        log.warn("{} dose not support,you need add the implementation of {}", url,EpisodeFetcher.class);
         return null;
     }
 

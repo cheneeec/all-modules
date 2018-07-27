@@ -33,6 +33,7 @@ public class HttpClientDownloader extends AbstractDownloader implements MultiThr
 
     @Override
     public PageResponse download(HttpRequest request) {
+
         log.info("Start downloading {}", request.getUrl());
         HttpUriRequestAdapter httpUriRequest = new HttpUriRequestAdapter(request);
         try {

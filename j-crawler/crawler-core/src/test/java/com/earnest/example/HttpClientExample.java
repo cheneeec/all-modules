@@ -5,15 +5,13 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -69,21 +67,22 @@ public class HttpClientExample {
 
     @Test
     public void ping() throws IOException {
-//        Process process = Runtime.getRuntime().exec("ping 14.118.252.64");
-        try {
-            Runtime.getRuntime().exec("cmd /c start ping 14.118.252.64");
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+
     }
 
     @Test
     public void rest() throws IOException {
+        CookieStore cookieStore = new BasicCookieStore();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultCookieStore(cookieStore).build();
 
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        for (int i = 0; i < 60; i++) {
-            HttpPost httpPost = new HttpPost("http://171.221.172.20:7082/v1/api/sms/aa110"+i+"2?phoneNumber=18280045913&content=测试短信");
-            httpClient.execute(httpPost);
-        }
+        HttpGet httpGet = new HttpGet("https://www.52pojie.cn/forum-24-1.html");
+
+        CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpGet);
+
+        System.out.println("======================");
+        cookieStore.getCookies()
+                .forEach(cookie -> System.out.println(cookie.getName()+":"+cookie.getValue()));
+
     }
 }

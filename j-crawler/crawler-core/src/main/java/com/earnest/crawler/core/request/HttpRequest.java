@@ -1,10 +1,7 @@
 package com.earnest.crawler.core.request;
 
 
-import lombok.Data;
-import org.apache.http.HttpHost;
 
-import java.util.Collections;
 import java.util.Map;
 
 public interface HttpRequest extends Cloneable {
@@ -62,11 +59,6 @@ public interface HttpRequest extends Cloneable {
     void setIgnoreCss(boolean ignoreCss);
 
 
-    @Data
-    class HttpProxy {
-        private HttpHost httpHost;
-        private String username;
-        private String password;
 
-    }
+
 }

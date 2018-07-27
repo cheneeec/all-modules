@@ -2,7 +2,6 @@ package com.earnest.crawler.core.request;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
@@ -51,7 +50,8 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
         //================
     }
 
-    private  void setHttpEntity(HttpRequest httpRequest) {
+    private void setHttpEntity(HttpRequest httpRequest) {
+        String charset = StringUtils.defaultString(httpRequest.getCharset(), "UTF-8");
         Map<String, String> parameters = httpRequest.getParameters();
 
         if (!StringUtils.equalsAnyIgnoreCase("GET", "DELETE")
@@ -66,7 +66,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
 
             //JSON
             if (StringUtils.equalsIgnoreCase(ContentType.APPLICATION_JSON.toString(), contentType)) {
-                httpRequestEntity = new StringEntity(JSONObject.toJSONString(parameters), Consts.UTF_8);
+                httpRequestEntity = new StringEntity(JSONObject.toJSONString(parameters), charset);
             } else {
 
                 List<BasicNameValuePair> nameValuePairs = parameters.keySet().stream()
@@ -74,7 +74,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
                         .collect(Collectors.toList());
 
                 try {
-                    httpRequestEntity = new UrlEncodedFormEntity(nameValuePairs, httpRequest.getCharset());
+                    httpRequestEntity = new UrlEncodedFormEntity(nameValuePairs, charset);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -87,7 +87,7 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
 
 
     private static RequestConfig createRequestConfig(HttpRequest httpRequest) {
-        RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+       /* RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
         //set Proxy
         HttpRequest.HttpProxy httpProxy = httpRequest.getHttpProxy();
         if (nonNull(httpProxy)) {
@@ -99,8 +99,9 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
             requestConfigBuilder.setConnectTimeout(connectTimeout);
         }
 
-        return requestConfigBuilder.build();
+        return requestConfigBuilder.build();*/
 
+        return null;
     }
 
     private void setHeaders(Map<String, String> headersMap) {
@@ -141,13 +142,13 @@ public class HttpUriRequestAdapter extends HttpEntityEnclosingRequestBase {
 
             clientContext.setCookieStore(cookieStore);
         }
-        //set proxy Credentials
+        /*//set proxy Credentials
         HttpRequest.HttpProxy httpProxy = httpRequest.getHttpProxy();
         if (nonNull(httpProxy) && !StringUtils.isAnyBlank(httpProxy.getUsername()
                 , httpProxy.getPassword())) {
 
 
-        }
+        }*/
 
 
         return clientContext;
