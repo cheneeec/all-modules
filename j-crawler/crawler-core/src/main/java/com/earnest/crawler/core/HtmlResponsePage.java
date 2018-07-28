@@ -26,8 +26,10 @@ public class HtmlResponsePage {
     private final StatusLine statusLine;
 
     private final Locale locale;
+
     @Setter
     private CookieStore cookieStore;
+
     @Setter
     private Header[] headers;
 

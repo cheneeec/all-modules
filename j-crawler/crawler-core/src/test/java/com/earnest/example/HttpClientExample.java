@@ -1,7 +1,10 @@
 package com.earnest.example;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -10,6 +13,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.*;
 import org.apache.http.util.EntityUtils;
@@ -19,6 +23,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 
 public class HttpClientExample {
     @Test
@@ -74,15 +79,39 @@ public class HttpClientExample {
     public void rest() throws IOException {
         CookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = HttpClients.custom()
-                .setDefaultCookieStore(cookieStore).build();
+                .addInterceptorFirst((HttpRequestInterceptor) (request, context) -> {
+                    System.out.println("==========================");
+                    System.out.println(JSONObject.toJSONString(request));
+                    System.out.println("===========================");
+//                    System.out.println(JSONObject.toJSONString(context));
+                })
+               .build();
+
+        HttpClientContext httpClientContext = HttpClientContext.create();
+        httpClientContext.setCookieStore(cookieStore);
 
         HttpGet httpGet = new HttpGet("https://www.52pojie.cn/forum-24-1.html");
 
-        CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpGet);
+        CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpGet,httpClientContext);
 
         System.out.println("======================");
         cookieStore.getCookies()
-                .forEach(cookie -> System.out.println(cookie.getName()+":"+cookie.getValue()));
+                .forEach(cookie -> System.out.println(cookie.getName() + ":" + cookie.getValue()));
+
+        System.out.println(Arrays.toString(closeableHttpResponse.getAllHeaders()));
+
+
+        HttpUriRequest build = RequestBuilder.get("https://www.52pojie.cn/thread-761117-1-1.html")
+                .setEntity(closeableHttpResponse.getEntity()).build();
+
+
+        CloseableHttpResponse closeableHttpResponse1 = httpClient.execute(build,httpClientContext);
+
+        System.out.println("+++++++++++++++++++++++++++++++++++");
+        cookieStore.getCookies()
+                .forEach(cookie -> System.out.println(cookie.getName() + ":" + cookie.getValue()));
+
+        System.out.println(Arrays.toString(closeableHttpResponse1.getAllHeaders()));
 
     }
 }
