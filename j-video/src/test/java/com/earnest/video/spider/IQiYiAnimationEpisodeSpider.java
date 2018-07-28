@@ -7,6 +7,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import org.junit.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
@@ -28,6 +30,9 @@ public class IQiYiAnimationEpisodeSpider {
         CloseableHttpResponse execute = httpClient.execute(new HttpGet("http://www.iqiyi.com/a_19rrhb3xvl.html#vfrm=2-4-0-1"));
 
         System.out.println(EntityUtils.toString(execute.getEntity()));
+
+
+
     }
 
 
