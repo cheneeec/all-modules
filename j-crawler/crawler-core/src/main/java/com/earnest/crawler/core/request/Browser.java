@@ -9,7 +9,7 @@ public enum Browser {
 
     public static final String USER_AGENT = "User-Agent";
     public static final String REFERER = "Referer";
-    public static final String CONTENT_TYPE = "content-type";
+    public static final String CONTENT_TYPE = "Content-Type";
 
     Browser(String userAgent) {
         this.userAgent = userAgent;

@@ -9,12 +9,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -23,11 +26,13 @@ import java.io.IOException;
 
 
 @Slf4j
-@AllArgsConstructor
-public class HttpClientDownloader implements Downloader<HttpResponse> {
+public class HttpClientDownloader implements Downloader {
 
-    private final CloseableHttpClient httpClient;
+    private CloseableHttpClient httpClient;
 
+    public HttpClientDownloader() {
+        this.httpClient = initializeHttpClient();
+    }
 
     @Override
     public HttpResponse download(HttpRequest request) throws IOException {
@@ -58,17 +63,30 @@ public class HttpClientDownloader implements Downloader<HttpResponse> {
         HttpEntity entity = response.getEntity();
         EntityUtils.consumeQuietly(entity);
 
-
-//        HtmlResponsePage htmlResponsePage = new HtmlResponsePage(request, entity, response.getStatusLine(), response.getLocale(), null, response.getAllHeaders());
-
         //关闭响应
         response.close();
 
         return response;
     }
 
+    /**
+     * 获取会话的上下文。
+     *
+     * @return {@link HttpContext}
+     */
+    protected HttpContext obtainHttpContext() {
+        return null;
+    }
+
+    protected CloseableHttpClient initializeHttpClient() {
+        System.out.println("HttpClientDownloader");
+        return HttpClients.createDefault();
+    }
+
     @Override
     public void close() throws IOException {
         httpClient.close();
     }
+
+
 }
