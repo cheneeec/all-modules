@@ -1,0 +1,12 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: eureka-discovery
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+  instance:
+    status-page-url-path: /info
+    health-check-url-path: /health
