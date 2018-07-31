@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.Serializable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -52,7 +53,7 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
     @Override
-    public Map<String, String> getHeaders() {
+    public Map<String,String> getHeaders() {
         if (CollectionUtils.isEmpty(headers)) {
             headers = Collections.singletonMap(Browser.USER_AGENT, Browser.GOOGLE.userAgent());
         }

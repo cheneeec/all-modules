@@ -1,33 +1,26 @@
 package com.earnest.crawler.core.downloader1;
 
-import com.earnest.crawler.core.HtmlResponsePage;
+import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.request.HttpRequest;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
-
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-
+import java.io.Serializable;
 
 @Slf4j
-public class HttpClientDownloader implements Downloader {
-
+public class HttpClientDownloader<T extends Serializable, R extends HttpResponseResult<T>> implements Downloader<T, R> {
     private CloseableHttpClient httpClient;
 
     public HttpClientDownloader() {
@@ -35,7 +28,7 @@ public class HttpClientDownloader implements Downloader {
     }
 
     @Override
-    public HttpResponse download(HttpRequest request) throws IOException {
+    public R download(HttpRequest request) throws IOException {
 
         Assert.notNull(request, "request is null");
 
@@ -61,12 +54,14 @@ public class HttpClientDownloader implements Downloader {
 
         //consume entity
         HttpEntity entity = response.getEntity();
+
+
         EntityUtils.consumeQuietly(entity);
 
         //关闭响应
         response.close();
 
-        return response;
+        return null;
     }
 
     /**

@@ -2,21 +2,15 @@ package com.earnest.crawler.core.builder;
 
 import org.springframework.util.Assert;
 
-public abstract class AbstractSpiderConfigurer<O> implements Configurer {
+public abstract class AbstractSpiderConfigurer<O> {
 
     private SpiderBuilder builder;
 
-    private O configured;
 
-    @Override
-    public void init() throws Exception {
-
+    public AbstractSpiderConfigurer(SpiderBuilder builder) {
+        this.builder = builder;
     }
 
-    @Override
-    public void configure() throws Exception {
-
-    }
 
     public SpiderBuilder and() {
         Assert.state(builder != null, "spider builder is null");
@@ -24,4 +18,5 @@ public abstract class AbstractSpiderConfigurer<O> implements Configurer {
     }
 
 
+    abstract O build();
 }

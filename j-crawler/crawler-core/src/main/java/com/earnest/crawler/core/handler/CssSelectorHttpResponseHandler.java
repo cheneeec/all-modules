@@ -18,7 +18,7 @@ public class CssSelectorHttpResponseHandler extends AbstractHttpResponseHandler 
     protected Set<String> extract(PageResponse pageResponse) {
 
         return newHttpRequestExtractor.apply(
-                Jsoup.parse( pageResponse.getContent())
+                Jsoup.parse(pageResponse.getContent())
         );
 
 

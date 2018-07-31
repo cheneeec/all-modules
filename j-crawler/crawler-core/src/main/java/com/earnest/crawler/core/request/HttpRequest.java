@@ -8,7 +8,6 @@ public interface HttpRequest extends Cloneable {
 
     String getUrl();
 
-
     Map<String, String> getParameters();
 
     /**
@@ -44,7 +43,7 @@ public interface HttpRequest extends Cloneable {
 
     void setCookies(Map<String, String> cookies);
 
-    void setHeaders(Map<String, String> headers);
+    void setHeaders(Map<String,String> headers);
 
     void setHttpProxy(HttpProxy httpProxy);
 
