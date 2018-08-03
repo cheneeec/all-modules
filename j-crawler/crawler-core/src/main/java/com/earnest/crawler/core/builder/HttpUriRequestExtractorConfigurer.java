@@ -1,40 +1,38 @@
 package com.earnest.crawler.core.builder;
 
-import com.earnest.crawler.core.HttpResponseResult;
+import com.earnest.crawler.core.extractor.CssSelectorHttpRequestExtractor;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.extractor.RegexHttpRequestExtractor;
+import org.jsoup.nodes.Document;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
-public class HttpUriRequestExtractorConfigurer<T, R extends HttpResponseResult<T>> extends AbstractSpiderConfigurer<Map<String, HttpRequestExtractor<T, R>>> {
+public class HttpUriRequestExtractorConfigurer extends AbstractSpiderConfigurer<HttpRequestExtractor> {
 
-    private final Map<String, HttpRequestExtractor<T, R>> requestExtractors = new LinkedHashMap<>(5);
 
-    private HttpRequestExtractor<T, R> defaultRegexHttpRequestExtractor;
+    private HttpRequestExtractor requestExtractor;
 
     public HttpUriRequestExtractorConfigurer(SpiderBuilder builder) {
         super(builder);
     }
 
-    public HttpUriRequestExtractorConfigurer<T, R> defaultMatch(String pattern) {
-        this.defaultRegexHttpRequestExtractor = (HttpRequestExtractor<T, R>) new RegexHttpRequestExtractor(pattern);
+
+    public HttpUriRequestExtractorConfigurer match(String pattern) {
+        this.requestExtractor = new RegexHttpRequestExtractor(pattern);
         return this;
     }
 
-    public HttpUriRequestExtractorConfigurer<T, R> match(String domainPath, String pattern) {
-        requestExtractors.put(domainPath, (HttpRequestExtractor<T, R>) (new RegexHttpRequestExtractor(pattern)));
+    public HttpUriRequestExtractorConfigurer select(Function<Document, Set<String>> cssSelectorExtractor) {
+        this.requestExtractor = new CssSelectorHttpRequestExtractor(cssSelectorExtractor);
         return this;
     }
 
 
     @Override
-    Map<String, HttpRequestExtractor<T, R>> build() {
-        if (defaultRegexHttpRequestExtractor != null) {
-            requestExtractors.put("**", defaultRegexHttpRequestExtractor);
-        }
-        return requestExtractors;
+    HttpRequestExtractor build() {
+        return requestExtractor;
     }
 
 

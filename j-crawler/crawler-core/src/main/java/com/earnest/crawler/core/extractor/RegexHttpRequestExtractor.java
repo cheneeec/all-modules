@@ -1,20 +1,23 @@
 package com.earnest.crawler.core.extractor;
 
-import com.earnest.crawler.core.RawTextHttpResponseResult;
+import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.request.HttpRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jsoup.helper.StringUtil;
 import org.springframework.util.Assert;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 @Getter
 @Setter
-public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor<String,RawTextHttpResponseResult> {
+public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor {
     private final Pattern urlPattern;
 
     public RegexHttpRequestExtractor(String urlPattern) {
@@ -24,14 +27,15 @@ public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor<Stri
 
 
     @Override
-    protected Set<String> extractUrl(RawTextHttpResponseResult rawTextHttpResponseResult) {
-        String content = rawTextHttpResponseResult.getContent();
+    protected Set<String> extractUrl(HttpResponseResult<String> responseResult) {
+
+        String content = responseResult.getContent();
 
         Matcher matcher = urlPattern.matcher(content);
-        HttpRequest httpRequest =  rawTextHttpResponseResult.getHttpRequest();
+        HttpUriRequest httpRequest = responseResult.getHttpRequest();
         Set<String> newUrls = new HashSet<>();
 
-        String baseUri = StringUtils.replaceFirst(httpRequest.getUrl(), "/*", "");
+        String baseUri = StringUtils.replaceFirst(httpRequest.getURI().toString(), "/*", "");
 
         while (matcher.find()) {
             String subUrl = matcher.group();
@@ -45,4 +49,9 @@ public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor<Stri
 
         return newUrls;
     }
+
+    public static void main(String[] args) {
+        System.out.println(URI.create("http://www.baidu.com").toString());
+    }
+
 }

@@ -7,7 +7,7 @@ public abstract class AbstractSpiderConfigurer<O> {
     private SpiderBuilder builder;
 
 
-    public AbstractSpiderConfigurer(SpiderBuilder builder) {
+     AbstractSpiderConfigurer(SpiderBuilder builder) {
         this.builder = builder;
     }
 
@@ -16,6 +16,8 @@ public abstract class AbstractSpiderConfigurer<O> {
         Assert.state(builder != null, "spider builder is null");
         return builder;
     }
+
+
 
 
     abstract O build();

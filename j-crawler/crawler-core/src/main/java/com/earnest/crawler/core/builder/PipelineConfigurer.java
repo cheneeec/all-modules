@@ -2,35 +2,26 @@ package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.pipeline.Pipeline;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
-public class PipelineConfigurer extends AbstractSpiderConfigurer<Map<String, Pipeline>> {
+public class PipelineConfigurer<T,R> extends AbstractSpiderConfigurer<Pipeline<T,R>> {
 
-    private Pipeline defaultPipeline;
+    private Pipeline<T,R> pipeline;
 
-    private Map<String, Pipeline> pipelines = new LinkedHashMap<>(5);
 
     public PipelineConfigurer(SpiderBuilder builder) {
         super(builder);
     }
 
-    public PipelineConfigurer defaultPipeline(Pipeline pipeline) {
-        this.defaultPipeline = pipeline;
+    public PipelineConfigurer pipeline(Pipeline<T,R> pipeline) {
+        this.pipeline = pipeline;
         return this;
     }
 
-    public PipelineConfigurer addPipeline(String pattern, Pipeline pipeline) {
-        pipelines.put(pattern, pipeline);
-        return this;
-    }
 
     @Override
-    Map<String, Pipeline> build() {
-        if (defaultPipeline != null) {
-            pipelines.put("**", defaultPipeline);
-        }
-        return pipelines;
+    Pipeline<T, R> build() {
+
+        return pipeline;
     }
 
 }

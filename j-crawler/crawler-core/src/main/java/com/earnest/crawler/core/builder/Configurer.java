@@ -1,7 +1,7 @@
 package com.earnest.crawler.core.builder;
 
 
-public interface Configurer{
+public interface Configurer<T> {
 
     /**
      * 配置器的初始化。
@@ -11,10 +11,10 @@ public interface Configurer{
     void init() throws Exception;
 
     /**
-     * 对B进行配置。
+     * 对O进行配置。
      *
      * @throws Exception 忽略任何异常。
      */
-    void configure() throws Exception;
+    void configure(T o) throws Exception;
 
 }

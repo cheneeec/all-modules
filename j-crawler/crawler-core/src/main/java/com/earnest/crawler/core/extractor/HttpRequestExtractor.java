@@ -2,13 +2,13 @@ package com.earnest.crawler.core.extractor;
 
 
 import com.earnest.crawler.core.HttpResponseResult;
-import com.earnest.crawler.core.request.HttpRequest;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Set;
 
 @FunctionalInterface
-public interface HttpRequestExtractor<T, R extends HttpResponseResult<T>> {
+public interface HttpRequestExtractor {
 
-    Set<HttpRequest> extract(R r);
+    Set<HttpUriRequest> extract(HttpResponseResult<String> responseResult);
 
 }

@@ -4,7 +4,7 @@ import com.earnest.crawler.core.HttpResponseResult;
 
 
 @FunctionalInterface
-public interface Pipeline<TYPE, T extends HttpResponseResult<TYPE>, RETURN> {
+public interface Pipeline<T, R> {
 
-    RETURN pipe(T t);
+    R pipe(HttpResponseResult<T> result);
 }

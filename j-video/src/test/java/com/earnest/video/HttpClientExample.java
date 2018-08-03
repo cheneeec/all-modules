@@ -6,8 +6,10 @@ import com.earnest.crawler.core.pipe.Pipeline;
 import com.earnest.crawler.core.request.Browser;
 import com.earnest.crawler.core.response.PageResponse;
 import com.earnest.video.entity.IQiYi;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -55,15 +57,19 @@ public class HttpClientExample {
 
             @Override
             public List<IQiYi> handleResponse(HttpResponse response) throws HttpResponseException, IOException {
-                System.out.println("===========");
-                System.out.println(JSONObject.toJSONString(response, SerializerFeature.PrettyFormat));
-                System.out.println("===========");
 
+                HeaderElement[] elements = response.getEntity().getContentType().getElements();
+                for (HeaderElement element : elements) {
+
+                    for (NameValuePair parameter : element.getParameters()) {
+                        System.out.println(parameter.getName() + "=" + parameter.getValue());
+                    }
+                }
+                System.out.println("===========");
                 return super.handleResponse(response);
             }
         });
 
-        System.out.println(JSONObject.toJSONString(execute, SerializerFeature.PrettyFormat));
     }
 
     @Test

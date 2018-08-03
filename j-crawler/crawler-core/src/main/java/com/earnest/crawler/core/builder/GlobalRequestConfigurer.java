@@ -2,6 +2,7 @@ package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.request.HttpProxy;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -18,6 +19,8 @@ public class GlobalRequestConfigurer extends RequestConfigConfigurer<CloseableHt
 
     private final CookieStore cookieStore = new BasicCookieStore();
 
+    private int thread;
+
 
     public GlobalRequestConfigurer(SpiderBuilder builder) {
         super(builder);
@@ -30,8 +33,13 @@ public class GlobalRequestConfigurer extends RequestConfigConfigurer<CloseableHt
     }
 
     public GlobalRequestConfigurer setThread(int thread) {
-        httpClientBuilder.setMaxConnTotal(thread);
+        this.thread = thread;
+        httpClientBuilder.setMaxConnTotal(this.thread);
         return this;
+    }
+
+    public int getThread() {
+        return thread;
     }
 
     public GlobalRequestConfigurer addCookie(String name, String value) {
@@ -48,7 +56,6 @@ public class GlobalRequestConfigurer extends RequestConfigConfigurer<CloseableHt
         cookies.forEach(this::addCookie);
         return this;
     }
-
 
 
     @Override

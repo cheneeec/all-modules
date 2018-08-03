@@ -1,8 +1,7 @@
 package com.earnest.crawler.core;
 
-import com.earnest.crawler.core.request.HttpRequest;
+import org.apache.http.client.methods.HttpUriRequest;
 
-import java.util.List;
 import java.util.Map;
 
 public interface HttpResponseResult<T> {
@@ -11,9 +10,9 @@ public interface HttpResponseResult<T> {
 
     boolean isSuccess();
 
-    HttpRequest getHttpRequest();
+    HttpUriRequest getHttpRequest();
 
-    Map<String, List<String>> getHeaders();
+    Map<String,String> getHeaders();
 
     String getCharset();
 

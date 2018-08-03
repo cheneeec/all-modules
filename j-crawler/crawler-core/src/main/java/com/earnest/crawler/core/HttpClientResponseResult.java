@@ -2,19 +2,21 @@ package com.earnest.crawler.core;
 
 import com.earnest.crawler.core.request.HttpRequest;
 import lombok.Setter;
+import org.apache.http.client.methods.HttpUriRequest;
 
-import java.util.List;
 import java.util.Map;
 
 @Setter
-public abstract class BasicHttpResponseResult<T> implements HttpResponseResult<T> {
+public class HttpClientResponseResult<T> implements HttpResponseResult<T> {
 
     private int status;
     private boolean success;
-    private HttpRequest httpRequest;
-    private Map<String, List<String>> Headers;
+    private HttpUriRequest httpRequest;
+    private Map<String, String> Headers;
     private Map<String, String> cookies;
     private String charset;
+
+    private T content;
 
     @Override
     public int getStatus() {
@@ -27,12 +29,12 @@ public abstract class BasicHttpResponseResult<T> implements HttpResponseResult<T
     }
 
     @Override
-    public HttpRequest getHttpRequest() {
+    public HttpUriRequest getHttpRequest() {
         return httpRequest;
     }
 
     @Override
-    public Map<String, List<String>> getHeaders() {
+    public Map<String, String> getHeaders() {
         return Headers;
     }
 
@@ -41,6 +43,10 @@ public abstract class BasicHttpResponseResult<T> implements HttpResponseResult<T
         return charset;
     }
 
+    @Override
+    public T getContent() {
+        return content;
+    }
 
 
     @Override
