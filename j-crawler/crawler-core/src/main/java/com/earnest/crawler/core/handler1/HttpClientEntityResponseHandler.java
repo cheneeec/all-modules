@@ -6,6 +6,7 @@ import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler1.Scheduler;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -14,6 +15,7 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
+import org.springframework.util.ReflectionUtils;
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.IOException;
@@ -101,11 +103,6 @@ public class HttpClientEntityResponseHandler<R, T> implements ResponseHandler<T>
     }
 
 
-    public static void main(String[] args) {
-        Pipeline<String, List<HttpResponse>> pipeline = result -> Collections.emptyList();
-        Class<? extends Pipeline> aClass = pipeline.getClass();
-        System.out.println((aClass.getSigners()));
-    }
 
 
 }

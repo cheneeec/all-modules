@@ -12,7 +12,6 @@
         <module>j-video</module>
         <module>j-security</module>
         <module>j-core</module>
-        <module>j-eureka</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -26,8 +25,6 @@
         <fastjson.version>1.2.41</fastjson.version>
 
     </properties>
-
-
 
 
     <dependencyManagement>
