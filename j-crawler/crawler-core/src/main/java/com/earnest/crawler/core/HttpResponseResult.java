@@ -2,6 +2,7 @@ package com.earnest.crawler.core;
 
 import org.apache.http.client.methods.HttpUriRequest;
 
+import java.io.InputStream;
 import java.util.Map;
 
 public interface HttpResponseResult<T> {
@@ -12,12 +13,14 @@ public interface HttpResponseResult<T> {
 
     HttpUriRequest getHttpRequest();
 
-    Map<String,String> getHeaders();
+    Map<String, String> getHeaders();
 
     String getCharset();
 
     T getContent();
 
     Map<String, String> getCookies();
+
+
 
 }

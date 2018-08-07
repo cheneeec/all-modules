@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 @Getter
 @Setter
 public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor {
+
     private final Pattern urlPattern;
 
     public RegexHttpRequestExtractor(String urlPattern) {
@@ -50,8 +51,5 @@ public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor {
         return newUrls;
     }
 
-    public static void main(String[] args) {
-        System.out.println(URI.create("http://www.baidu.com").toString());
-    }
 
 }

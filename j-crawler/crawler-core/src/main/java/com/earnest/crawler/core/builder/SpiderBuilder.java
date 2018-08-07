@@ -1,9 +1,18 @@
 package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.crawler.Spider;
+import com.earnest.crawler.core.extractor.HttpRequestExtractor;
+import com.earnest.crawler.core.handler1.HttpClientEntityResponseHandler;
+import com.earnest.crawler.core.pipeline.Pipeline;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
+import java.util.List;
 
 
 public class SpiderBuilder implements Builder<Spider> {
@@ -20,6 +29,8 @@ public class SpiderBuilder implements Builder<Spider> {
     private final CookieStore cookieStore = new BasicCookieStore();
 
     private final HttpClientContext clientContext = new HttpClientContext();
+    //调度器
+
 
     /**
      * 设置开始爬取的起点网址。
@@ -60,7 +71,12 @@ public class SpiderBuilder implements Builder<Spider> {
 
     @Override
     public Spider build() {
+        HttpUriRequest httpUriRequest = startingPointConfigurer.build();
+        CloseableHttpClient closeableHttpClient = globalRequestConfigurer.build();
+        HttpRequestExtractor httpRequestExtractor = httpUriRequestExtractorConfigurer.build();
+        Pipeline pipeline = pipelineConfigurer.build();
 
+        HttpClientEntityResponseHandler responseHandler = new HttpClientEntityResponseHandler(pipeline);
         return null;
     }
 }

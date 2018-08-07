@@ -5,8 +5,8 @@ import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler1.Scheduler;
-import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.ClassUtils;
+import lombok.Setter;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -15,54 +15,77 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.util.EntityUtils;
-import org.springframework.util.ReflectionUtils;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
-/**
- * @param <R> 可以获得的结果类型。四种选择：{@link String},{@link java.io.InputStream},{@link org.jsoup.nodes.Document},{@link Array}
- * @param <T>
- */
-@AllArgsConstructor
-public class HttpClientEntityResponseHandler<R, T> implements ResponseHandler<T> {
+@Setter
+public class HttpClientEntityResponseHandler<R> implements ResponseHandler<R>, HttpResponseHandler<Document, R> {
 
-    private final Scheduler scheduler;
+    private Scheduler scheduler;
 
-    private final Pipeline<R, T> pipeline;
+    private final Pipeline<Document, R> pipeline;
 
-    private final HttpRequestExtractor httpRequestExtractor;
+    private HttpRequestExtractor httpRequestExtractor;
 
+
+    public HttpClientEntityResponseHandler(Pipeline<Document, R> pipeline) {
+        this(null, pipeline, null);
+    }
+
+    public HttpClientEntityResponseHandler(Scheduler scheduler, Pipeline<Document, R> pipeline, HttpRequestExtractor httpRequestExtractor) {
+        this.scheduler = scheduler;
+        this.pipeline = pipeline;
+        this.httpRequestExtractor = httpRequestExtractor;
+    }
 
     @Override
-    public T handleResponse(HttpResponse response) throws IOException {
-
-        HttpClientResponseResult<String> responseResult = createHttpClientResponseResult(response);
-
-        //put new httpUriRequests
-        Set<HttpUriRequest> newHttpUriRequests = httpRequestExtractor.extract(responseResult);
-
-        newHttpUriRequests.forEach(scheduler::put);
-
-
+    public R handleResponse(HttpResponse response) throws IOException {
         //super method
-        final StatusLine statusLine = response.getStatusLine();
-        final HttpEntity entity = response.getEntity();
+        StatusLine statusLine = response.getStatusLine();
+        HttpEntity entity = response.getEntity();
         if (statusLine.getStatusCode() >= 300) {
+
             EntityUtils.consume(entity);
             throw new HttpResponseException(statusLine.getStatusCode(),
                     statusLine.getReasonPhrase());
         }
-        return entity == null ? null : handleResponseResult(responseResult);
-        //super method
+
+        String content = EntityUtils.toString(response.getEntity());
+
+
+        HttpClientResponseResult<String> stringHttpResponseResult = createHttpClientResponseResult(response);
+        stringHttpResponseResult.setContent(content);
+
+        //
+        extractNewHttpRequests(stringHttpResponseResult);
+
+        HttpClientResponseResult<Document> documentResponseResult = createHttpClientResponseResult(response);
+        documentResponseResult.setContent(Jsoup.parse(content));
+
+        return entity == null ? null : handle(documentResponseResult);
+
     }
 
-    private T handleResponseResult(HttpClientResponseResult<String> responseResult) {
-        return null;
+    /**
+     * 从结果中提取新的{@link HttpUriRequest}。
+     *
+     * @param responseResult
+     */
+    private void extractNewHttpRequests(HttpResponseResult<String> responseResult) {
+        if (ObjectUtils.allNotNull(httpRequestExtractor, scheduler)) {
+            //create responseResult
+
+            //extract new httpUriRequests
+            Set<HttpUriRequest> newHttpUriRequests = httpRequestExtractor.extract(responseResult);
+
+            //add new httpUriRequests to scheduler
+            newHttpUriRequests.forEach(scheduler::put);
+        }
     }
+
 
     /**
      * 根据{@link HttpResponse}创建{@link HttpClientResponseResult}
@@ -71,11 +94,11 @@ public class HttpClientEntityResponseHandler<R, T> implements ResponseHandler<T>
      * @return {@link HttpClientResponseResult}
      * @throws IOException
      */
-    private HttpClientResponseResult<String> createHttpClientResponseResult(HttpResponse response) throws IOException {
-        HttpClientResponseResult<String> responseResult = new HttpClientResponseResult<>();
-        Map<String, String> headers = new LinkedHashMap<>();
+    private <Q> HttpClientResponseResult<Q> createHttpClientResponseResult(HttpResponse response) throws IOException {
 
-        HttpEntity entity = response.getEntity();
+        HttpClientResponseResult<Q> responseResult = new HttpClientResponseResult<>();
+
+        Map<String, String> headers = new LinkedHashMap<>();
 
         Arrays.stream(response.getAllHeaders())
                 .forEach(header -> headers.put(header.getName(), header.getValue()));
@@ -86,6 +109,8 @@ public class HttpClientEntityResponseHandler<R, T> implements ResponseHandler<T>
 
         responseResult.setSuccess("OK".equalsIgnoreCase(response.getStatusLine().getReasonPhrase()));
 
+        HttpEntity entity = response.getEntity();
+
         // set charset
         Arrays.stream(entity.getContentType().getElements())
                 .map(e -> e.getParameterByName("charset"))
@@ -93,16 +118,20 @@ public class HttpClientEntityResponseHandler<R, T> implements ResponseHandler<T>
                 .map(NameValuePair::getValue).ifPresent(responseResult::setCharset);
 
         //set entity
-        responseResult.setContent(EntityUtils.toString(entity));
+//        responseResult.setContent(EntityUtils.toString(entity));
+
 
         //set httpUriRequest
         HttpUriRequest httpUriRequest = HttpClientResponseContextHolder.getHttpUriRequest(response);
 
         responseResult.setHttpRequest(httpUriRequest);
+
         return responseResult;
     }
 
 
-
-
+    @Override
+    public R handle(HttpResponseResult<Document> responseResult) {
+        return pipeline.pipe(responseResult);
+    }
 }
