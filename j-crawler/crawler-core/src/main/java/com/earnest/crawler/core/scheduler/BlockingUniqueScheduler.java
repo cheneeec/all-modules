@@ -48,10 +48,10 @@ public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler i
     }
 
     @Override
-    public boolean addAll(Collection<HttpRequest> httpRequests) {
-        if (CollectionUtils.isEmpty(httpRequests)) return true;
+    public void addAll(Collection<HttpRequest> httpRequests) {
+        if (CollectionUtils.isEmpty(httpRequests)) return;
         Set<HttpRequest> filterHistoryHttpRequests = filterHistoryHttpRequests(httpRequests);
-        if (CollectionUtils.isEmpty(filterHistoryHttpRequests)) return true;
+        if (CollectionUtils.isEmpty(filterHistoryHttpRequests)) return;
         try {
             lock.lock();
             int originalTaskSize = taskSet.size();
@@ -61,7 +61,7 @@ public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler i
                 getCondition.signal();
                 newTaskSize--;
             }
-            return Objects.equals(originalTaskSize, newTaskSize);
+            Objects.equals(originalTaskSize, newTaskSize);
         } finally {
             lock.unlock();
         }

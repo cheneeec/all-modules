@@ -2,9 +2,12 @@ package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.request.Browser;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.jsoup.Connection;
 import org.springframework.util.Assert;
 
@@ -19,9 +22,12 @@ public class StartingPointConfigurer extends RequestConfigConfigurer<HttpUriRequ
     private String method;
     private Map<String, String> parameters = new LinkedHashMap<>();
 
+    private final CookieStore cookieStore;
 
-    public StartingPointConfigurer(SpiderBuilder builder) {
+
+    public StartingPointConfigurer(SpiderBuilder builder, CookieStore cookieStore) {
         super(builder);
+        this.cookieStore = cookieStore;
     }
 
 
@@ -70,6 +76,7 @@ public class StartingPointConfigurer extends RequestConfigConfigurer<HttpUriRequ
         return this;
     }
 
+
     @Override
     HttpUriRequest build() {
 
@@ -83,10 +90,16 @@ public class StartingPointConfigurer extends RequestConfigConfigurer<HttpUriRequ
         this.parameters.forEach(requestBuilder::addParameter);
         //add headers
         this.headers.forEach(requestBuilder::addHeader);
+
         //add cookies
+        this.cookies.entrySet()
+                .stream()
+                .map(e -> new BasicClientCookie(e.getKey(), e.getValue()))
+                .forEach(cookieStore::addCookie);
 
         //set requestConfig
         requestBuilder.setConfig(requestConfig());
+
 
         return requestBuilder.build();
     }

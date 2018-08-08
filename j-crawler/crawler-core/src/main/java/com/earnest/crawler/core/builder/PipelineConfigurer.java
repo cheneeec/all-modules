@@ -1,43 +1,46 @@
 package com.earnest.crawler.core.builder;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.earnest.crawler.core.HttpResponseResult;
+import com.earnest.crawler.core.pipeline.DocumentPipeline;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import org.jsoup.nodes.Document;
 
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
-public class PipelineConfigurer<T, R> extends AbstractSpiderConfigurer<Pipeline<T, R>> {
+public class PipelineConfigurer extends AbstractSpiderConfigurer<Pipeline> {
 
-    private Pipeline<T, R> pipeline;
+    private Pipeline pipeline;
 
 
     public PipelineConfigurer(SpiderBuilder builder) {
         super(builder);
     }
 
-    public PipelineConfigurer<T, R> pipeline(Pipeline<T, R> pipeline) {
+    public PipelineConfigurer pipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
         return this;
     }
 
-    /*@SuppressWarnings("unchecked")
-    public PipelineConfigurer<T, R> asFile(Function<HttpResponseResult<InputStream>, R> fileHandler) {
-        this.pipeline = t -> fileHandler.apply((HttpResponseResult<InputStream>) t);
-        return this;
-    }*/
 
     @SuppressWarnings("unchecked")
-    public PipelineConfigurer<T, R> cssSelector(Function<HttpResponseResult<Document>, R> cssSelector) {
-        this.pipeline = t -> cssSelector.apply((HttpResponseResult<Document>) t);
+    public PipelineConfigurer cssSelector(Consumer<HttpResponseResult<Document>> cssSelector) {
+        this.pipeline = new DocumentPipeline(cssSelector);
         return this;
     }
 
 
     @Override
-    Pipeline<T, R> build() {
+    Pipeline build() {
 
-        return pipeline;
+        return Optional.ofNullable(pipeline)
+                .orElse(r -> System.out.println(
+                        JSONObject.toJSONString(r, SerializerFeature.PrettyFormat)
+                ));
     }
 
 }

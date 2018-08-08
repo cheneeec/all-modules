@@ -18,6 +18,7 @@ public class HttpClientResponseResult<T> implements HttpResponseResult<T> {
     private String charset;
     private T content;
 
+    private String reason;
 
 
     @Override
@@ -54,5 +55,10 @@ public class HttpClientResponseResult<T> implements HttpResponseResult<T> {
     @Override
     public Map<String, String> getCookies() {
         return cookies;
+    }
+
+    @Override
+    public String getReason() {
+        return reason;
     }
 }

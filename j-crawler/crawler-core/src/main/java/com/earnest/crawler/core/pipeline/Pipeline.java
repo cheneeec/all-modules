@@ -1,10 +1,9 @@
 package com.earnest.crawler.core.pipeline;
 
-import com.earnest.crawler.core.HttpResponseResult;
+import com.earnest.crawler.core.StringResponseResult;
 
 
 @FunctionalInterface
-public interface Pipeline<T, R> {
-
-    R pipe(HttpResponseResult<T> result);
+public interface Pipeline {
+    void pipe(StringResponseResult result);
 }

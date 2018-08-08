@@ -2,8 +2,6 @@ package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.request.HttpProxy;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -17,13 +15,14 @@ public class GlobalRequestConfigurer extends RequestConfigConfigurer<CloseableHt
 
     private final HttpClientBuilder httpClientBuilder = HttpClients.custom();
 
-    private final CookieStore cookieStore = new BasicCookieStore();
+    private final CookieStore cookieStore;
 
     private int thread;
 
 
-    public GlobalRequestConfigurer(SpiderBuilder builder) {
+    public GlobalRequestConfigurer(SpiderBuilder builder, CookieStore cookieStore) {
         super(builder);
+        this.cookieStore = cookieStore;
     }
 
     public GlobalRequestConfigurer setProxy(HttpProxy httpProxy) {

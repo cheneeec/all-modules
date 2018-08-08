@@ -2,7 +2,6 @@ package com.earnest.crawler.core;
 
 import org.apache.http.client.methods.HttpUriRequest;
 
-import java.io.InputStream;
 import java.util.Map;
 
 public interface HttpResponseResult<T> {
@@ -21,6 +20,7 @@ public interface HttpResponseResult<T> {
 
     Map<String, String> getCookies();
 
+    String getReason();
 
 
 }

@@ -48,4 +48,9 @@ public class BlockingUniqueScheduler implements Scheduler {
         }
         return false;
     }
+
+    @Override
+    public void put(Collection<HttpUriRequest> httpUriRequest) {
+        queue.addAll(httpUriRequest);
+    }
 }

@@ -33,12 +33,10 @@ public interface Scheduler extends DownloadListener {
      * @param httpRequests
      * @return
      */
-    default boolean addAll(Collection<HttpRequest> httpRequests) {
+    default void addAll(Collection<HttpRequest> httpRequests) {
         try {
             httpRequests.forEach(this::put);
-            return true;
         } catch (Exception e) {
-            return false;
         }
 
     }
