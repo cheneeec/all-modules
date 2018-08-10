@@ -97,8 +97,8 @@ public class HttpClientExample {
 
     public static void main(String[] args) {
         Spider spider = new SpiderBuilder()
-                .request().from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
-                .method(Connection.Method.GET)
+                .request().method(Connection.Method.GET)
+                .from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
                 .and()
                 .global()
                 .setThread(10).userAgent(Browser.GOOGLE.userAgent())

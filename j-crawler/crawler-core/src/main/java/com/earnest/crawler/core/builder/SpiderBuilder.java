@@ -1,44 +1,49 @@
 package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.crawler.Spider;
-import com.earnest.crawler.core.downloader1.HttpClientDownloader;
+import com.earnest.crawler.core.downloader1.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
-import com.earnest.crawler.core.scheduler1.BlockingUniqueScheduler;
 import com.earnest.crawler.core.scheduler1.Scheduler;
 import com.earnest.crawler.core.spider.Crawler;
 import com.earnest.crawler.core.spider.ExecutableSpider;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class SpiderBuilder implements Builder<Spider> {
 
-    //起点配置
-    private final StartingPointConfigurer startingPointConfigurer;
-    //全局的请求设置
-    private final GlobalRequestConfigurer globalRequestConfigurer;
-    //管道配置
-    private final PipelineConfigurer pipelineConfigurer = new PipelineConfigurer(this);
-    //新的请求提取器
-    private final HttpUriRequestExtractorConfigurer httpUriRequestExtractorConfigurer = new HttpUriRequestExtractorConfigurer(this);
-    //cookies存储器
-    private final CookieStore cookieStore = new BasicCookieStore();
-    //会话上下文
-    private final HttpClientContext clientContext = new HttpClientContext();
+
+    private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new TreeMap<>();
+
+    private Map<Class<?>, List<? extends Object>> sharedObjectMap = new LinkedHashMap<>();
 
     public SpiderBuilder() {
-        this.startingPointConfigurer = new StartingPointConfigurer(this, cookieStore);
-        this.globalRequestConfigurer = new GlobalRequestConfigurer(this, cookieStore);
-        this.clientContext.setCookieStore(cookieStore);
+        init();
+    }
+
+    private void init() {
+        //起点配置
+        configurers.put(HttpUriRequestConfigurer.class, new HttpUriRequestConfigurer());
+        //全局的请求设置
+        configurers.put(DownloaderConfigurer.class, new DownloaderConfigurer());
+        //管道配置
+        configurers.put(PipelineConfigurer.class, new PipelineConfigurer());
+        //新的请求提取器
+        configurers.put(HttpUriRequestExtractorConfigurer.class, new HttpUriRequestExtractorConfigurer());
+
+        configurers.values().forEach(c -> {
+            c.setBuilder(this);
+            c.setSharedObjectMap(sharedObjectMap);
+            c.init();
+        });
     }
 
 
     //调度器
-
 
 
     /**
@@ -46,8 +51,8 @@ public class SpiderBuilder implements Builder<Spider> {
      *
      * @return
      */
-    public StartingPointConfigurer request() {
-        return startingPointConfigurer;
+    public HttpUriRequestConfigurer request() {
+        return (HttpUriRequestConfigurer) configurers.get(HttpUriRequestConfigurer.class);
     }
 
     /**
@@ -55,8 +60,8 @@ public class SpiderBuilder implements Builder<Spider> {
      *
      * @return
      */
-    public GlobalRequestConfigurer global() {
-        return globalRequestConfigurer;
+    public DownloaderConfigurer global() {
+        return (DownloaderConfigurer) configurers.get(DownloaderConfigurer.class);
     }
 
     /**
@@ -65,7 +70,7 @@ public class SpiderBuilder implements Builder<Spider> {
      * @return
      */
     public PipelineConfigurer pipeline() {
-        return pipelineConfigurer;
+        return (PipelineConfigurer) configurers.get(PipelineConfigurer.class);
     }
 
     /**
@@ -74,27 +79,21 @@ public class SpiderBuilder implements Builder<Spider> {
      * @return
      */
     public HttpUriRequestExtractorConfigurer extract() {
-        return httpUriRequestExtractorConfigurer;
+        return (HttpUriRequestExtractorConfigurer) configurers.get(HttpUriRequestExtractorConfigurer.class);
     }
 
 
     @Override
     public Spider build() {
-        HttpUriRequest httpUriRequest = startingPointConfigurer.build();
+        configurers.values().forEach(SharedSpiderConfigurer::configure);
 
-        CloseableHttpClient closeableHttpClient = globalRequestConfigurer.build();
+        Downloader downloader = (Downloader) sharedObjectMap.get(Downloader.class).get(0);
+        HttpRequestExtractor httpRequestExtractor = (HttpRequestExtractor) sharedObjectMap.get(HttpRequestExtractor.class).get(0);
+        Scheduler scheduler = (Scheduler) sharedObjectMap.get(Scheduler.class).get(0);
+        Pipeline pipeline = (Pipeline) sharedObjectMap.get(Pipeline.class).get(0);
 
-        HttpRequestExtractor httpRequestExtractor = httpUriRequestExtractorConfigurer.build();
+        Crawler crawler = new Crawler(downloader, httpRequestExtractor, scheduler, pipeline);
 
-
-        Pipeline pipeline = pipelineConfigurer.build();
-
-
-        Scheduler scheduler = new BlockingUniqueScheduler();
-
-
-        scheduler.put(httpUriRequest);
-
-        return new ExecutableSpider(new Crawler(new HttpClientDownloader(closeableHttpClient, clientContext), httpRequestExtractor, scheduler, pipeline));
+        return new ExecutableSpider(crawler);
     }
 }

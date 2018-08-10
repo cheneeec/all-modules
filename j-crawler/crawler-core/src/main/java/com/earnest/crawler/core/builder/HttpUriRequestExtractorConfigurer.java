@@ -6,17 +6,15 @@ import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.extractor.RegexHttpRequestExtractor;
 import org.jsoup.nodes.Document;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 
-public class HttpUriRequestExtractorConfigurer extends AbstractSpiderConfigurer<HttpRequestExtractor> {
+public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<HttpRequestExtractor> {
 
 
     private HttpRequestExtractor requestExtractor;
 
-    public HttpUriRequestExtractorConfigurer(SpiderBuilder builder) {
-        super(builder);
-    }
 
     /**
      * 使用正则表达式提取新的链接。
@@ -51,10 +49,9 @@ public class HttpUriRequestExtractorConfigurer extends AbstractSpiderConfigurer<
     }
 
 
+
     @Override
-    HttpRequestExtractor build() {
-        return requestExtractor;
+    public void configure() {
+        sharedObjectMap.put(HttpRequestExtractor.class, Collections.singletonList(requestExtractor));
     }
-
-
 }

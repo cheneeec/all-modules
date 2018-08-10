@@ -7,19 +7,15 @@ import com.earnest.crawler.core.pipeline.DocumentPipeline;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import org.jsoup.nodes.Document;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 
-public class PipelineConfigurer extends AbstractSpiderConfigurer<Pipeline> {
+public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
 
     private Pipeline pipeline;
 
-
-    public PipelineConfigurer(SpiderBuilder builder) {
-        super(builder);
-    }
 
     public PipelineConfigurer pipeline(Pipeline pipeline) {
         this.pipeline = pipeline;
@@ -35,12 +31,16 @@ public class PipelineConfigurer extends AbstractSpiderConfigurer<Pipeline> {
 
 
     @Override
-    Pipeline build() {
+    public void configure() {
 
-        return Optional.ofNullable(pipeline)
-                .orElse(r -> System.out.println(
-                        JSONObject.toJSONString(r, SerializerFeature.PrettyFormat)
+        sharedObjectMap.put(Pipeline.class,
+                Collections.singletonList(
+                        Optional.ofNullable(pipeline)
+                                .orElse(r -> System.out.println(
+                                        JSONObject.toJSONString(r, SerializerFeature.PrettyFormat)
+                                ))
                 ));
     }
+
 
 }
