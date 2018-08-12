@@ -8,16 +8,13 @@ import com.earnest.crawler.core.scheduler1.Scheduler;
 import com.earnest.crawler.core.spider.Crawler;
 import com.earnest.crawler.core.spider.ExecutableSpider;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public class SpiderBuilder implements Builder<Spider> {
 
 
-    private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new TreeMap<>();
+    private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new LinkedHashMap<>();
 
     private Map<Class<?>, List<? extends Object>> sharedObjectMap = new LinkedHashMap<>();
 
@@ -25,6 +22,7 @@ public class SpiderBuilder implements Builder<Spider> {
         init();
     }
 
+    @SuppressWarnings("unchecked")
     private void init() {
         //起点配置
         configurers.put(HttpUriRequestConfigurer.class, new HttpUriRequestConfigurer());
@@ -35,7 +33,10 @@ public class SpiderBuilder implements Builder<Spider> {
         //新的请求提取器
         configurers.put(HttpUriRequestExtractorConfigurer.class, new HttpUriRequestExtractorConfigurer());
 
-        configurers.values().forEach(c -> {
+        ArrayList<SharedSpiderConfigurer> spiderConfigurers = new ArrayList<>(configurers.values());
+        Collections.sort(spiderConfigurers);
+
+        spiderConfigurers.forEach(c -> {
             c.setBuilder(this);
             c.setSharedObjectMap(sharedObjectMap);
             c.init();
@@ -85,7 +86,11 @@ public class SpiderBuilder implements Builder<Spider> {
 
     @Override
     public Spider build() {
-        configurers.values().forEach(SharedSpiderConfigurer::configure);
+
+        ArrayList<SharedSpiderConfigurer> spiderConfigurers = new ArrayList<>(configurers.values());
+        Collections.sort(spiderConfigurers);
+        spiderConfigurers.forEach(SharedSpiderConfigurer::configure);
+
 
         Downloader downloader = (Downloader) sharedObjectMap.get(Downloader.class).get(0);
         HttpRequestExtractor httpRequestExtractor = (HttpRequestExtractor) sharedObjectMap.get(HttpRequestExtractor.class).get(0);

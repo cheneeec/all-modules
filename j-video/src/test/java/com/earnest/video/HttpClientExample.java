@@ -101,7 +101,8 @@ public class HttpClientExample {
                 .from("http://list.iqiyi.com/www/4/38-------------4-1-1-iqiyi--.html")
                 .and()
                 .global()
-                .setThread(10).userAgent(Browser.GOOGLE.userAgent())
+                .setThreadNumber(10)
+                .userAgent(Browser.GOOGLE.userAgent())
                 .and()
                 .pipeline()
                 .cssSelector(response -> {
