@@ -12,15 +12,19 @@ import java.util.*;
 
 public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequest> {
     private SpiderBuilder builder;
+    private HttpUriRequestPropertyConfigurer httpUriRequestPropertyConfigurer;
+
 
     public HttpUriRequestPropertyConfigurer method(Connection.Method method) {
         RequestBuilder requestBuilder = RequestBuilder.create(method.name());
-        return new HttpUriRequestPropertyConfigurer(requestBuilder, builder);
+        httpUriRequestPropertyConfigurer = new HttpUriRequestPropertyConfigurer(requestBuilder, builder);
+        httpUriRequestPropertyConfigurer.setSharedObjectMap(sharedObjectMap);
+        return httpUriRequestPropertyConfigurer;
     }
 
     @Override
     protected int order() {
-        return 3;
+        return 2;
     }
 
     @Override
@@ -32,10 +36,16 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
     }
 
     @Override
+    public void configure() {
+        httpUriRequestPropertyConfigurer.configure();
+    }
+
+    @Override
     public void setBuilder(SpiderBuilder builder) {
         super.setBuilder(builder);
         this.builder = builder;
     }
+
 
     public class HttpUriRequestPropertyConfigurer extends RequestConfigConfigurer<HttpUriRequest> {
 
@@ -106,6 +116,7 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
                     (List<Object>) sharedObjectMap.computeIfAbsent(HttpUriRequest.class, k -> new ArrayList<>());
 
             objects.add(0, httpUriRequest);
+
         }
     }
 

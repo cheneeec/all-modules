@@ -18,6 +18,7 @@ import static java.util.Objects.isNull;
 public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler implements BlockingScheduler {
 
     private final Set<HttpRequest> taskSet;
+
     private final Set<String> historyTaskSet;
 
     private final ReentrantLock lock = new ReentrantLock();

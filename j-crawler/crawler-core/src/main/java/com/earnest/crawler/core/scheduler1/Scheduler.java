@@ -12,6 +12,6 @@ public interface Scheduler {
 
     boolean put(HttpUriRequest httpUriRequest);
 
-    void put(Collection<HttpUriRequest> httpUriRequest);
+    void putAll(Collection<HttpUriRequest> httpUriRequests);
 
 }

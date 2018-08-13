@@ -126,7 +126,7 @@ public class HttpClientExample {
                 .and()
                 .build();
 
-        spider.start();
+//        spider.start();
 
 
     }

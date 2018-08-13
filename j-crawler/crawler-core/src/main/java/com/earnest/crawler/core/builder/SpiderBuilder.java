@@ -14,11 +14,11 @@ import java.util.*;
 public class SpiderBuilder implements Builder<Spider> {
 
 
-    private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new TreeMap<>();
+    private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new LinkedHashMap<>();
 
-    private Map<Class<?>, List<? extends Object>> sharedObjectMap = new LinkedHashMap<>();
+    private Map<Class<?>, List<?>> sharedObjectMap = new LinkedHashMap<>();
 
-    private final Set<SharedSpiderConfigurer> sharedSpiderConfigurers = new TreeSet<>();
+    private final List<SharedSpiderConfigurer> sharedSpiderConfigurers = new ArrayList<>();
 
     public SpiderBuilder() {
         init();
@@ -26,10 +26,18 @@ public class SpiderBuilder implements Builder<Spider> {
 
     private void init() {
 
-        initSharedSpiderConfigurers();
+        sharedSpiderConfigurers.add(new HttpUriRequestConfigurer());
+        sharedSpiderConfigurers.add(new DownloaderConfigurer());
+        sharedSpiderConfigurers.add(new PipelineConfigurer());
+        sharedSpiderConfigurers.add(new HttpUriRequestExtractorConfigurer());
+        sharedSpiderConfigurers.add(new SchedulerConfigurer());
+
+        Collections.sort(sharedSpiderConfigurers);
+
 
         sharedSpiderConfigurers.forEach(e -> {
             e.setBuilder(this);
+            e.setSharedObjectMap(sharedObjectMap);
             configurers.put(e.getClass(), e);
             e.init();
         });
@@ -43,13 +51,6 @@ public class SpiderBuilder implements Builder<Spider> {
         configurers.put(HttpUriRequestExtractorConfigurer.class, new HttpUriRequestExtractorConfigurer());*/
 
 
-    }
-
-    private void initSharedSpiderConfigurers() {
-        sharedSpiderConfigurers.add(new HttpUriRequestConfigurer());
-        sharedSpiderConfigurers.add(new DownloaderConfigurer());
-        sharedSpiderConfigurers.add(new PipelineConfigurer());
-        sharedSpiderConfigurers.add(new HttpUriRequestExtractorConfigurer());
     }
 
 
@@ -92,17 +93,28 @@ public class SpiderBuilder implements Builder<Spider> {
         return (HttpUriRequestExtractorConfigurer) configurers.get(HttpUriRequestExtractorConfigurer.class);
     }
 
+    public SchedulerConfigurer scheduler() {
+        return (SchedulerConfigurer) configurers.get(SchedulerConfigurer.class);
+    }
+
 
     @Override
     public Spider build() {
         sharedSpiderConfigurers.forEach(SharedSpiderConfigurer::configure);
-
+        //downloader
         Downloader downloader = (Downloader) sharedObjectMap.get(Downloader.class).get(0);
+        //httpRequestExtractor
         HttpRequestExtractor httpRequestExtractor = (HttpRequestExtractor) sharedObjectMap.get(HttpRequestExtractor.class).get(0);
+        //scheduler
         Scheduler scheduler = (Scheduler) sharedObjectMap.get(Scheduler.class).get(0);
+        //pipeline
         Pipeline pipeline = (Pipeline) sharedObjectMap.get(Pipeline.class).get(0);
+        //thread
+        Integer thread = (Integer) sharedObjectMap.get(Integer.class).get(0);
 
         Crawler crawler = new Crawler(downloader, httpRequestExtractor, scheduler, pipeline);
+
+        crawler.run();
 
         return new ExecutableSpider(crawler);
     }

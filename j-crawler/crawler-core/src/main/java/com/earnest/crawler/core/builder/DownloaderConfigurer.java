@@ -6,6 +6,7 @@ import com.earnest.crawler.core.request.HttpProxy;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -29,13 +30,11 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
 
         sharedObjectMap.put(Integer.class, Collections.singletonList(thread));
 
-        httpClientBuilder.setMaxConnTotal(this.thread);
+        httpClientBuilder.setMaxConnTotal(thread);
+
         return this;
     }
 
-    public int getThread() {
-        return thread;
-    }
 
     public DownloaderConfigurer addCookie(String name, String value) {
         ((CookieStore) sharedObjectMap.get(CookieStore.class).get(0))
@@ -57,6 +56,7 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
         cookies.forEach(this::addCookie);
         return this;
     }
+
 
     @Override
     protected int order() {
@@ -83,18 +83,26 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
     @Override
     public void configure() {
 
-        //移除上下文的cookieStore
-        Object o = sharedObjectMap.get(CookieStore.class).remove(1);
+        //移除session的cookieStore
+        Object sessionCookieStore = sharedObjectMap.get(CookieStore.class).remove(1);
 
-        Assert.state(o != null, "session cookieStore is null");
+        Assert.state(sessionCookieStore != null, "session cookieStore is null");
 
 
         //获得HttpClientContext
         HttpClientContext httpClientContext = (HttpClientContext) sharedObjectMap.remove(HttpClientContext.class).get(0);
 
+        //将session的cookieStore
+        httpClientContext.setCookieStore((CookieStore) sessionCookieStore);
+
+        //设置全局的cookieStore
+        CloseableHttpClient httpClient = httpClientBuilder
+                .setDefaultCookieStore(((CookieStore) sharedObjectMap.remove(CookieStore.class).get(0)))
+                .build();
+
         sharedObjectMap.put(Downloader.class,
                 Collections.singletonList(
-                        new HttpClientDownloader(httpClientBuilder.build(), httpClientContext)
+                        new HttpClientDownloader(httpClient, httpClientContext)
                 ));
 
     }

@@ -50,6 +50,12 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
 
 
 
+
+    @Override
+    protected int order() {
+        return 3;
+    }
+
     @Override
     public void configure() {
         sharedObjectMap.put(HttpRequestExtractor.class, Collections.singletonList(requestExtractor));

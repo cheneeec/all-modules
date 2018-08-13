@@ -6,7 +6,6 @@ import com.earnest.crawler.core.downloader1.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler1.Scheduler;
-import lombok.AllArgsConstructor;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.Closeable;
@@ -21,7 +20,7 @@ public class Crawler implements Closeable, Runnable {
     private final Scheduler scheduler;
     private final Pipeline pipeline;
 
-    private volatile boolean running;
+    private volatile boolean running=true;
 
     public Crawler(Downloader downloader, HttpRequestExtractor httpRequestExtractor, Scheduler scheduler, Pipeline pipeline) {
         this.downloader = downloader;
@@ -37,7 +36,7 @@ public class Crawler implements Closeable, Runnable {
             HttpUriRequest httpUriRequest = scheduler.take();
             StringResponseResult responseResult = downloader.download(httpUriRequest);
             Set<HttpUriRequest> httpUriRequests = httpRequestExtractor.extract(responseResult);
-            scheduler.put(httpUriRequests);
+            scheduler.putAll(httpUriRequests);
             pipeline.pipe(responseResult);
         }
 
