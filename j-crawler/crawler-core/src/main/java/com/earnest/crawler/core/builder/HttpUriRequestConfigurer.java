@@ -11,11 +11,11 @@ import org.jsoup.Connection;
 import java.util.*;
 
 public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequest> {
-
+    private SpiderBuilder builder;
 
     public HttpUriRequestPropertyConfigurer method(Connection.Method method) {
         RequestBuilder requestBuilder = RequestBuilder.create(method.name());
-        return new HttpUriRequestPropertyConfigurer(requestBuilder);
+        return new HttpUriRequestPropertyConfigurer(requestBuilder, builder);
     }
 
     @Override
@@ -29,17 +29,21 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
         //放入会话CookieStore
         List<Object> cookieStores = (List<Object>) sharedObjectMap.get(CookieStore.class);
         cookieStores.add(new BasicCookieStore());
-
-
     }
 
+    @Override
+    public void setBuilder(SpiderBuilder builder) {
+        super.setBuilder(builder);
+        this.builder = builder;
+    }
 
     public class HttpUriRequestPropertyConfigurer extends RequestConfigConfigurer<HttpUriRequest> {
 
         private final RequestBuilder requestBuilder;
 
-        private HttpUriRequestPropertyConfigurer(RequestBuilder requestBuilder) {
+        private HttpUriRequestPropertyConfigurer(RequestBuilder requestBuilder, SpiderBuilder builder) {
             this.requestBuilder = requestBuilder;
+            setBuilder(builder);
         }
 
         public HttpUriRequestPropertyConfigurer from(String url) {
@@ -94,7 +98,7 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
 
         @Override
         @SuppressWarnings("unchecked")
-        public void configure(){
+        public void configure() {
 
             HttpUriRequest httpUriRequest = requestBuilder.build();
 

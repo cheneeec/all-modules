@@ -8,10 +8,7 @@ import com.earnest.crawler.core.scheduler1.Scheduler;
 import com.earnest.crawler.core.spider.Crawler;
 import com.earnest.crawler.core.spider.ExecutableSpider;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public class SpiderBuilder implements Builder<Spider> {
@@ -21,25 +18,38 @@ public class SpiderBuilder implements Builder<Spider> {
 
     private Map<Class<?>, List<? extends Object>> sharedObjectMap = new LinkedHashMap<>();
 
+    private final Set<SharedSpiderConfigurer> sharedSpiderConfigurers = new TreeSet<>();
+
     public SpiderBuilder() {
         init();
     }
 
     private void init() {
-        //起点配置
-        configurers.put(HttpUriRequestConfigurer.class, new HttpUriRequestConfigurer());
+
+        initSharedSpiderConfigurers();
+
+        sharedSpiderConfigurers.forEach(e -> {
+            e.setBuilder(this);
+            configurers.put(e.getClass(), e);
+            e.init();
+        });
+
+      /*  configurers.put(HttpUriRequestConfigurer.class, new HttpUriRequestConfigurer());
         //全局的请求设置
         configurers.put(DownloaderConfigurer.class, new DownloaderConfigurer());
         //管道配置
         configurers.put(PipelineConfigurer.class, new PipelineConfigurer());
         //新的请求提取器
-        configurers.put(HttpUriRequestExtractorConfigurer.class, new HttpUriRequestExtractorConfigurer());
+        configurers.put(HttpUriRequestExtractorConfigurer.class, new HttpUriRequestExtractorConfigurer());*/
 
-        configurers.values().forEach(c -> {
-            c.setBuilder(this);
-            c.setSharedObjectMap(sharedObjectMap);
-            c.init();
-        });
+
+    }
+
+    private void initSharedSpiderConfigurers() {
+        sharedSpiderConfigurers.add(new HttpUriRequestConfigurer());
+        sharedSpiderConfigurers.add(new DownloaderConfigurer());
+        sharedSpiderConfigurers.add(new PipelineConfigurer());
+        sharedSpiderConfigurers.add(new HttpUriRequestExtractorConfigurer());
     }
 
 
@@ -85,7 +95,7 @@ public class SpiderBuilder implements Builder<Spider> {
 
     @Override
     public Spider build() {
-        configurers.values().forEach(SharedSpiderConfigurer::configure);
+        sharedSpiderConfigurers.forEach(SharedSpiderConfigurer::configure);
 
         Downloader downloader = (Downloader) sharedObjectMap.get(Downloader.class).get(0);
         HttpRequestExtractor httpRequestExtractor = (HttpRequestExtractor) sharedObjectMap.get(HttpRequestExtractor.class).get(0);
