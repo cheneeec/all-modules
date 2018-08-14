@@ -1,14 +1,11 @@
 package com.earnest.crawler.core.downloader1;
 
 import com.earnest.crawler.core.StringResponseResult;
-import com.earnest.crawler.core.handler1.HttpClientResponseContextHolder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
@@ -33,14 +30,14 @@ public class HttpClientDownloader implements Downloader {
     private final CloseableHttpClient httpClient;
 
     private final HttpClientContext httpContext;
-    @Setter
-    private ResponseHandler<StringResponseResult> responseResultHandler;
+   /* @Setter
+    private ResponseHandler<StringResponseResult> responseResultHandler;*/
 
 
     public HttpClientDownloader(CloseableHttpClient httpClient, HttpClientContext httpContext) {
         this.httpClient = Optional.ofNullable(httpClient).orElse(HttpClients.createMinimal());
         this.httpContext = httpContext;
-        this.responseResultHandler = new ResponseResultHandler(httpContext);
+//        this.responseResultHandler = new ResponseResultHandler(httpContext);
     }
 
     public HttpClientDownloader(CloseableHttpClient httpClient) {

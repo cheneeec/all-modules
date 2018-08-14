@@ -5,8 +5,6 @@ import com.earnest.crawler.core.downloader1.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler1.Scheduler;
-import com.earnest.crawler.core.spider.Crawler;
-import com.earnest.crawler.core.spider.ExecutableSpider;
 
 import java.util.*;
 
@@ -25,13 +23,14 @@ public class SpiderBuilder implements Builder<Spider> {
     }
 
     private void init() {
-
+        //
         sharedSpiderConfigurers.add(new HttpUriRequestConfigurer());
         sharedSpiderConfigurers.add(new DownloaderConfigurer());
         sharedSpiderConfigurers.add(new PipelineConfigurer());
         sharedSpiderConfigurers.add(new HttpUriRequestExtractorConfigurer());
         sharedSpiderConfigurers.add(new SchedulerConfigurer());
 
+        //
         Collections.sort(sharedSpiderConfigurers);
 
 
@@ -41,15 +40,6 @@ public class SpiderBuilder implements Builder<Spider> {
             configurers.put(e.getClass(), e);
             e.init();
         });
-
-      /*  configurers.put(HttpUriRequestConfigurer.class, new HttpUriRequestConfigurer());
-        //全局的请求设置
-        configurers.put(DownloaderConfigurer.class, new DownloaderConfigurer());
-        //管道配置
-        configurers.put(PipelineConfigurer.class, new PipelineConfigurer());
-        //新的请求提取器
-        configurers.put(HttpUriRequestExtractorConfigurer.class, new HttpUriRequestExtractorConfigurer());*/
-
 
     }
 
@@ -112,10 +102,8 @@ public class SpiderBuilder implements Builder<Spider> {
         //thread
         Integer thread = (Integer) sharedObjectMap.get(Integer.class).get(0);
 
-        Crawler crawler = new Crawler(downloader, httpRequestExtractor, scheduler, pipeline);
+//        DefaultSpider crawler = new DefaultSpider(downloader, httpRequestExtractor, scheduler, pipeline);
 
-        crawler.run();
-
-        return new ExecutableSpider(crawler);
+        return null;
     }
 }

@@ -40,15 +40,21 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
 
     /**
      * 选取一个固定的范围获得链接。
+     * <blockquote>
+     * 例:
+     * <pre>
+     *         <code>http://list.iqiyi.com/www/4/38-------------4-${1~30}-1-iqiyi--.html</code>
+     * </pre>
+     * </blockquote>
+     * 抓取从1到30页的内容。
      *
      * @return
      */
-    public HttpUriRequestExtractorConfigurer range() {
+    public HttpUriRequestExtractorConfigurer range(String rangeRegexUrl) {
+
         this.requestExtractor = new EmptyHttpRequestExtractor();
         return this;
     }
-
-
 
 
     @Override
@@ -59,5 +65,9 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
     @Override
     public void configure() {
         sharedObjectMap.put(HttpRequestExtractor.class, Collections.singletonList(requestExtractor));
+    }
+
+    public static void main(String[] args) {
+
     }
 }
