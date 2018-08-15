@@ -5,6 +5,7 @@ import com.earnest.crawler.core.downloader1.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler1.Scheduler;
+import com.earnest.crawler.core.spider.DefaultSpider;
 
 import java.util.*;
 
@@ -104,6 +105,6 @@ public class SpiderBuilder implements Builder<Spider> {
 
 //        DefaultSpider crawler = new DefaultSpider(downloader, httpRequestExtractor, scheduler, pipeline);
 
-        return null;
+        return new DefaultSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
     }
 }

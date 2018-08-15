@@ -47,7 +47,7 @@ public class HttpClientDownloader implements Downloader {
     @Override
     public StringResponseResult download(HttpUriRequest request) {
         Assert.notNull(request, "request is null");
-        log.info("Start downloading {}", request.getURI().toString());
+        log.trace("Start downloading {}", request.getURI());
         if (httpContext == null) {
             log.debug("httpContext is null and session will not be saved");
         }

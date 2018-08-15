@@ -74,6 +74,7 @@ public abstract class AbstractBaseVideoEntitySpider<T extends BaseVideoEntity> i
     }
 
     private SpiderBuilder createSpiderBuilder(Pipeline<List<T>> pipeline, HttpRequest from, String match, int threadNumber) {
+
         return Spiders.createCustom()
                 .from(from)
                 .match(match)
@@ -84,7 +85,7 @@ public abstract class AbstractBaseVideoEntitySpider<T extends BaseVideoEntity> i
 
     @Override
     public void start() {
-        spider.start();
+
     }
 
     @Override

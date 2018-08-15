@@ -30,19 +30,21 @@ public class BlockingUniqueScheduler implements Scheduler {
     //阻塞超时时间
     private final int timeout;
 
+    private final static int DEFAULT_TIMEOUT=5000;
+
     public BlockingUniqueScheduler(int initialCapacity, int timeout) {
         taskSet = new HashSet<>(initialCapacity);
-        historyTaskSet = Collections.newSetFromMap(new ConcurrentHashMap<>(initialCapacity * 10));
+        historyTaskSet = new HashSet<>(initialCapacity * 10);
         this.timeout = timeout;
         getCondition = lock.newCondition();
     }
 
     public BlockingUniqueScheduler(int timeout) {
-        this(10000, timeout == 0 ? 5000 : 0);
+        this(10000, timeout == 0 ? DEFAULT_TIMEOUT : timeout);
     }
 
     public BlockingUniqueScheduler() {
-        this(5000);
+        this(DEFAULT_TIMEOUT);
     }
 
 
@@ -61,6 +63,7 @@ public class BlockingUniqueScheduler implements Scheduler {
         try {
             lock.lock();
             if (taskSet.isEmpty()) {
+                log.debug("The number of threads currently waiting is {}", lock.getWaitQueueLength(getCondition)+1);
                 //等待取值
                 boolean await = getCondition.await(timeout, TimeUnit.MILLISECONDS);
                 //等待到超时时间
@@ -101,6 +104,7 @@ public class BlockingUniqueScheduler implements Scheduler {
                 return false;
             }
             if (taskSet.add(httpUriRequest)) {
+                log.debug("The number of threads currently waiting is {}", lock.getWaitQueueLength(getCondition)-1);
                 getCondition.signal();
             }
             return true;
@@ -113,15 +117,15 @@ public class BlockingUniqueScheduler implements Scheduler {
     public void putAll(Collection<HttpUriRequest> httpUriRequests) {
         if (CollectionUtils.isEmpty(httpUriRequests)) return;
 
-        //过滤历史请求
-        Set<HttpUriRequest> httpUriRequestSet = httpUriRequests.stream()
-                .filter(httpRequest -> !historyTaskSet.contains(httpRequest.getURI().toString()))
-                .collect(Collectors.toSet());
-
-        if (CollectionUtils.isEmpty(httpUriRequestSet)) return;
-
         try {
             lock.lock();
+            //过滤历史请求
+            Set<HttpUriRequest> httpUriRequestSet = httpUriRequests.stream()
+                    .filter(httpRequest -> !historyTaskSet.contains(httpRequest.getURI().toString()))
+                    .collect(Collectors.toSet());
+
+            if (CollectionUtils.isEmpty(httpUriRequestSet)) return;
+
             int originalTaskSize = taskSet.size();
             taskSet.addAll(httpUriRequestSet);
             int newTaskSize = taskSet.size();
