@@ -103,7 +103,6 @@ public class SpiderBuilder implements Builder<Spider> {
         //thread
         Integer thread = (Integer) sharedObjectMap.get(Integer.class).get(0);
 
-//        DefaultSpider crawler = new DefaultSpider(downloader, httpRequestExtractor, scheduler, custom);
 
         return new DefaultSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
     }

@@ -1,12 +1,12 @@
 package com.earnest.crawler.core.builder;
 
 
-public interface Configurer {
+public abstract class Configurer {
 
 
-    void init();
+    abstract void init();
 
 
-    void configure();
+    abstract void configure();
 
 }
