@@ -1,6 +1,6 @@
 package com.earnest.crawler.core.builder;
 
-import com.earnest.crawler.core.request.HttpProxy;
+import com.earnest.crawler.core.HttpProxy;
 import org.apache.http.client.config.RequestConfig;
 
 public class RequestConfigConfigurer<O> extends SharedSpiderConfigurer<O> {

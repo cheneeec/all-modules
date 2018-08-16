@@ -1,10 +1,10 @@
 package com.earnest.crawler.core.builder;
 
-import com.earnest.crawler.core.crawler.Spider;
-import com.earnest.crawler.core.downloader1.Downloader;
+import com.earnest.crawler.core.spider.Spider;
+import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
-import com.earnest.crawler.core.scheduler1.Scheduler;
+import com.earnest.crawler.core.scheduler.Scheduler;
 import com.earnest.crawler.core.spider.DefaultSpider;
 
 import java.util.*;
@@ -98,12 +98,12 @@ public class SpiderBuilder implements Builder<Spider> {
         HttpRequestExtractor httpRequestExtractor = (HttpRequestExtractor) sharedObjectMap.get(HttpRequestExtractor.class).get(0);
         //scheduler
         Scheduler scheduler = (Scheduler) sharedObjectMap.get(Scheduler.class).get(0);
-        //pipeline
+        //custom
         Pipeline pipeline = (Pipeline) sharedObjectMap.get(Pipeline.class).get(0);
         //thread
         Integer thread = (Integer) sharedObjectMap.get(Integer.class).get(0);
 
-//        DefaultSpider crawler = new DefaultSpider(downloader, httpRequestExtractor, scheduler, pipeline);
+//        DefaultSpider crawler = new DefaultSpider(downloader, httpRequestExtractor, scheduler, custom);
 
         return new DefaultSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
     }

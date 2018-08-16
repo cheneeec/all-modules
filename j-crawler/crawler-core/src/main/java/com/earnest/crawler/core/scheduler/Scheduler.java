@@ -1,59 +1,17 @@
 package com.earnest.crawler.core.scheduler;
 
-import com.earnest.crawler.core.downloader.listener.DownloadListener;
-import com.earnest.crawler.core.event.DownloadErrorEvent;
-import com.earnest.crawler.core.event.DownloadSuccessEvent;
-import com.earnest.crawler.core.request.HttpRequest;
+import org.apache.http.client.methods.HttpUriRequest;
 
 import java.util.Collection;
-import java.util.Set;
 
+public interface Scheduler {
 
-public interface Scheduler extends DownloadListener {
-    /**
-     * 获取请求失败的集合
-     *
-     * @return
-     */
-    Set<DownloadErrorEvent> getDownloadErrorEventSet();
-
-
-    Set<DownloadSuccessEvent> getDownloadSuccessEventSet();
-
-    /**
-     * 判断任务队列是否为空
-     *
-     * @return
-     */
     boolean isEmpty();
 
-    /**
-     * 添加所有请求
-     *
-     * @param httpRequests
-     * @return
-     */
-    default void addAll(Collection<HttpRequest> httpRequests) {
-        try {
-            httpRequests.forEach(this::put);
-        } catch (Exception e) {
-        }
+    HttpUriRequest take();
 
-    }
+    boolean put(HttpUriRequest httpUriRequest);
 
-    /**
-     * 获取一个请求
-     *
-     * @return
-     */
-    HttpRequest take();
-
-    /**
-     * 加入一个请求
-     *
-     * @param httpRequest
-     * @return
-     */
-    boolean put(HttpRequest httpRequest);
+    void putAll(Collection<HttpUriRequest> httpUriRequests);
 
 }

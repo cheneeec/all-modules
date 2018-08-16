@@ -1,6 +1,6 @@
 package com.earnest.crawler.core.builder;
 
-import com.earnest.crawler.core.request.Browser;
+import com.earnest.crawler.core.Browser;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -29,14 +29,14 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
 
     @Override
     @SuppressWarnings("unchecked")
-    public void init() {
+    void init() {
         //放入会话CookieStore
         List<Object> cookieStores = (List<Object>) sharedObjectMap.get(CookieStore.class);
         cookieStores.add(new BasicCookieStore());
     }
 
     @Override
-    public void configure() {
+    void configure() {
         httpUriRequestPropertyConfigurer.configure();
     }
 
@@ -108,7 +108,7 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
 
         @Override
         @SuppressWarnings("unchecked")
-        public void configure() {
+         void configure() {
 
             HttpUriRequest httpUriRequest = requestBuilder.build();
 

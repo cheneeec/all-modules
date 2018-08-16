@@ -21,7 +21,7 @@ public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
     private Pipeline pipeline;
 
 
-    public PipelineConfigurer pipeline(Pipeline pipeline) {
+    public PipelineConfigurer custom(Pipeline pipeline) {
         this.pipeline = pipeline;
         return this;
     }
@@ -69,7 +69,7 @@ public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
     }
 
     @Override
-    public void configure() {
+     void configure() {
 
         sharedObjectMap.put(Pipeline.class,
                 Collections.singletonList(

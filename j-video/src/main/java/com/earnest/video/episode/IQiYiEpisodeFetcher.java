@@ -2,7 +2,7 @@ package com.earnest.video.episode;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.earnest.crawler.core.request.Browser;
+import com.earnest.crawler.core.Browser;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;

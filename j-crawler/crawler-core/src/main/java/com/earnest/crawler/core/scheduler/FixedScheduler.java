@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.scheduler1;
+package com.earnest.crawler.core.scheduler;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.CollectionUtils;

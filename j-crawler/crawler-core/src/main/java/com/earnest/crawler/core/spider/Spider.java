@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.crawler;
+package com.earnest.crawler.core.spider;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -13,7 +13,4 @@ public interface Spider extends Closeable {
 
     boolean isRunning();
 
-    String getName();
-
-    void setName(String name);
 }

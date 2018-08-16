@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.request;
+package com.earnest.crawler.core;
 
 import lombok.Data;
 import org.apache.http.HttpHost;

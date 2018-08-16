@@ -2,9 +2,9 @@ package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.extractor.EmptyHttpRequestExtractor;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
-import com.earnest.crawler.core.scheduler1.BlockingUniqueScheduler;
-import com.earnest.crawler.core.scheduler1.FixedScheduler;
-import com.earnest.crawler.core.scheduler1.Scheduler;
+import com.earnest.crawler.core.scheduler.BlockingUniqueScheduler;
+import com.earnest.crawler.core.scheduler.FixedScheduler;
+import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.Assert;
@@ -43,7 +43,7 @@ public class SchedulerConfigurer extends SharedSpiderConfigurer<Scheduler> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void configure() {
+    void configure() {
         //获取请求列表
         List<HttpUriRequest> httpUriRequests = (List<HttpUriRequest>) sharedObjectMap.remove(HttpUriRequest.class);
         Assert.state(!CollectionUtils.isEmpty(httpUriRequests), "httpUriRequest is empty");

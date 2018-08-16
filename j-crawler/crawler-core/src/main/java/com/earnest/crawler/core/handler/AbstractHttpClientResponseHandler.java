@@ -1,8 +1,7 @@
-package com.earnest.crawler.core.handler2;
+package com.earnest.crawler.core.handler;
 
 import com.earnest.crawler.core.HttpClientResponseResult;
 import com.earnest.crawler.core.HttpResponseResult;
-import com.earnest.crawler.core.handler1.HttpClientResponseContextHolder;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;

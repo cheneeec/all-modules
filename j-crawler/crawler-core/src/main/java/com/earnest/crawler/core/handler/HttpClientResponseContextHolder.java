@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.handler1;
+package com.earnest.crawler.core.handler;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;

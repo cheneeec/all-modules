@@ -1,7 +1,6 @@
 package com.earnest.crawler.core.extractor;
 
 import com.earnest.crawler.core.HttpResponseResult;
-import com.earnest.crawler.core.request.HttpRequest;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +8,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.jsoup.helper.StringUtil;
 import org.springframework.util.Assert;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;

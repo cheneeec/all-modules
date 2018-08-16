@@ -1,8 +1,8 @@
 package com.earnest.crawler.core.builder;
 
-import com.earnest.crawler.core.downloader1.Downloader;
-import com.earnest.crawler.core.downloader1.HttpClientDownloader;
-import com.earnest.crawler.core.request.HttpProxy;
+import com.earnest.crawler.core.downloader.Downloader;
+import com.earnest.crawler.core.downloader.HttpClientDownloader;
+import com.earnest.crawler.core.HttpProxy;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -27,7 +27,6 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
     }
 
     public DownloaderConfigurer setThreadNumber(int thread) {
-
         sharedObjectMap.put(Integer.class, Collections.singletonList(thread));
 
         httpClientBuilder.setMaxConnTotal(thread);
@@ -64,7 +63,7 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
     }
 
     @Override
-    public void init() {
+    void init() {
 
         //放入全局cookieStore
         List<CookieStore> cookieStores = new ArrayList<>(2);
@@ -81,7 +80,7 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
     }
 
     @Override
-    public void configure() {
+    void configure() {
 
         //移除session的cookieStore
         Object sessionCookieStore = sharedObjectMap.get(CookieStore.class).remove(1);

@@ -1,9 +1,7 @@
 package com.earnest.crawler.core.extractor;
 
 import com.earnest.crawler.core.HttpResponseResult;
-import com.earnest.crawler.core.request.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 

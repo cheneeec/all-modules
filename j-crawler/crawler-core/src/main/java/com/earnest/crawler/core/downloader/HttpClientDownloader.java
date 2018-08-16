@@ -1,96 +1,129 @@
 package com.earnest.crawler.core.downloader;
 
-import com.earnest.crawler.core.event.DownloadErrorEvent;
-import com.earnest.crawler.core.event.DownloadSuccessEvent;
-import com.earnest.crawler.core.request.HttpRequest;
-import com.earnest.crawler.core.request.HttpUriRequestAdapter;
-import com.earnest.crawler.core.response.PageResponse;
-import lombok.AllArgsConstructor;
+import com.earnest.crawler.core.StringResponseResult;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
-
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.util.Assert;
 
-import java.io.Closeable;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
-
-import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
-@AllArgsConstructor
-public class HttpClientDownloader extends AbstractDownloader implements MultiThreadBean {
+@Getter
+public class HttpClientDownloader implements Downloader {
 
-    private final HttpClient httpClient;
+    private final CloseableHttpClient httpClient;
 
-    public HttpClientDownloader() {
-        this(HttpClients.createSystem());
+    private final HttpClientContext httpContext;
+   /* @Setter
+    private ResponseHandler<StringResponseResult> responseResultHandler;*/
+
+
+    public HttpClientDownloader(CloseableHttpClient httpClient, HttpClientContext httpContext) {
+        this.httpClient = Optional.ofNullable(httpClient).orElse(HttpClients.createMinimal());
+        this.httpContext = httpContext;
+//        this.responseResultHandler = new ResponseResultHandler(httpContext);
     }
 
+    public HttpClientDownloader(CloseableHttpClient httpClient) {
+        this(httpClient, null);
+    }
 
     @Override
-    public PageResponse download(HttpRequest request) {
+    public StringResponseResult download(HttpUriRequest request) {
+        Assert.notNull(request, "request is null");
+        log.trace("Start downloading {}", request.getURI());
+        if (httpContext == null) {
+            log.debug("httpContext is null and session will not be saved");
+        }
 
-        log.info("Start downloading {}", request.getUrl());
-        HttpUriRequestAdapter httpUriRequest = new HttpUriRequestAdapter(request);
         try {
-            org.apache.http.HttpResponse response = httpClient.execute(httpUriRequest, httpUriRequest.obtainHttpContext());
-            HttpEntity httpEntity = response.getEntity();
-
-            PageResponse pageResponse = new PageResponse(EntityUtils.toString(httpEntity, Consts.UTF_8),request);
-            pageResponse.setStatus(response.getStatusLine().getStatusCode());
-
-
-            if (nonNull(httpEntity.getContentType())) {
-                pageResponse.setContentType(httpEntity.getContentType().getValue());
-            }
-            //关闭响应
-            if (response instanceof Closeable) {
-                ((Closeable) response).close();
-            }
-            onSuccess(new DownloadSuccessEvent(pageResponse));
-            return pageResponse;
+            CloseableHttpResponse httpResponse = httpClient.execute(request, httpContext);
+            log.debug("download successful,url={}", request.getURI().toString());
+            return convert(httpResponse, request);
         } catch (IOException e) {
-            onError(new DownloadErrorEvent(request, e));
-            log.error("An error occurred while downloading {} ,error:{}", request.getUrl(), e.getMessage());
-            PageResponse pageResponse = new PageResponse(e.getMessage());
-            pageResponse.setStatus(500);
-            return pageResponse;
+            log.error("url:{} download failed,error:{}", request.getURI().toString(), e.getMessage());
+            StringResponseResult responseResult = new StringResponseResult();
+            responseResult.setReason(e.getMessage());
+            responseResult.setSuccess(false);
+            return responseResult;
         }
 
-
-    }
-
-
-    @Override
-    public void close() {
-        if (nonNull(httpClient) && httpClient instanceof Closeable) {
-            try {
-                ((Closeable) httpClient).close();
-            } catch (IOException e) {
-                log.error("An error occurred while closing the client,error:{}", e.getMessage());
-                e.printStackTrace();
-            } finally {
-                try {
-                    ((Closeable) httpClient).close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     @Override
-    public void setThread(int num) {
-        //设置最大连接数，系统默认是5x2
-        int maxConnectionCount = (int) Math.ceil(((double) num / 2));
+    public void close() throws IOException {
 
-        System.getProperties().setProperty("http.maxConnections", String.valueOf(maxConnectionCount));
-        log.info("set SystemProperty: [http.maxConnections={}]", maxConnectionCount * 2);
+        httpClient.close();
+
     }
 
+    private StringResponseResult convert(HttpResponse response, HttpUriRequest httpUriRequest) throws IOException {
 
+        StringResponseResult responseResult = new StringResponseResult();
+
+        Map<String, String> headers = new LinkedHashMap<>();
+
+        Arrays.stream(response.getAllHeaders())
+                .forEach(header -> headers.put(header.getName(), header.getValue()));
+
+        responseResult.setHeaders(headers);
+
+        responseResult.setStatus(response.getStatusLine().getStatusCode());
+
+        String reasonPhrase = response.getStatusLine().getReasonPhrase();
+
+        responseResult.setSuccess("OK".equalsIgnoreCase(reasonPhrase));
+        responseResult.setReason(reasonPhrase);
+
+
+        HttpEntity entity = response.getEntity();
+
+        // set charset
+        Arrays.stream(entity.getContentType().getElements())
+                .map(e -> e.getParameterByName("charset"))
+                .findAny()
+                .map(NameValuePair::getValue).ifPresent(responseResult::setCharset);
+
+        //set entity
+        responseResult.setContent(EntityUtils.toString(entity));
+
+
+        //set httpUriRequest
+        responseResult.setHttpRequest(httpUriRequest);
+
+        //set cookies
+        if (httpContext != null) {
+            responseResult.setCookies(
+                    httpContext.getCookieStore().getCookies().stream()
+                            .collect(toMap(Cookie::getName, Cookie::getValue))
+            );
+        }
+
+
+        if (!responseResult.isSuccess()) {
+            EntityUtils.consume(response.getEntity());
+        }
+
+        if (response instanceof CloseableHttpResponse) {
+            ((CloseableHttpResponse) response).close();
+        }
+
+        return responseResult;
+    }
 }

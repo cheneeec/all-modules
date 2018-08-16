@@ -1,10 +1,11 @@
 package com.earnest.crawler.core.scheduler;
 
+
 import com.earnest.crawler.core.exception.TakeTimeoutException;
-import com.earnest.crawler.core.request.HttpRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.Assert;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.CollectionUtils;
+
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -12,28 +13,37 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
-
+/**
+ * 阻塞的调度器，并且能够保证请求唯一。
+ */
 @Slf4j
-public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler implements BlockingScheduler {
-
-    private final Set<HttpRequest> taskSet;
-
+public class BlockingUniqueScheduler implements Scheduler {
+    //任务值
+    private final Set<HttpUriRequest> taskSet;
+    //历史值
     private final Set<String> historyTaskSet;
-
+    //取值条件
     private final ReentrantLock lock = new ReentrantLock();
     //取值条件
     private final Condition getCondition;
+    //阻塞超时时间
+    private final int timeout;
 
-    public BlockingUniqueScheduler(int initialCapacity) {
-        super(new HashSet<>(initialCapacity * 10), new HashSet<>(initialCapacity / 10));
+    private final static int DEFAULT_TIMEOUT=5000;
+
+    public BlockingUniqueScheduler(int initialCapacity, int timeout) {
         taskSet = new HashSet<>(initialCapacity);
         historyTaskSet = new HashSet<>(initialCapacity * 10);
+        this.timeout = timeout;
         getCondition = lock.newCondition();
     }
 
+    public BlockingUniqueScheduler(int timeout) {
+        this(10000, timeout == 0 ? DEFAULT_TIMEOUT : timeout);
+    }
+
     public BlockingUniqueScheduler() {
-        this(10000);
+        this(DEFAULT_TIMEOUT);
     }
 
 
@@ -45,94 +55,86 @@ public class BlockingUniqueScheduler extends AbstractDownloadListenerScheduler i
         } finally {
             lock.unlock();
         }
-
     }
 
     @Override
-    public void addAll(Collection<HttpRequest> httpRequests) {
-        if (CollectionUtils.isEmpty(httpRequests)) return;
-        Set<HttpRequest> filterHistoryHttpRequests = filterHistoryHttpRequests(httpRequests);
-        if (CollectionUtils.isEmpty(filterHistoryHttpRequests)) return;
+    public HttpUriRequest take() {
         try {
             lock.lock();
-            int originalTaskSize = taskSet.size();
-            taskSet.addAll(filterHistoryHttpRequests);
-            int newTaskSize = taskSet.size();
-            while (newTaskSize != originalTaskSize) {
-                getCondition.signal();
-                newTaskSize--;
+            if (taskSet.isEmpty()) {
+                log.debug("The number of threads currently waiting is {}", lock.getWaitQueueLength(getCondition)+1);
+                //等待取值
+                boolean await = getCondition.await(timeout, TimeUnit.MILLISECONDS);
+                //等待到超时时间
+                if (!await) {
+                    throw new TakeTimeoutException("the time is out");
+                }
+                return obtainNewHttpUriRequest();
+            } else {
+                return obtainNewHttpUriRequest();
             }
-            Objects.equals(originalTaskSize, newTaskSize);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    private Set<HttpRequest> filterHistoryHttpRequests(Collection<HttpRequest> httpRequests) {
-        try {
-            lock.lock();
-            return httpRequests.parallelStream()
-                    .filter(httpRequest -> !historyTaskSet.contains(httpRequest.getUrl()))
-                    .collect(Collectors.toSet());
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public HttpRequest take() {
-        try {
-            return take(0, null);
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            log.error("Interrupted when getting a httpRequest,error:{}", e.getMessage());
-        } catch (TakeTimeoutException ignored) {
-            //ignored,it is not happened
+            log.error("Interrupted when getting a httpUriRequest,error:{}", e.getMessage());
+        } finally {
+            lock.unlock();
+        }
+        return null;
+    }
+
+    private HttpUriRequest obtainNewHttpUriRequest() {
+        Iterator<HttpUriRequest> httpUriRequestIterator = taskSet.iterator();
+        if (httpUriRequestIterator.hasNext()) {
+            HttpUriRequest httpUriRequest = httpUriRequestIterator.next();
+            historyTaskSet.add(httpUriRequest.getURI().toString());
+            httpUriRequestIterator.remove();
+            return httpUriRequest;
         }
         return null;
     }
 
     @Override
-    public boolean put(HttpRequest httpRequest) {
-        Assert.notNull(httpRequest, "the  argument:[httpRequest] is required,it must not be null");
-        String url = httpRequest.getUrl();
+    public boolean put(HttpUriRequest httpUriRequest) {
+        if (httpUriRequest == null) return true;
+        String uri = httpUriRequest.getURI().toString();
         try {
             lock.lock();
-            if (historyTaskSet.contains(url)) return false;
-            boolean add = taskSet.add(httpRequest);
-            if (add) getCondition.signal();
-            return add;
+            if (historyTaskSet.contains(uri)) {
+                log.trace("URI:{} is already in the history set", uri);
+                return false;
+            }
+            if (taskSet.add(httpUriRequest)) {
+                log.trace("The number of threads currently waiting is {}", lock.getWaitQueueLength(getCondition)-1);
+                getCondition.signal();
+            }
+            return true;
         } finally {
             lock.unlock();
         }
     }
 
-
     @Override
-    public HttpRequest take(long time, TimeUnit unit) throws InterruptedException, TakeTimeoutException {
+    public void putAll(Collection<HttpUriRequest> httpUriRequests) {
+        if (CollectionUtils.isEmpty(httpUriRequests)) return;
+
         try {
             lock.lock();
-            if (taskSet.isEmpty()) {
-                if (isNull(unit)) {
-                    getCondition.await();
-                } else {
-                    boolean await = getCondition.await(time, unit);
-                    if (!await) {
-                        throw new TakeTimeoutException("the time is out");
-                    }
-                }
+            //过滤历史请求
+            Set<HttpUriRequest> httpUriRequestSet = httpUriRequests.stream()
+                    .filter(httpRequest -> !historyTaskSet.contains(httpRequest.getURI().toString()))
+                    .collect(Collectors.toSet());
+
+            if (CollectionUtils.isEmpty(httpUriRequestSet)) return;
+
+            int originalTaskSize = taskSet.size();
+            taskSet.addAll(httpUriRequestSet);
+            int newTaskSize = taskSet.size();
+            while (newTaskSize != originalTaskSize) {
+                getCondition.signal();
+                newTaskSize--;
             }
-            Iterator<HttpRequest> iterator = taskSet.iterator();
-            if (iterator.hasNext()) {
-                HttpRequest next = iterator.next();
-                iterator.remove();
-                //将其也添加到historyTaskSet中
-                historyTaskSet.add(next.getUrl());
-                return next;
-            }
-            return null;
         } finally {
             lock.unlock();
         }
+
     }
 }

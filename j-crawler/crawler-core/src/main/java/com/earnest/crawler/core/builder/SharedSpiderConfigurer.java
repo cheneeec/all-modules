@@ -11,14 +11,13 @@ import java.util.Map;
 
 @Setter
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class SharedSpiderConfigurer<O> implements Comparable<SharedSpiderConfigurer<O>>, Configurer {
+public abstract class SharedSpiderConfigurer<O> implements Comparable<SharedSpiderConfigurer<O>> {
 
     private SpiderBuilder builder;
 
 
     @Setter(value = AccessLevel.PACKAGE)
     protected Map<Class<?>, List<?>> sharedObjectMap;
-
 
 
     public SpiderBuilder and() {
@@ -38,13 +37,11 @@ public abstract class SharedSpiderConfigurer<O> implements Comparable<SharedSpid
         return Integer.compare(order(), o.order());
     }
 
-    @Override
-    public void init()  {
+    void init() {
 
     }
 
-    @Override
-    public void configure() {
+    void configure() {
 
     }
 
