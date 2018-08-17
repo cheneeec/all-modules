@@ -7,9 +7,8 @@ import java.util.List;
 public interface Spider extends Closeable {
     void start();
 
-    void shutdown();
+    void stop();
 
-    List<Runnable> shutdownNow();
 
     boolean isRunning();
 

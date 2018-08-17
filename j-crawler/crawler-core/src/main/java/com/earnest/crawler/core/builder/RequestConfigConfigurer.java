@@ -8,7 +8,6 @@ public class RequestConfigConfigurer<O> extends SharedSpiderConfigurer<O> {
     protected RequestConfig.Builder custom = RequestConfig.custom();
 
 
-
     public RequestConfigConfigurer<O> connectTimeout(int connectTimeout) {
         custom.setConnectTimeout(connectTimeout);
         return this;
@@ -19,8 +18,8 @@ public class RequestConfigConfigurer<O> extends SharedSpiderConfigurer<O> {
         return this;
     }
 
-    protected RequestConfig requestConfig() {
-        return custom.build();
+    protected RequestConfig.Builder getRequestConfigBuilder() {
+        return custom;
     }
 
 

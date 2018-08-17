@@ -5,7 +5,7 @@ import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler.Scheduler;
-import com.earnest.crawler.core.spider.DefaultSpider;
+import com.earnest.crawler.core.spider.AsyncSpider;
 
 import java.util.*;
 
@@ -104,6 +104,6 @@ public class SpiderBuilder implements Builder<Spider> {
         Integer thread = (Integer) sharedObjectMap.get(Integer.class).get(0);
 
 
-        return new DefaultSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
+        return new AsyncSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
     }
 }

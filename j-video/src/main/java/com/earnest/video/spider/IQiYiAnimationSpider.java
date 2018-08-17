@@ -5,10 +5,8 @@ import com.earnest.video.service.IQiYiAnimationCachedVideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
-
-
-
 public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider<IQiYi> {
+
     @Autowired
     private IQiYiAnimationCachedVideoService iQiYiAnimationCachedVideoService;
 
@@ -28,5 +26,5 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider<IQiYi> {
                 return iQiYi;
             }).collect(Collectors.toList());
             */
-    
+
 }

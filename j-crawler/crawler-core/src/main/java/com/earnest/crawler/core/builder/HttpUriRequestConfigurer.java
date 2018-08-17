@@ -1,14 +1,26 @@
 package com.earnest.crawler.core.builder;
 
+import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Connection;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequest> {
     private SpiderBuilder builder;
@@ -47,9 +59,17 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
     }
 
 
-    public class HttpUriRequestPropertyConfigurer extends RequestConfigConfigurer<HttpUriRequest> {
+    public static class HttpUriRequestPropertyConfigurer extends RequestConfigConfigurer<HttpUriRequest> {
 
         private final RequestBuilder requestBuilder;
+
+        private String stringParam;
+
+        private String contentType;
+
+        private Map<String, String> parameters = new LinkedHashMap<>();
+
+        private static Pattern charsetPattern = Pattern.compile(";charset=(.+)[;?]");
 
         private HttpUriRequestPropertyConfigurer(RequestBuilder requestBuilder, SpiderBuilder builder) {
             this.requestBuilder = requestBuilder;
@@ -80,11 +100,18 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
         }
 
         public HttpUriRequestPropertyConfigurer addParameter(String name, String value) {
+            this.parameters.put(name, value);
             requestBuilder.addParameter(name, value);
             return this;
         }
 
+        public HttpUriRequestPropertyConfigurer addStringParamter(Object param) {
+            this.stringParam = JSONObject.toJSONString(param);
+            return this;
+        }
+
         public HttpUriRequestPropertyConfigurer addParameters(Map<String, String> parameters) {
+            this.parameters.putAll(parameters);
             parameters.forEach(requestBuilder::addParameter);
             return this;
         }
@@ -101,24 +128,65 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
 
 
         public HttpUriRequestPropertyConfigurer contentType(String contentType) {
-            requestBuilder.setHeader(Browser.CONTENT_TYPE, contentType);
+            this.contentType = StringUtils.deleteWhitespace(contentType);
+            requestBuilder.setHeader(Browser.CONTENT_TYPE, this.contentType);
             return this;
         }
 
 
         @Override
         @SuppressWarnings("unchecked")
-         void configure() {
+        void configure() {
 
-            HttpUriRequest httpUriRequest = requestBuilder.build();
+            RequestBuilder httpUriRequestBuilder =
+                    requestBuilder
+                            .setConfig(getRequestConfigBuilder().build());
+
+
+            //如果是contentType为json
+            if (StringUtils.indexOf(contentType, ContentType.APPLICATION_JSON.getMimeType()) > -1) {
+
+                //获取字符编码
+                StringEntity stringEntity = new StringEntity(JSONObject.toJSONString(stringParam), extractCharset(contentType));
+
+                requestBuilder.setEntity(stringEntity);
+            }
+
 
             List<Object> objects =
                     (List<Object>) sharedObjectMap.computeIfAbsent(HttpUriRequest.class, k -> new ArrayList<>());
 
-            objects.add(0, httpUriRequest);
+            objects.add(0, httpUriRequestBuilder.build());
 
         }
+
+
+        private static String extractCharset(String contentType) {
+            Matcher matcher = charsetPattern.matcher(contentType);
+
+            if (matcher.find()) {
+                return matcher.group(1);
+            }
+
+            return Charset.defaultCharset().displayName();
+        }
+
+
     }
 
 
+    public static void main(String[] args) {
+        ContentType contentType = ContentType.create("application/json", new BasicNameValuePair("charset", "UTF-8"), new BasicNameValuePair("a", "b"));
+        System.out.println(contentType);
+        String contentTypeString = contentType.toString();
+        String deleteWhitespace = StringUtils.deleteWhitespace(contentTypeString);
+        System.out.println(deleteWhitespace);
+        Pattern pattern = Pattern.compile(";charset=(.+)[;?]");
+
+        Matcher matcher = pattern.matcher(deleteWhitespace);
+        if (matcher.find()) {
+            System.out.println(matcher.group(1));
+        }
+
+    }
 }

@@ -38,4 +38,13 @@ public abstract class SharedSpiderConfigurer<O> extends Configurer implements Co
     }
 
 
+    @Override
+    void init() {
+
+    }
+
+    @Override
+    void configure() {
+
+    }
 }

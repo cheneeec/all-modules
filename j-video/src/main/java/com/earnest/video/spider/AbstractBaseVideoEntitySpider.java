@@ -1,9 +1,11 @@
 package com.earnest.video.spider;
 
+import com.earnest.crawler.core.builder.SpiderBuilder;
 import com.earnest.crawler.core.spider.Spider;
+import org.jsoup.Connection;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
-import java.util.List;
 
 public class AbstractBaseVideoEntitySpider<T> implements Spider {
 
@@ -16,6 +18,7 @@ public class AbstractBaseVideoEntitySpider<T> implements Spider {
     private Spider createSpider() {
 
 
+
         return null;
     }
 
@@ -25,14 +28,10 @@ public class AbstractBaseVideoEntitySpider<T> implements Spider {
     }
 
     @Override
-    public void shutdown() {
+    public void stop() {
 
     }
 
-    @Override
-    public List<Runnable> shutdownNow() {
-        return null;
-    }
 
     @Override
     public boolean isRunning() {
