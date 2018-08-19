@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<HttpRequestExtractor> {
@@ -82,7 +83,7 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
     }
 
     @Override
-     void configure() {
+    void configure() {
 
         if (!ArrayUtils.isEmpty(ranges) && StringUtils.isNotBlank(uriTemplate)) {
             @SuppressWarnings("unchecked")
@@ -95,27 +96,21 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
                     .map(URI::toString)
                     .collect(Collectors.toSet());
 
-            for (int i = ranges[0]; i < ranges[1] + 1; i++) {
-                String url = StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(i));
-                //去重
-                if (uris.contains(url)) {
-                    continue;
-                }
-                HttpUriRequest newHttpRequest;
-                if (httpUriRequest != null) {
-                    newHttpRequest = RequestBuilder.copy(httpUriRequest)
-                            .setUri(url)
-                            .build();
-                } else
-                    newHttpRequest = RequestBuilder.get(url).build();
 
-                log.trace("Generated a new Url:{}", newHttpRequest.getURI());
-
-                httpUriRequests.add(newHttpRequest);
-            }
+            IntStream.range(ranges[0], ranges[1] + 1)
+                    .mapToObj(i -> StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(i)))
+                    .filter(uri -> !uris.contains(uri))
+                    .map(u -> httpUriRequest == null ? RequestBuilder.get(u) : RequestBuilder.copy(httpUriRequest).setUri(u))
+                    .map(RequestBuilder::build)
+                    .peek(h -> log.trace("Generated a new Url:{}", h.getURI()))
+                    .forEach(httpUriRequests::add);
         }
 
         sharedObjectMap.put(HttpRequestExtractor.class, Collections.singletonList(requestExtractor));
     }
 
+    public static void main(String[] args) {
+        IntStream.range(1, 31)
+                .forEach(System.out::println);
+    }
 }
