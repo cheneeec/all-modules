@@ -104,13 +104,10 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
                     .map(RequestBuilder::build)
                     .peek(h -> log.trace("Generated a new Url:{}", h.getURI()))
                     .forEach(httpUriRequests::add);
+
         }
 
         sharedObjectMap.put(HttpRequestExtractor.class, Collections.singletonList(requestExtractor));
     }
 
-    public static void main(String[] args) {
-        IntStream.range(1, 31)
-                .forEach(System.out::println);
-    }
 }
