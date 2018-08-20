@@ -4,19 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Connection;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -53,7 +48,7 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
     }
 
     @Override
-    public void setBuilder(SpiderBuilder builder) {
+    void setBuilder(SpiderBuilder builder) {
         super.setBuilder(builder);
         this.builder = builder;
     }
@@ -144,11 +139,9 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
 
 
             //如果是contentType为json
-            if (StringUtils.indexOf(contentType, ContentType.APPLICATION_JSON.getMimeType()) > -1) {
-
+            if (StringUtils.indexOf(contentType, ContentType.APPLICATION_JSON.getMimeType()) > -1 && stringParam != null) {
                 //获取字符编码
                 StringEntity stringEntity = new StringEntity(JSONObject.toJSONString(stringParam), extractCharset(contentType));
-
                 requestBuilder.setEntity(stringEntity);
             }
 
@@ -175,18 +168,4 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
     }
 
 
-    public static void main(String[] args) {
-        ContentType contentType = ContentType.create("application/json", new BasicNameValuePair("charset", "UTF-8"), new BasicNameValuePair("a", "b"));
-        System.out.println(contentType);
-        String contentTypeString = contentType.toString();
-        String deleteWhitespace = StringUtils.deleteWhitespace(contentTypeString);
-        System.out.println(deleteWhitespace);
-        Pattern pattern = Pattern.compile(";charset=(.+)[;?]");
-
-        Matcher matcher = pattern.matcher(deleteWhitespace);
-        if (matcher.find()) {
-            System.out.println(matcher.group(1));
-        }
-
-    }
 }

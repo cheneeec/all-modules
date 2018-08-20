@@ -26,10 +26,11 @@ public class DocumentPipeline implements Pipeline {
         HttpUriRequest httpRequest = result.getHttpRequest();
         String url = "";
         if (httpRequest != null) {
-            url = httpRequest.getURI().toString();
+            url = httpRequest.getRequestLine().getUri();
         }
-        //TODO Copy HttpClientResponseResult
-        HttpClientResponseResult<Document> responseResult = new HttpClientResponseResult<>();
+
+        HttpClientResponseResult<Document> responseResult = new HttpClientResponseResult<>(result);
+
 
         responseResult.setContent(Jsoup.parse(result.getContent(), url));
 

@@ -7,12 +7,12 @@ import com.earnest.crawler.core.extractor.RegexHttpRequestExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.RequestLine;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.jsoup.nodes.Document;
 import org.springframework.util.Assert;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -92,16 +92,17 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
             HttpUriRequest httpUriRequest = httpUriRequests.get(0);
 
             Set<String> uris = httpUriRequests.stream()
-                    .map(HttpUriRequest::getURI)
-                    .map(URI::toString)
+                    .map(HttpUriRequest::getRequestLine)
+                    .map(RequestLine::getUri)
                     .collect(Collectors.toSet());
 
 
             IntStream.range(ranges[0], ranges[1] + 1)
                     .mapToObj(i -> StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(i)))
                     .filter(uri -> !uris.contains(uri))
-                    .map(u -> httpUriRequest == null ? RequestBuilder.get(u) : RequestBuilder.copy(httpUriRequest).setUri(u))
-                    .map(RequestBuilder::build)
+                    .map(u ->
+                            (httpUriRequest == null ? RequestBuilder.get(u) : RequestBuilder.copy(httpUriRequest).setUri(u)).build()
+                    )
                     .peek(h -> log.trace("Generated a new Url:{}", h.getURI()))
                     .forEach(httpUriRequests::add);
 

@@ -3,21 +3,20 @@ package com.earnest.crawler.core.scheduler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
- * 固定请求的调度器。
+ * 固定请求的调度器。线程不安全。
  */
 public class FixedScheduler implements Scheduler {
 
     private final Set<HttpUriRequest> taskSet;
 
+
     public FixedScheduler(int initialCapacity) {
-        this.taskSet = Collections.newSetFromMap(new ConcurrentHashMap<>(initialCapacity));
+        taskSet = Collections.newSetFromMap(new ConcurrentHashMap<>(initialCapacity));
     }
 
     public FixedScheduler() {

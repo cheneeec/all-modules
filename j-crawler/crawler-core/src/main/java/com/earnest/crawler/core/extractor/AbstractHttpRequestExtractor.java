@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.extractor;
 
+import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.HttpResponseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -19,9 +20,12 @@ public abstract class AbstractHttpRequestExtractor implements HttpRequestExtract
 
         RequestBuilder requestBuilder = RequestBuilder.copy(httpRequest);
         Set<String> newUris = extractUrl(responseResult);
-        log.trace("Get {} new uris by {}", newUris.size(), httpRequest.getURI());
+        if (newUris.size() != 0)
+            log.trace("Get {} new uris by {}", newUris.size(), httpRequest.getURI());
         return newUris.stream().map(url ->
-                requestBuilder.setUri(url).build()
+                requestBuilder.setUri(url)
+                        .setHeader(Browser.REFERER, httpRequest.getRequestLine().getUri())
+                        .build()
         ).collect(Collectors.toSet());
     }
 

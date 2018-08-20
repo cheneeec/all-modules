@@ -9,10 +9,11 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Map;
 
-@Setter
+
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public abstract class SharedSpiderConfigurer<O> extends Configurer implements Comparable<SharedSpiderConfigurer<O>> {
 
+    @Setter(AccessLevel.PACKAGE)
     private SpiderBuilder builder;
 
 

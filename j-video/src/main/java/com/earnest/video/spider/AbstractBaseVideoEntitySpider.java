@@ -1,45 +1,69 @@
 package com.earnest.video.spider;
 
+import com.earnest.crawler.core.Browser;
+import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.builder.SpiderBuilder;
 import com.earnest.crawler.core.spider.Spider;
 import org.jsoup.Connection;
-import org.springframework.http.MediaType;
+import org.jsoup.nodes.Document;
+import org.springframework.boot.CommandLineRunner;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 
-public class AbstractBaseVideoEntitySpider<T> implements Spider {
+public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLineRunner {
 
     protected final Spider spider;
+
+    protected final AtomicLong id = new AtomicLong(1000);
 
     public AbstractBaseVideoEntitySpider() {
         spider = createSpider();
     }
 
     private Spider createSpider() {
-
-
-
-        return null;
+        return new SpiderBuilder()
+                .global().userAgent(Browser.GOOGLE.userAgent()).setThreadNumber(5)
+                .and()
+                .request().method(Connection.Method.GET).from(getFromUrl())
+                .and()
+                .extract().range(getRangeRegexUrl())
+                .and()
+                .pipeline().cssSelector(cssSelectorPipeline()).and()
+                .build();
     }
+
+    protected abstract Consumer<HttpResponseResult<Document>> cssSelectorPipeline();
+
+
+    protected abstract String getRangeRegexUrl();
+
+    protected abstract String getFromUrl();
 
     @Override
     public void start() {
-
+        spider.start();
     }
 
     @Override
     public void stop() {
-
+        spider.stop();
     }
 
 
     @Override
     public boolean isRunning() {
-        return false;
+        return spider.isRunning();
     }
 
     @Override
     public void close() throws IOException {
+        spider.close();
+    }
 
+    @Override
+    public void run(String... args) throws Exception {
+        spider.start();
     }
 }

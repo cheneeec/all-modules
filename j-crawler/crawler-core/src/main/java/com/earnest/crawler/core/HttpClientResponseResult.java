@@ -21,6 +21,19 @@ public class HttpClientResponseResult<T> implements HttpResponseResult<T> {
     private String reason;
 
 
+    public HttpClientResponseResult(HttpClientResponseResult<?> httpClientResponseResult) {
+        this.status = httpClientResponseResult.getStatus();
+        this.success = httpClientResponseResult.isSuccess();
+        this.httpRequest = httpClientResponseResult.getHttpRequest();
+        this.Headers = httpClientResponseResult.getHeaders();
+        this.cookies = httpClientResponseResult.getCookies();
+        this.charset = httpClientResponseResult.getCharset();
+        this.reason = httpClientResponseResult.getReason();
+        this.content = null;
+
+    }
+
+
     @Override
     public int getStatus() {
         return status;
@@ -61,4 +74,5 @@ public class HttpClientResponseResult<T> implements HttpResponseResult<T> {
     public String getReason() {
         return reason;
     }
+
 }

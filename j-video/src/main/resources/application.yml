@@ -1,6 +1,6 @@
 logging:
   level:
-    com.earnest: trace
+    com.earnest: debug
 security:
   user:
     name: user

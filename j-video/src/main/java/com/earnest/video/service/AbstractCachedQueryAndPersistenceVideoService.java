@@ -8,6 +8,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public abstract class AbstractCachedQueryAndPersistenceVideoService<T extends BaseVideoEntity> implements BasicQueryAndPersistenceVideoService<T> {
@@ -20,7 +21,7 @@ public abstract class AbstractCachedQueryAndPersistenceVideoService<T extends Ba
     }
 
     public AbstractCachedQueryAndPersistenceVideoService() {
-        this(new LinkedHashMap<>());
+        this(new ConcurrentHashMap<>());
     }
 
 

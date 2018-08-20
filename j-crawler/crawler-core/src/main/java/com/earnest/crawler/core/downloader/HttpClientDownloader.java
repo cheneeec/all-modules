@@ -30,14 +30,12 @@ public class HttpClientDownloader implements Downloader {
     private final CloseableHttpClient httpClient;
 
     private final HttpClientContext httpContext;
-   /* @Setter
-    private ResponseHandler<StringResponseResult> responseResultHandler;*/
+
 
 
     public HttpClientDownloader(CloseableHttpClient httpClient, HttpClientContext httpContext) {
         this.httpClient = Optional.ofNullable(httpClient).orElse(HttpClients.createMinimal());
         this.httpContext = httpContext;
-//        this.responseResultHandler = new ResponseResultHandler(httpContext);
     }
 
     public HttpClientDownloader(CloseableHttpClient httpClient) {
@@ -54,16 +52,21 @@ public class HttpClientDownloader implements Downloader {
 
         try {
             CloseableHttpResponse httpResponse = httpClient.execute(request, httpContext);
-            log.debug("download successful,url={}", request.getURI().toString());
-            return convert(httpResponse, request);
+            log.debug("download successful,url={}", request.getRequestLine().getUri());
+            return successAdapt(httpResponse, request);
         } catch (IOException e) {
-            log.error("url:{} download failed,error:{}", request.getURI().toString(), e.getMessage());
-            StringResponseResult responseResult = new StringResponseResult();
-            responseResult.setReason(e.getMessage());
-            responseResult.setSuccess(false);
-            return responseResult;
+            log.error("url:{} download failed,error:{}", request.getRequestLine().getUri(), e.getMessage());
+            return failureAdapt(request, e);
         }
 
+    }
+
+    private static StringResponseResult failureAdapt(HttpUriRequest request, IOException e) {
+        StringResponseResult responseResult = new StringResponseResult();
+        responseResult.setHttpRequest(request);
+        responseResult.setReason(e.getMessage());
+        responseResult.setSuccess(false);
+        return responseResult;
     }
 
     @Override
@@ -73,9 +76,12 @@ public class HttpClientDownloader implements Downloader {
 
     }
 
-    private StringResponseResult convert(HttpResponse response, HttpUriRequest httpUriRequest) throws IOException {
+    private StringResponseResult successAdapt(HttpResponse response, HttpUriRequest httpUriRequest) throws IOException {
 
         StringResponseResult responseResult = new StringResponseResult();
+
+        //set httpUriRequest
+        responseResult.setHttpRequest(httpUriRequest);
 
         Map<String, String> headers = new LinkedHashMap<>();
 
@@ -104,8 +110,7 @@ public class HttpClientDownloader implements Downloader {
         responseResult.setContent(EntityUtils.toString(entity));
 
 
-        //set httpUriRequest
-        responseResult.setHttpRequest(httpUriRequest);
+
 
         //set cookies
         if (httpContext != null) {

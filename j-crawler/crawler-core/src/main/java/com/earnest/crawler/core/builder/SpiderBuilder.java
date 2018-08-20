@@ -8,40 +8,40 @@ import com.earnest.crawler.core.scheduler.Scheduler;
 import com.earnest.crawler.core.spider.AsyncSpider;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
-public class SpiderBuilder implements Builder<Spider> {
+public class SpiderBuilder extends SharedSpiderConfigurer<Spider> implements Builder<Spider> {
 
 
     private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new LinkedHashMap<>();
 
-    private Map<Class<?>, List<?>> sharedObjectMap = new LinkedHashMap<>();
 
-    private final List<SharedSpiderConfigurer> sharedSpiderConfigurers = new ArrayList<>();
+    private final List<SharedSpiderConfigurer> sharedSpiderConfigurers;
 
     public SpiderBuilder() {
         init();
+        this.sharedSpiderConfigurers = createSharedSpiderConfigurers();
+
+
     }
 
-    private void init() {
-        //
-        sharedSpiderConfigurers.add(new HttpUriRequestConfigurer());
-        sharedSpiderConfigurers.add(new DownloaderConfigurer());
-        sharedSpiderConfigurers.add(new PipelineConfigurer());
-        sharedSpiderConfigurers.add(new HttpUriRequestExtractorConfigurer());
-        sharedSpiderConfigurers.add(new SchedulerConfigurer());
+    private List<SharedSpiderConfigurer> createSharedSpiderConfigurers() {
+        return Stream.of(new HttpUriRequestConfigurer(), new DownloaderConfigurer(), new PipelineConfigurer(), new HttpUriRequestExtractorConfigurer(), new SchedulerConfigurer())
+                .sorted()
+                .peek(e -> {
+                    e.setBuilder(this);
+                    e.setSharedObjectMap(sharedObjectMap);
+                    configurers.put(e.getClass(), e);
+                    e.init();
+                })
+                .collect(Collectors.toList());
+    }
 
-        //
-        Collections.sort(sharedSpiderConfigurers);
-
-
-        sharedSpiderConfigurers.forEach(e -> {
-            e.setBuilder(this);
-            e.setSharedObjectMap(sharedObjectMap);
-            configurers.put(e.getClass(), e);
-            e.init();
-        });
-
+    @Override
+    void init() {
+        sharedObjectMap = new LinkedHashMap<>();
     }
 
 
@@ -88,10 +88,16 @@ public class SpiderBuilder implements Builder<Spider> {
         return (SchedulerConfigurer) configurers.get(SchedulerConfigurer.class);
     }
 
+    @Override
+    void configure() {
+        sharedSpiderConfigurers.forEach(SharedSpiderConfigurer::configure);
+    }
 
     @Override
     public Spider build() {
-        sharedSpiderConfigurers.forEach(SharedSpiderConfigurer::configure);
+
+        configure();
+
         //downloader
         Downloader downloader = (Downloader) sharedObjectMap.get(Downloader.class).get(0);
         //httpRequestExtractor
@@ -106,4 +112,5 @@ public class SpiderBuilder implements Builder<Spider> {
 
         return new AsyncSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
     }
+
 }
