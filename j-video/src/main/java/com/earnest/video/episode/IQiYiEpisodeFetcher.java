@@ -63,7 +63,7 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
         log.debug("connect {} is  successful", httpGet.getURI());
 
-        List<Episode> episodes = extractJsonStringAndReturn(entityString);
+        List<Episode> episodes = extractJsonString(entityString);
 
         EntityUtils.consumeQuietly(entity);
 
@@ -84,7 +84,7 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
      * @param entityString
      * @return
      */
-    private static List<Episode> extractJsonStringAndReturn(String entityString) {
+    private static List<Episode> extractJsonString(String entityString) {
         Matcher matcher = episodeExtractPattern.matcher(entityString);
 
         List<Episode> episodes = null;
