@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    private final CloseableHttpClient httpClient;
 
     private static final String CALLBACK_JS_FUNCTION_PREFIX = "window.Q.__callbacks__.";
 
@@ -40,6 +40,14 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
     private static final String API_URL = "http://cache.video.iqiyi.com/jp/avlist/${albumId}/${page}/${size}/?albumId=${albumId}&pageNum=${size}&pageNo=${page}&callback=" + CALLBACK_JS_FUNCTION_PREFIX;
 
     private static final Pattern episodeExtractPattern = Pattern.compile("\"vlist\":(\\[\\{.+\\}\\])");
+
+    public IQiYiEpisodeFetcher(CloseableHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    public IQiYiEpisodeFetcher() {
+        this.httpClient = CloseableHttpClientFactoryBean.INSTANCE.getObject();
+    }
 
     @Override
     public List<Episode> fetch(String url, EpisodePage episodePage) throws IOException {
@@ -61,7 +69,7 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
         String entityString = EntityUtils.toString(entity);
 
-        log.debug("connect {} is  successful", httpGet.getURI());
+        log.debug("connect {} is  successful", httpGet.getRequestLine().getUri());
 
         List<Episode> episodes = extractJsonString(entityString);
 

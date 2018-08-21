@@ -29,7 +29,7 @@ public class SpiderBuilder extends SharedSpiderConfigurer<Spider> implements Bui
 
     private List<SharedSpiderConfigurer> createSharedSpiderConfigurers() {
         return Stream.of(new HttpUriRequestConfigurer(), new DownloaderConfigurer(), new PipelineConfigurer(), new HttpUriRequestExtractorConfigurer(), new SchedulerConfigurer())
-                .sorted()
+                .sorted(Comparator.comparingInt(SharedSpiderConfigurer::order))
                 .peek(e -> {
                     e.setBuilder(this);
                     e.setSharedObjectMap(sharedObjectMap);

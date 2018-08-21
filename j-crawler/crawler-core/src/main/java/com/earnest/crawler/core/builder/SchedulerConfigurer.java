@@ -22,16 +22,16 @@ public class SchedulerConfigurer extends SharedSpiderConfigurer<Scheduler> {
     private Scheduler scheduler;
 
 
-    public SchedulerConfigurer blockingUnique(int timeout) {
+    public SharedSpiderConfigurer blockingUnique(int timeout) {
         scheduler = new BlockingUniqueScheduler(timeout);
         return this;
     }
 
-    public SchedulerConfigurer blockingUnique() {
+    public SharedSpiderConfigurer blockingUnique() {
         return blockingUnique(0);
     }
 
-    public SchedulerConfigurer fixed() {
+    public SharedSpiderConfigurer fixed() {
         scheduler = new FixedArrayScheduler();
         return this;
     }

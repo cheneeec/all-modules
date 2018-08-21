@@ -34,7 +34,7 @@ public class IQiYiEpisodeFetcherTest {
     }
 
     @Test
-    public void bb(){
+    public void bb() {
         System.out.println(URI.create("http://www.iqiyi.com/a_19rrgzldkl.html#vfrm=2-4-0-1").getHost());
         System.out.println(URI.create("http://list.iqiyi.com/www/4/-------------4-1-1-iqiyi--.html").getHost());
         System.out.println(URI.create("http://list.iqiyi.com/www/4/-------------4-1-1-iqiyi--.html").getPath());

@@ -38,7 +38,7 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
      * @param pattern
      * @return
      */
-    public HttpUriRequestExtractorConfigurer match(String pattern) {
+    public SharedSpiderConfigurer match(String pattern) {
         this.requestExtractor = new RegexHttpRequestExtractor(pattern);
         return this;
     }
@@ -49,7 +49,7 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
      * @param cssSelectorExtractor
      * @return
      */
-    public HttpUriRequestExtractorConfigurer select(Function<Document, Set<String>> cssSelectorExtractor) {
+    public SharedSpiderConfigurer select(Function<Document, Set<String>> cssSelectorExtractor) {
         this.requestExtractor = new CssSelectorHttpRequestExtractor(cssSelectorExtractor);
         return this;
     }
@@ -66,7 +66,7 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
      *
      * @return
      */
-    public HttpUriRequestExtractorConfigurer range(String rangeRegexUrl) {
+    public SharedSpiderConfigurer range(String rangeRegexUrl) {
         Matcher matcher = pattern.matcher(rangeRegexUrl);
         Assert.isTrue(matcher.find(), "rangeRegexUrl is incorrect,should contain content in the form ${start~end}");
         ranges[0] = Integer.parseInt(matcher.group(1));

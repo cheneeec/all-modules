@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class SharedSpiderConfigurer<O> extends Configurer implements Comparable<SharedSpiderConfigurer<O>> {
+public abstract class SharedSpiderConfigurer<O> extends Configurer {
 
     @Setter(AccessLevel.PACKAGE)
     private SpiderBuilder builder;
@@ -32,11 +32,6 @@ public abstract class SharedSpiderConfigurer<O> extends Configurer implements Co
         return Integer.MAX_VALUE;
     }
 
-
-    @Override
-    public int compareTo(SharedSpiderConfigurer<O> o) {
-        return Integer.compare(order(), o.order());
-    }
 
 
     @Override

@@ -21,14 +21,14 @@ public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
     private Pipeline pipeline;
 
 
-    public PipelineConfigurer custom(Pipeline pipeline) {
+    public SharedSpiderConfigurer custom(Pipeline pipeline) {
         this.pipeline = pipeline;
         return this;
     }
 
 
     @SuppressWarnings("unchecked")
-    public PipelineConfigurer cssSelector(Consumer<HttpResponseResult<Document>> cssSelector) {
+    public SharedSpiderConfigurer cssSelector(Consumer<HttpResponseResult<Document>> cssSelector) {
         this.pipeline = new DocumentPipeline(cssSelector);
         return this;
     }
@@ -41,7 +41,7 @@ public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
      * @param fileNameGenerator 定义保存文件的名字。默认为请求地址的路径{@link com.earnest.crawler.core.pipeline.UriPathFileNameGenerator}。
      * @return
      */
-    public PipelineConfigurer asFile(String rootPath, String charset, FileNameGenerator fileNameGenerator) {
+    public SharedSpiderConfigurer asFile(String rootPath, String charset, FileNameGenerator fileNameGenerator) {
         this.pipeline = new FilePipeline(rootPath, charset);
         ((FilePipeline) this.pipeline).setFileNameGenerator(fileNameGenerator);
         return this;
@@ -53,7 +53,7 @@ public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
      * @return
      * @see #asFile(String, String, FileNameGenerator)
      */
-    public PipelineConfigurer asFile(String rootPath, String charset) {
+    public SharedSpiderConfigurer asFile(String rootPath, String charset) {
         this.pipeline = new FilePipeline(rootPath, charset);
         return this;
     }
@@ -63,7 +63,7 @@ public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
      * @return
      * @see #asFile(String, String, FileNameGenerator)
      */
-    public PipelineConfigurer asFile(String rootPath) {
+    public SharedSpiderConfigurer asFile(String rootPath) {
         this.pipeline = new FilePipeline(rootPath);
         return this;
     }

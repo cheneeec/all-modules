@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EpisodePage {
+public class EpisodePage  {
     private int page;
     private int size;
 }

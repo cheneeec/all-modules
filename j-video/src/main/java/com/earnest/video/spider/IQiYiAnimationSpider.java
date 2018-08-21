@@ -1,7 +1,5 @@
 package com.earnest.video.spider;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.service.IQiYiAnimationCachedVideoService;
@@ -58,6 +56,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
     protected String getFromUrl() {
         return FROM_URL;
     }
+
 
 
 }
