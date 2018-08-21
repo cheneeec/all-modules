@@ -26,7 +26,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
     private final static String RANGE_REGEX_URL = "https://list.iqiyi.com/www/4/-------------4-${1~30}-1-iqiyi--.html";
 
     @Override
-    protected Consumer<HttpResponseResult<Document>> cssSelectorPipeline() {
+    protected Consumer<HttpResponseResult<Document>> getCssSelectorPipeline() {
         return httpResponse -> {
             Element element = httpResponse.getContent().body();
             Elements elements = element.select("body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li");

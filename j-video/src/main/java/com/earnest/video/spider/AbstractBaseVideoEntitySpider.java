@@ -24,17 +24,18 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     private Spider createSpider() {
         return new SpiderBuilder()
-                .global().userAgent(Browser.GOOGLE.userAgent()).setThreadNumber(5)
+                .global().userAgent(Browser.GOOGLE.userAgent()).setThreadNumber(3)
                 .and()
                 .request().method(Connection.Method.GET).from(getFromUrl())
                 .and()
                 .extract().range(getRangeRegexUrl())
                 .and()
-                .pipeline().cssSelector(cssSelectorPipeline()).and()
+                .pipeline().cssSelector(getCssSelectorPipeline())
+                .and()
                 .build();
     }
 
-    protected abstract Consumer<HttpResponseResult<Document>> cssSelectorPipeline();
+    protected abstract Consumer<HttpResponseResult<Document>> getCssSelectorPipeline();
 
 
     protected abstract String getRangeRegexUrl();

@@ -25,7 +25,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
 
     @Override
-    protected Consumer<HttpResponseResult<Document>> cssSelectorPipeline() {
+    protected Consumer<HttpResponseResult<Document>> getCssSelectorPipeline() {
         return httpResponse -> {
             Element element = httpResponse.getContent().body();
             Elements elements = element.select("#widget-tab-0 > div.piclist-scroll.piclist-scroll-h290 > div > div:nth-child(1) > ul > li:not(li.J_videoLi.first_bigImg)");

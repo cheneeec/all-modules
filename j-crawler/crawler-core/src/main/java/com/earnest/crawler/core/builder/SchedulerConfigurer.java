@@ -3,7 +3,8 @@ package com.earnest.crawler.core.builder;
 import com.earnest.crawler.core.extractor.EmptyHttpRequestExtractor;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.scheduler.BlockingUniqueScheduler;
-import com.earnest.crawler.core.scheduler.FixedScheduler;
+import com.earnest.crawler.core.scheduler.FixedArrayScheduler;
+import com.earnest.crawler.core.scheduler.FixedSetScheduler;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -31,7 +32,7 @@ public class SchedulerConfigurer extends SharedSpiderConfigurer<Scheduler> {
     }
 
     public SchedulerConfigurer fixed() {
-        scheduler = new FixedScheduler();
+        scheduler = new FixedArrayScheduler();
         return this;
     }
 

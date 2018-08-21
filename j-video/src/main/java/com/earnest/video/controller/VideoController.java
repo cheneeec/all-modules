@@ -23,7 +23,6 @@ public class VideoController {
 
     public VideoController(IQiYiMovieCachedVideoService movieVideoService, IQiYiAnimationCachedVideoService animationVideoService) {
         this.videoServiceMap = initializeVideoServiceMap(movieVideoService, animationVideoService);
-
     }
 
 
@@ -44,7 +43,6 @@ public class VideoController {
     public BaseVideoEntity get(@PathVariable long id, @PathVariable String type) {
         return videoServiceMap.get(type).get(id);
     }
-
 
 
 }

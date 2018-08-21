@@ -4,22 +4,21 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
+
 
 /**
  * 固定请求的调度器。线程不安全。
  */
-public class FixedScheduler implements Scheduler {
+public class FixedSetScheduler implements Scheduler {
 
     private final Set<HttpUriRequest> taskSet;
 
 
-    public FixedScheduler(int initialCapacity) {
-        taskSet = Collections.newSetFromMap(new ConcurrentHashMap<>(initialCapacity));
+    public FixedSetScheduler(int initialCapacity) {
+        taskSet = new LinkedHashSet<>(initialCapacity);
     }
 
-    public FixedScheduler() {
+    public FixedSetScheduler() {
         this(16);
     }
 
@@ -30,6 +29,7 @@ public class FixedScheduler implements Scheduler {
 
     @Override
     public HttpUriRequest take() {
+
         Iterator<HttpUriRequest> iterator = taskSet.iterator();
         if (iterator.hasNext()) {
             HttpUriRequest next = iterator.next();
@@ -51,4 +51,6 @@ public class FixedScheduler implements Scheduler {
         taskSet.addAll(httpUriRequests);
 
     }
+
+
 }
