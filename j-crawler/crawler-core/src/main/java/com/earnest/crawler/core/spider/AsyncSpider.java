@@ -1,7 +1,6 @@
 package com.earnest.crawler.core.spider;
 
 
-import com.alibaba.fastjson.util.IOUtils;
 import com.earnest.crawler.core.StringResponseResult;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.exception.TakeTimeoutException;
@@ -10,33 +9,18 @@ import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler.Scheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.springframework.util.Assert;
 import org.springframework.util.CustomizableThreadCreator;
 
-import java.io.Closeable;
-import java.util.Arrays;
-import java.util.Set;
 import java.util.concurrent.*;
 
 @Slf4j
-public class AsyncSpider implements Spider {
+public class AsyncSpider extends SyncSpider {
 
-    private final Downloader downloader;
-    private final Scheduler scheduler;
-    private final HttpRequestExtractor httpRequestExtractor;
-    private final Pipeline pipeline;
     private final ThreadPoolExecutor threadPool;
 
     public AsyncSpider(Downloader downloader, Scheduler scheduler, HttpRequestExtractor httpRequestExtractor, Pipeline pipeline, Integer threadNumber) {
-        Assert.notNull(downloader, "downloader is null");
-        Assert.notNull(scheduler, "scheduler is null");
-        Assert.notNull(pipeline, "pipeline is null");
-        this.downloader = downloader;
-        this.scheduler = scheduler;
-        this.httpRequestExtractor = httpRequestExtractor;
-        this.pipeline = pipeline;
+        super(downloader, scheduler, httpRequestExtractor, pipeline);
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNumber + 1, new SpiderThreadFactory());
-
     }
 
 
@@ -89,14 +73,7 @@ public class AsyncSpider implements Spider {
                 try {
                     //当有活动的线程才去取值
                     if (threadPool.getActiveCount() != 1) {
-                        //获取下载的结果
-                        StringResponseResult stringResponseResult = responseResultsQueue.take();
-                        //对下载的结果进行提取
-                        Set<HttpUriRequest> httpUriRequests = httpRequestExtractor.extract(stringResponseResult);
-                        //将结果放入
-                        scheduler.putAll(httpUriRequests);
-                        //将结果进行处理
-                        pipeline.pipe(stringResponseResult);
+                        stringResponseResultHandle(responseResultsQueue.take());
                     } else
                         break;
                 } catch (InterruptedException e) {//在线程结果处理完成后发生
@@ -125,15 +102,8 @@ public class AsyncSpider implements Spider {
         if (!threadPool.isShutdown()) {
             threadPool.shutdown();
         }
-        closeComponents(downloader, scheduler, httpRequestExtractor, pipeline);
+        super.close();
 
-    }
-
-    private void closeComponents(Object... components) {
-        Arrays.stream(components)
-                .filter(a -> a instanceof Closeable)
-                .map(s -> (Closeable) s)
-                .forEach(IOUtils::close);
     }
 
 

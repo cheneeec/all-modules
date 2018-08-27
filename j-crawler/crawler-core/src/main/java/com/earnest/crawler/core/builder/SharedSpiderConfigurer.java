@@ -16,7 +16,6 @@ public abstract class SharedSpiderConfigurer<O> extends Configurer {
     @Setter(AccessLevel.PACKAGE)
     private SpiderBuilder builder;
 
-
     @Setter(value = AccessLevel.PACKAGE)
     protected Map<Class<?>, List<?>> sharedObjectMap;
 
@@ -26,12 +25,6 @@ public abstract class SharedSpiderConfigurer<O> extends Configurer {
 
         return builder;
     }
-
-
-    protected int order() {
-        return Integer.MAX_VALUE;
-    }
-
 
 
     @Override

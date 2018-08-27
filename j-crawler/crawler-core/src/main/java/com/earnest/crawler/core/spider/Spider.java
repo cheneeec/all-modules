@@ -9,7 +9,6 @@ public interface Spider extends Closeable {
 
     void stop();
 
-
     boolean isRunning();
 
 }

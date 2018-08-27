@@ -111,7 +111,6 @@ public class HttpClientDownloader implements Downloader {
 
 
 
-
         //set cookies
         if (httpContext != null) {
             responseResult.setCookies(

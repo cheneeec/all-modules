@@ -1,12 +1,16 @@
 package com.earnest.crawler.core.builder;
 
 
-public abstract class Configurer {
+abstract class Configurer {
 
 
     abstract void init();
 
 
     abstract void configure();
+
+    protected int order() {
+        return Integer.MAX_VALUE;
+    }
 
 }

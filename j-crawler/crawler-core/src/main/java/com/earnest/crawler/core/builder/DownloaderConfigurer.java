@@ -20,8 +20,6 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
     private final HttpClientBuilder httpClientBuilder = HttpClients.custom();
 
 
-
-
     public DownloaderConfigurer setProxy(HttpProxy httpProxy) {
         Assert.notNull(httpProxy, "httpProxy is null");
         httpClientBuilder.setProxy(httpProxy.getHttpHost());
