@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class SpiderBuilder extends SharedSpiderConfigurer<Spider> implements Builder<Spider> {
+public class SpiderBuilder extends SharedSpiderConfigurer implements Builder<Spider> {
 
 
     private final Map<Class<? extends SharedSpiderConfigurer>, SharedSpiderConfigurer> configurers = new LinkedHashMap<>();
@@ -23,8 +23,6 @@ public class SpiderBuilder extends SharedSpiderConfigurer<Spider> implements Bui
     public SpiderBuilder() {
         init();
         this.sharedSpiderConfigurers = createSharedSpiderConfigurers();
-
-
     }
 
     private List<SharedSpiderConfigurer> createSharedSpiderConfigurers() {
@@ -84,6 +82,11 @@ public class SpiderBuilder extends SharedSpiderConfigurer<Spider> implements Bui
         return (HttpUriRequestExtractorConfigurer) configurers.get(HttpUriRequestExtractorConfigurer.class);
     }
 
+    /**
+     * 设置调度器的类型。
+     *
+     * @return
+     */
     public SchedulerConfigurer scheduler() {
         return (SchedulerConfigurer) configurers.get(SchedulerConfigurer.class);
     }

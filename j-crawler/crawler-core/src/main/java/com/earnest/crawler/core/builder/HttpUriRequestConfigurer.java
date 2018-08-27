@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequest> {
+public class HttpUriRequestConfigurer extends SharedSpiderConfigurer {
     private SpiderBuilder builder;
     private HttpUriRequestPropertyConfigurer httpUriRequestPropertyConfigurer;
 
@@ -54,7 +54,7 @@ public class HttpUriRequestConfigurer extends SharedSpiderConfigurer<HttpUriRequ
     }
 
 
-    public static class HttpUriRequestPropertyConfigurer extends RequestConfigConfigurer<HttpUriRequest> {
+    public static class HttpUriRequestPropertyConfigurer extends RequestConfigConfigurer{
 
         private final RequestBuilder requestBuilder;
 

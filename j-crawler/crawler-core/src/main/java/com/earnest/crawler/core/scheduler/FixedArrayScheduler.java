@@ -3,25 +3,20 @@ package com.earnest.crawler.core.scheduler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FixedArrayScheduler implements Scheduler {
 
-    private final List<HttpUriRequest> tasks;
+    private final HttpUriRequest[] tasks;
 
     private AtomicInteger index = new AtomicInteger();
 
 
     public FixedArrayScheduler(int initialCapacity) {
-        tasks = new ArrayList<>(initialCapacity);
+        tasks = new HttpUriRequest[initialCapacity];
     }
 
-    public FixedArrayScheduler() {
-        this(30);
-    }
 
     @Override
     public boolean isEmpty() {
@@ -32,14 +27,16 @@ public class FixedArrayScheduler implements Scheduler {
     public HttpUriRequest take() {
         if (index.get() < 1) return null;
         int i = index.decrementAndGet();
-        return tasks.remove(i);
+        HttpUriRequest task = tasks[i];
+        tasks[i] = null;
+        return task;
     }
 
     @Override
     public boolean put(HttpUriRequest httpUriRequest) {
         if (httpUriRequest == null) return true;
         int i = index.getAndIncrement();
-        tasks.add(i, httpUriRequest);
+        tasks[i] = httpUriRequest;
         return true;
     }
 

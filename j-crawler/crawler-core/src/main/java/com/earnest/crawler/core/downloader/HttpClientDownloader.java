@@ -42,6 +42,8 @@ public class HttpClientDownloader implements Downloader {
         this(httpClient, null);
     }
 
+
+
     @Override
     public StringResponseResult download(HttpUriRequest request) {
         Assert.notNull(request, "request is null");

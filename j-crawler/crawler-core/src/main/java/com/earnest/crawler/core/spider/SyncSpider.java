@@ -81,7 +81,7 @@ public class SyncSpider implements Spider {
     }
 
 
-    void closeComponents(Object... components) {
+    private static void closeComponents(Object... components) {
         Arrays.stream(components)
                 .filter(a -> a instanceof Closeable)
                 .map(s -> (Closeable) s)

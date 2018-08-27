@@ -3,17 +3,17 @@ package com.earnest.crawler.core.builder;
 import com.earnest.crawler.core.HttpProxy;
 import org.apache.http.client.config.RequestConfig;
 
-public class RequestConfigConfigurer<O> extends SharedSpiderConfigurer<O> {
+public class RequestConfigConfigurer extends SharedSpiderConfigurer {
 
     protected RequestConfig.Builder custom = RequestConfig.custom();
 
 
-    public RequestConfigConfigurer<O> connectTimeout(int connectTimeout) {
+    public RequestConfigConfigurer connectTimeout(int connectTimeout) {
         custom.setConnectTimeout(connectTimeout);
         return this;
     }
 
-    public RequestConfigConfigurer<O> setProxy(HttpProxy proxy) {
+    public RequestConfigConfigurer setProxy(HttpProxy proxy) {
         custom.setProxy(proxy.getHttpHost());
         return this;
     }

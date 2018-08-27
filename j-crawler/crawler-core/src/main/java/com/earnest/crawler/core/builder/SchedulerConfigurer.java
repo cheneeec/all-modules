@@ -16,7 +16,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-public class SchedulerConfigurer extends SharedSpiderConfigurer<Scheduler> {
+public class SchedulerConfigurer extends SharedSpiderConfigurer {
 
     private Scheduler scheduler;
 
@@ -30,8 +30,8 @@ public class SchedulerConfigurer extends SharedSpiderConfigurer<Scheduler> {
         return blockingUnique(0);
     }
 
-    public SharedSpiderConfigurer fixed() {
-        scheduler = new FixedArrayScheduler();
+    public SharedSpiderConfigurer fixed(int initialCapacity) {
+        scheduler = new FixedArrayScheduler(initialCapacity);
         return this;
     }
 
@@ -55,7 +55,7 @@ public class SchedulerConfigurer extends SharedSpiderConfigurer<Scheduler> {
 
             if (httpRequestExtractors.isEmpty() || (httpRequestExtractors.get(0) instanceof EmptyHttpRequestExtractor)) {
                 //初始化固定的调度器
-                fixed();
+                fixed(httpUriRequests.size());
             } else {//默认初始化调度器
                 blockingUnique();
             }

@@ -11,7 +11,7 @@ import java.util.Map;
 
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract class SharedSpiderConfigurer<O> extends Configurer {
+public abstract class SharedSpiderConfigurer extends Configurer {
 
     @Setter(AccessLevel.PACKAGE)
     private SpiderBuilder builder;

@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 /**
  * 配置相关的{@link Pipeline}。如果没有指定将配置一个控制台输出的管道。
  */
-public class PipelineConfigurer extends SharedSpiderConfigurer<Pipeline> {
+public class PipelineConfigurer extends SharedSpiderConfigurer {
 
     private Pipeline pipeline;
 

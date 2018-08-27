@@ -31,7 +31,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
             List<IQiYi> iQiYis = elements.stream().map(e -> {
                 IQiYi iQiYi = new IQiYi();
                 iQiYi.setFromUrl(httpResponse.getHttpRequest().getRequestLine().getUri());
-                iQiYi.setId(id.getAndIncrement());
+                iQiYi.setId(generateId());
 
                 Elements a = e.select("div.site-piclist_pic > a");
                 iQiYi.setPlayValue(a.attr("href"));
@@ -56,7 +56,6 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
     protected String getFromUrl() {
         return FROM_URL;
     }
-
 
 
 }

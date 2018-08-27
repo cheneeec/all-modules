@@ -15,7 +15,7 @@ import org.springframework.util.Assert;
 import java.util.*;
 
 
-public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
+public class DownloaderConfigurer extends RequestConfigConfigurer {
 
     private final HttpClientBuilder httpClientBuilder = HttpClients.custom();
 
@@ -50,7 +50,6 @@ public class DownloaderConfigurer extends RequestConfigConfigurer<Downloader> {
         CookieStore cookieStore = (CookieStore) sharedObjectMap.get(CookieStore.class).get(0);
 
         cookies.forEach((k, v) -> cookieStore.addCookie(new BasicClientCookie(k, v)));
-
 
         cookies.forEach(this::addCookie);
         return this;

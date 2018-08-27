@@ -1,5 +1,6 @@
 package com.earnest.crawler.core.builder;
 
+import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.extractor.CssSelectorHttpRequestExtractor;
 import com.earnest.crawler.core.extractor.EmptyHttpRequestExtractor;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
@@ -15,15 +16,15 @@ import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<HttpRequestExtractor> {
+public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer {
 
 
     private HttpRequestExtractor requestExtractor;
@@ -86,22 +87,32 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer<Ht
     void configure() {
 
         if (!ArrayUtils.isEmpty(ranges) && StringUtils.isNotBlank(uriTemplate)) {
+            //
             @SuppressWarnings("unchecked")
             List<HttpUriRequest> httpUriRequests = (List<HttpUriRequest>) sharedObjectMap.get(HttpUriRequest.class);
             //获得模板的请求
-            HttpUriRequest httpUriRequest = httpUriRequests.get(0);
+            HttpUriRequest httpUriRequestTemplate = httpUriRequests.get(0);
 
-            Set<String> uris = httpUriRequests.stream()
-                    .map(HttpUriRequest::getRequestLine)
-                    .map(RequestLine::getUri)
-                    .collect(Collectors.toSet());
 
 
             IntStream.range(ranges[0], ranges[1] + 1)
-                    .mapToObj(i -> StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(i)))
-                    .filter(uri -> !uris.contains(uri))
-                    .map(u ->
-                            (httpUriRequest == null ? RequestBuilder.get(u) : RequestBuilder.copy(httpUriRequest).setUri(u)).build()
+                    .mapToObj(page ->
+                            new String[]{StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(page)), String.valueOf(page)}
+                    )
+                    .filter(uriArray ->
+                            httpUriRequests.stream().map(HttpUriRequest::getRequestLine)
+                                    .map(RequestLine::getUri)
+                                    .anyMatch(s -> !uriArray[0].equalsIgnoreCase(s))
+                    )
+                    .map(u -> {
+                                Optional<HttpUriRequest> httpUriRequestOptional = Optional.ofNullable(httpUriRequestTemplate);
+                                RequestBuilder requestBuilder = httpUriRequestOptional.map(RequestBuilder::copy).orElseGet(RequestBuilder::get);
+                                requestBuilder.setUri(u[0]);
+                                if (Integer.valueOf(u[1]) != ranges[0]) {
+                                    requestBuilder.setHeader(Browser.REFERER, StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(Integer.valueOf(u[1]) - 1)));
+                                }
+                                return requestBuilder.build();
+                            }
                     )
                     .peek(h -> log.trace("Generated a new Url:{}", h.getURI()))
                     .forEach(httpUriRequests::add);

@@ -16,7 +16,7 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     protected final Spider spider;
 
-    protected final AtomicLong id = new AtomicLong(1000);
+    private final AtomicLong id = new AtomicLong(10000);
 
     public AbstractBaseVideoEntitySpider() {
         spider = createSpider();
@@ -41,6 +41,10 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
     protected abstract String getRangeRegexUrl();
 
     protected abstract String getFromUrl();
+
+    protected Long generateId() {
+        return id.getAndIncrement();
+    }
 
     @Override
     public void start() {
