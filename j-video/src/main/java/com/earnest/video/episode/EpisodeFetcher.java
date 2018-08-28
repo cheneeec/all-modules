@@ -2,11 +2,12 @@ package com.earnest.video.episode;
 
 import com.earnest.video.entity.Episode;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 
 
-public interface EpisodeFetcher {
+public interface EpisodeFetcher  extends Closeable {
     /**
      * 对指定的{@code url}进行抓取，并且获得集数。
      *

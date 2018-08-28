@@ -45,9 +45,6 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
         this.httpClient = httpClient;
     }
 
-    public IQiYiEpisodeFetcher() {
-        this.httpClient = CloseableHttpClientFactoryBean.INSTANCE.getObject();
-    }
 
     @Override
     public List<Episode> fetch(String url, EpisodePage episodePage) throws IOException {
@@ -160,4 +157,8 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
     }
 
 
+    @Override
+    public void close() throws IOException {
+        httpClient.close();
+    }
 }

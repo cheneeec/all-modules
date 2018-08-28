@@ -1,5 +1,6 @@
 package com.earnest.video.episode;
 
+import com.earnest.crawler.core.Browser;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -10,7 +11,10 @@ import org.springframework.beans.factory.FactoryBean;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CloseableHttpClientFactoryBean implements FactoryBean<CloseableHttpClient>, DisposableBean {
 
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    private final CloseableHttpClient httpClient = HttpClients.custom()
+            .setUserAgent(Browser.GOOGLE.userAgent())
+            .setMaxConnTotal(8)
+            .build();
 
     public static final CloseableHttpClientFactoryBean INSTANCE = new CloseableHttpClientFactoryBean();
 

@@ -34,4 +34,13 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
     public boolean support(String url) {
         return episodeFetchers.stream().map(episodeFetcher -> episodeFetcher.support(url)).findAny().orElse(false);
     }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            CloseableHttpClientFactoryBean.INSTANCE.destroy();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
 }
