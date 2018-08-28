@@ -18,9 +18,11 @@ public class AsyncSpider extends SyncSpider {
 
     private final ThreadPoolExecutor threadPool;
 
+
     public AsyncSpider(Downloader downloader, Scheduler scheduler, HttpRequestExtractor httpRequestExtractor, Pipeline pipeline, Integer threadNumber) {
         super(downloader, scheduler, httpRequestExtractor, pipeline);
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNumber + 1, new SpiderThreadFactory());
+
     }
 
 
@@ -28,10 +30,11 @@ public class AsyncSpider extends SyncSpider {
     public void start() {
 
         int threadNumber = threadPool.getMaximumPoolSize();
-        BlockingQueue<StringResponseResult> responseResultsQueue = new ArrayBlockingQueue<>(100);
+
+        final BlockingQueue<StringResponseResult> responseResultsQueue = new ArrayBlockingQueue<>(100);
 
 
-        Thread resultHandleThread = createResultHandleThread(responseResultsQueue);
+        final Thread resultHandleThread = createResultHandleThread(responseResultsQueue);
 
 
         //进行下载
@@ -57,6 +60,15 @@ public class AsyncSpider extends SyncSpider {
                         break; //拿到null时
                 }
                 if (threadPool.getActiveCount() == 2) {//当活动线程只剩下最后一个
+                    while (!responseResultsQueue.isEmpty()) {
+                        try {
+                            //等待响应结果处理完成
+                            TimeUnit.MILLISECONDS.sleep(50);
+                        } catch (InterruptedException e) {
+                            log.error("Interrupted while processing the http response");
+                            resultHandleThread.interrupt();
+                        }
+                    }
                     resultHandleThread.interrupt();
                 }
 
@@ -72,7 +84,7 @@ public class AsyncSpider extends SyncSpider {
             while (true) {
                 try {
                     //当有活动的线程才去取值
-                    if (threadPool.getActiveCount() != 1) {
+                    if (threadPool.getActiveCount() > 1) {
                         stringResponseResultHandle(responseResultsQueue.take());
                     } else
                         break;

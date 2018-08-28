@@ -60,7 +60,7 @@ public class BlockingUniqueScheduler implements Scheduler {
     @Override
     public HttpUriRequest take() {
         try {
-            lock.lock();
+            lock.lockInterruptibly();
             if (taskSet.isEmpty()) {
                 log.debug("The number of threads currently waiting is {}", lock.getWaitQueueLength(getCondition)+1);
                 //等待取值
