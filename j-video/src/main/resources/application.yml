@@ -5,3 +5,7 @@ security:
   user:
     name: user
     password: default
+spring:
+  redis:
+    host: 192.168.2.51
+    password: CDGSbaosight@2017.t.ld.91992021

@@ -47,7 +47,7 @@ public abstract class AbstractCachedQueryAndPersistenceVideoService<T extends Ba
 
         return new PageImpl<>(
                 //获得内容
-                values.stream().skip(pageRequest.getPageSize() * pageRequest.getPageNumber())
+                values.stream().skip(pageRequest.getOffset())
                         .limit(pageRequest.getPageSize())
                         .collect(Collectors.toList()),
                 pageRequest, cachedMap.size());

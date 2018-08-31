@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ import java.util.Map;
 @RequestMapping("/v1/api")
 @SuppressWarnings("unchecked")
 public class VideoController {
-
+//http://www.iqiyi.com/v_19rqzi1f7s.html
     private final Map<String, BasicQueryAndPersistenceVideoService> videoServiceMap;
 
 
@@ -37,7 +38,6 @@ public class VideoController {
     public Page<? extends BaseVideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
         return videoServiceMap.get(type).findAll(pageRequest);
     }
-
 
     @GetMapping("/{id:\\d+}")
     public BaseVideoEntity get(@PathVariable long id, @PathVariable String type) {

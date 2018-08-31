@@ -16,7 +16,7 @@ import java.util.List;
 
 
 public class IQiYiEpisodeFetcherTest {
-    IQiYiEpisodeFetcher episodeFetcher = new IQiYiEpisodeFetcher();
+    IQiYiEpisodeFetcher episodeFetcher = new IQiYiEpisodeFetcher(CloseableHttpClientFactoryBean.INSTANCE.getObject());
 
     @Test
     public void fetch() throws Exception {
