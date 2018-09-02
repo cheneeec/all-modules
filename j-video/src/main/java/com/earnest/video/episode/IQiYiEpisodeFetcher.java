@@ -41,6 +41,8 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
     private static final Pattern episodeExtractPattern = Pattern.compile("\"vlist\":(\\[\\{.+\\}\\])");
 
+    private static final EpisodePage DEFAULT_EPISODE_PAGE = new EpisodePage(1, 50);
+
     public IQiYiEpisodeFetcher(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
     }
@@ -49,14 +51,15 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
     @Override
     public List<Episode> fetch(String url, EpisodePage episodePage) throws IOException {
 
-        episodePage = Optional.ofNullable(episodePage).orElse(new EpisodePage(1, 50));
+        episodePage = Optional.ofNullable(episodePage).orElse(DEFAULT_EPISODE_PAGE);
+
 
         String requestUrl = StringUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(url))
                 .replaceAll("\\$\\{page}", String.valueOf(episodePage.getPage()))
                 .replaceAll("\\$\\{size}", String.valueOf(episodePage.getSize()))
                 + generateRandomJsCallback();
 
-        log.info("Get the API request address:{},start sending http request", requestUrl);
+        log.debug("Get the API request address:{},start sending http request", requestUrl);
 
         HttpUriRequest httpGet = createHttpRequest(url, requestUrl);
 
@@ -66,7 +69,7 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
         String entityString = EntityUtils.toString(entity);
 
-        log.debug("connect {} is  successful", httpGet.getRequestLine().getUri());
+        log.info("connect {} is  successful", httpGet.getRequestLine().getUri());
 
         List<Episode> episodes = extractJsonString(entityString);
 

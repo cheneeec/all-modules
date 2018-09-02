@@ -1,24 +1,15 @@
 package com.earnest.script;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.earnest.crawler.core.Browser;
 import com.gargoylesoftware.htmlunit.*;
-import com.gargoylesoftware.htmlunit.html.DomElement;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.javascript.DebuggerImpl;
 import com.gargoylesoftware.htmlunit.javascript.HtmlUnitContextFactory;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine;
-import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
-import com.gargoylesoftware.htmlunit.javascript.background.BackgroundJavaScriptFactory;
-import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJob;
 import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
-import net.sourceforge.htmlunit.corejs.javascript.Context;
-import net.sourceforge.htmlunit.corejs.javascript.debug.DebuggableScript;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
@@ -51,7 +42,6 @@ public class HtmlunitTest {
         webClient.getOptions().setTimeout(30000);//设置“浏览器”的请求超时时间
 
 //        webClient.setAjaxController(new NicelyResynchronizingAjaxController());//设置支持ajax
-
 
         final WebRequest[] ajax = new WebRequest[1];
 
@@ -110,7 +100,7 @@ public class HtmlunitTest {
             }
         });
 
-        HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=http://www.iqiyi.com/v_19rqzi1f7s.html");
+        HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=http://www.iqiyi.com/v_19rqzi2kuo.html");
    /*     System.out.println("======================================");
         System.out.println(page.asText());
         System.out.println("======================================");

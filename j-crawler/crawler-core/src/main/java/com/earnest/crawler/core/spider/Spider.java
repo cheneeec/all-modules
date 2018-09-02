@@ -7,7 +7,10 @@ import java.util.List;
 public interface Spider extends Closeable {
     void start();
 
-    void stop();
+    default void stop() {
+        throw new UnsupportedOperationException(this.getClass()+" can't stop");
+    }
+
 
     boolean isRunning();
 

@@ -65,10 +65,6 @@ public class SyncSpider implements Spider {
         pipeline.pipe(stringResponseResult);
     }
 
-    @Override
-    public void stop() {
-        throw new UnsupportedOperationException("SyncSpider can't stop");
-    }
 
     @Override
     public boolean isRunning() {
