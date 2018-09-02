@@ -39,8 +39,10 @@ public class HtmlunitTest {
         webClient.getOptions().setCssEnabled(false);
         //禁用javascript支持
         webClient.getOptions().setJavaScriptEnabled(true);//启用JS解释器，默认为true
-        webClient.getOptions().setDoNotTrackEnabled(false);
+        webClient.getOptions().setPrintContentOnFailingStatusCode(false);//在失败的时候打印内容
+        webClient.getOptions().setDoNotTrackEnabled(true);
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);///当HTTP的状态非200时是否抛出异常
+        webClient.getOptions().setActiveXNative(false); //默认false
 
         webClient.getOptions().setThrowExceptionOnScriptError(false);//但js执行错误时，是否抛出异常
 
@@ -49,7 +51,6 @@ public class HtmlunitTest {
         webClient.getOptions().setTimeout(30000);//设置“浏览器”的请求超时时间
 
 //        webClient.setAjaxController(new NicelyResynchronizingAjaxController());//设置支持ajax
-
 
 
         final WebRequest[] ajax = new WebRequest[1];
@@ -69,36 +70,29 @@ public class HtmlunitTest {
         JavaScriptEngine javaScriptEngine = (JavaScriptEngine) webClient.getJavaScriptEngine();
 
 
-
         HtmlUnitContextFactory contextFactory = javaScriptEngine.getContextFactory();
 
 
-        /*webClient.addWebWindowListener(new WebWindowListener() {
+        webClient.addWebWindowListener(new WebWindowListener() {
             @Override
             public void webWindowOpened(WebWindowEvent event) {
             }
 
             @Override
             public void webWindowContentChanged(WebWindowEvent event) {
+
                 System.out.println(event.getNewPage().getUrl());
                 if ("http://jiexi.071811.cc/stapi.php?url=http://www.iqiyi.com/v_19rqzi2kuo.html".equals(event.getNewPage().getUrl().toString())) {
                     WebResponse webResponse = event.getNewPage().getWebResponse();
-
                     System.out.println(webResponse.getContentAsString());
-
                 }
 
                 JavaScriptJobManager jobManager = event.getWebWindow().getJobManager();
 
-                JavaScriptJob earliestJob = jobManager.getEarliestJob(job -> {
+                jobManager.removeAllJobs();
 
-                    System.out.println(job.getClass());
-                    System.out.println(job);
 
-                    return true;
-                });
-
-                if("http://jiexi.071811.cc/api/xit.php".equalsIgnoreCase(event.getNewPage().getUrl().toString())){
+                if ("http://jiexi.071811.cc/api/xit.php".equalsIgnoreCase(event.getNewPage().getUrl().toString())) {
                     System.out.println(event.getNewPage().getWebResponse().getContentAsString());
                 }
 
@@ -114,15 +108,13 @@ public class HtmlunitTest {
             public void webWindowClosed(WebWindowEvent event) {
 
             }
-        });*/
+        });
 
         HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=http://www.iqiyi.com/v_19rqzi1f7s.html");
    /*     System.out.println("======================================");
         System.out.println(page.asText());
         System.out.println("======================================");
         System.out.println(page.getWebResponse().getContentAsString());*/
-
-
 
 
         List<NameValuePair> headers = page.getWebResponse().getResponseHeaders();
@@ -153,6 +145,8 @@ public class HtmlunitTest {
 
         String url = result.getString("url");
 
+        webClient.getJavaScriptEngine().shutdown();
+
 
         //获取执行后真正的结果
         System.out.println(url);
@@ -164,7 +158,7 @@ public class HtmlunitTest {
 
 
     @Test
-    public void video(){
+    public void video() {
 
     }
 
