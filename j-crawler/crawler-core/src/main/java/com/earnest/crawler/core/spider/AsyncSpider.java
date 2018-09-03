@@ -18,11 +18,9 @@ public class AsyncSpider extends SyncSpider {
 
     private final ThreadPoolExecutor threadPool;
 
-
     public AsyncSpider(Downloader downloader, Scheduler scheduler, HttpRequestExtractor httpRequestExtractor, Pipeline pipeline, Integer threadNumber) {
         super(downloader, scheduler, httpRequestExtractor, pipeline);
         this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNumber + 1, new SpiderThreadFactory());
-
     }
 
 
@@ -115,7 +113,6 @@ public class AsyncSpider extends SyncSpider {
             threadPool.shutdown();
         }
         super.close();
-
     }
 
 

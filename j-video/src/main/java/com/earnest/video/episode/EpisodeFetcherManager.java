@@ -1,5 +1,6 @@
 package com.earnest.video.episode;
 
+import com.earnest.video.bean.CloseableHttpClientFactoryBean;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
 

@@ -23,23 +23,25 @@ public class HtmlunitTest {
 
     @Test(timeout = Long.MAX_VALUE)
     public void show() throws Exception {
+
         WebClient webClient = new WebClient(BrowserVersion.CHROME);
 
+        WebClientOptions webClientOptions = webClient.getOptions();
 
         //禁用CSS
-        webClient.getOptions().setCssEnabled(false);
+        webClientOptions.setCssEnabled(false);
         //禁用javascript支持
-        webClient.getOptions().setJavaScriptEnabled(true);//启用JS解释器，默认为true
-        webClient.getOptions().setPrintContentOnFailingStatusCode(false);//在失败的时候打印内容
-        webClient.getOptions().setDoNotTrackEnabled(true);
-        webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);///当HTTP的状态非200时是否抛出异常
-        webClient.getOptions().setActiveXNative(false); //默认false
+        webClientOptions.setJavaScriptEnabled(true);//启用JS解释器，默认为true
+        webClientOptions.setPrintContentOnFailingStatusCode(false);//在失败的时候打印内容
+        webClientOptions.setDoNotTrackEnabled(true);
+        webClientOptions.setThrowExceptionOnFailingStatusCode(false);///当HTTP的状态非200时是否抛出异常
+        webClientOptions.setActiveXNative(false); //默认false
 
-        webClient.getOptions().setThrowExceptionOnScriptError(false);//但js执行错误时，是否抛出异常
+        webClientOptions.setThrowExceptionOnScriptError(false);//但js执行错误时，是否抛出异常
+        webClientOptions.setTimeout(5000);//设置“浏览器”的请求超时时间
 
-        webClient.waitForBackgroundJavaScript(30000);//设置JS后台等待执行时间
+        webClient.waitForBackgroundJavaScript(5000);//设置JS后台等待执行时间
 
-        webClient.getOptions().setTimeout(30000);//设置“浏览器”的请求超时时间
 
 //        webClient.setAjaxController(new NicelyResynchronizingAjaxController());//设置支持ajax
 
@@ -57,10 +59,8 @@ public class HtmlunitTest {
             }
         });
 
-        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) webClient.getJavaScriptEngine();
 
 
-        HtmlUnitContextFactory contextFactory = javaScriptEngine.getContextFactory();
 
 
         webClient.addWebWindowListener(new WebWindowListener() {
@@ -72,12 +72,14 @@ public class HtmlunitTest {
             public void webWindowContentChanged(WebWindowEvent event) {
 
                 System.out.println(event.getNewPage().getUrl());
-                if ("http://jiexi.071811.cc/stapi.php?url=http://www.iqiyi.com/v_19rqzi2kuo.html".equals(event.getNewPage().getUrl().toString())) {
+                if ("http://jiexi.071811.cc/stapi.php?url=http://www.iqiyi.com/v_19rqz6uit0.html".equals(event.getNewPage().getUrl().toString())) {
                     WebResponse webResponse = event.getNewPage().getWebResponse();
                     System.out.println(webResponse.getContentAsString());
                 }
 
                 JavaScriptJobManager jobManager = event.getWebWindow().getJobManager();
+
+
 
                 jobManager.removeAllJobs();
 
@@ -100,7 +102,7 @@ public class HtmlunitTest {
             }
         });
 
-        HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=http://www.iqiyi.com/v_19rqzi2kuo.html");
+        HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=http://www.iqiyi.com/v_19rqz6uit0.html");
    /*     System.out.println("======================================");
         System.out.println(page.asText());
         System.out.println("======================================");
@@ -132,6 +134,13 @@ public class HtmlunitTest {
         FileCopyUtils.copy(page.getWebResponse().getContentAsStream(), new FileOutputStream("d:/a.txt"));
         System.out.println("=========================================");*/
         JSONObject result = JSONObject.parseObject(webClient.loadWebResponse(ajax[0]).getContentAsString());
+
+        //关掉javascript
+        JavaScriptEngine javaScriptEngine = (JavaScriptEngine) webClient.getJavaScriptEngine();
+
+        HtmlUnitContextFactory contextFactory = javaScriptEngine.getContextFactory();
+
+        javaScriptEngine.shutdown();
 
         String url = result.getString("url");
 

@@ -46,7 +46,6 @@ public class SyncSpider implements Spider {
             }
             StringResponseResult stringResponseResult = downloader.download(httpUriRequest);
             stringResponseResultHandle(stringResponseResult);
-
         }
 
     }

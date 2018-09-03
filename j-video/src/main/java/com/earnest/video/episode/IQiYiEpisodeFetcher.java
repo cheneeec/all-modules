@@ -14,7 +14,9 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.helper.HttpConnection;
 import org.jsoup.nodes.Element;
 import org.springframework.util.Assert;
 
@@ -80,6 +82,7 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
         return episodes;
     }
 
+    //TODO 这里只是初略的记录特征
     @Override
     public boolean support(String url) {
         Assert.hasText(url, "url is empty or null");
@@ -144,12 +147,21 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
      */
     private static String getAlbumId(String url) throws IOException {
 
-        Element body = Jsoup.connect(url)
+        Connection connection = Jsoup.connect(url)
                 .userAgent(Browser.GOOGLE.userAgent())
                 .ignoreContentType(true)
+                .validateTLSCertificates(false)
                 .referrer(url)
-                .timeout(5000)
+                .timeout(5000);
+
+        //获取cookies
+//        connection.response().cookies();
+        //get headers
+//        connection.response().headers();
+
+        Element body = connection
                 .get().body();
+
 
         return body.select("span.effect-score").attr("data-score-tvid");
 

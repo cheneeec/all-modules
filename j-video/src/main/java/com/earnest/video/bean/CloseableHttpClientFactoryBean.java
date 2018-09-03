@@ -1,4 +1,4 @@
-package com.earnest.video.episode;
+package com.earnest.video.bean;
 
 import com.earnest.crawler.core.Browser;
 import lombok.AccessLevel;
