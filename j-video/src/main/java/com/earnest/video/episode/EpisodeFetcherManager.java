@@ -1,9 +1,8 @@
 package com.earnest.video.episode;
 
-import com.earnest.video.bean.CloseableHttpClientFactoryBean;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
-
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,8 +14,8 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
 
     private final List<EpisodeFetcher> episodeFetchers = new ArrayList<>();
 
-    public EpisodeFetcherManager() {
-        episodeFetchers.add(new IQiYiEpisodeFetcher(CloseableHttpClientFactoryBean.INSTANCE.getObject()));
+    public EpisodeFetcherManager(CloseableHttpClient httpClient) {
+        episodeFetchers.add(new IQiYiEpisodeFetcher(httpClient, stringResponseHandler));
     }
 
 
@@ -48,10 +47,8 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
 
     @Override
     public void close() throws IOException {
-        try {
-            CloseableHttpClientFactoryBean.INSTANCE.destroy();
-        } catch (Exception e) {
-            throw new IOException(e);
+        for (EpisodeFetcher episodeFetcher : episodeFetchers) {
+            episodeFetcher.close();
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.earnest.video.search;
 
-import com.earnest.video.bean.CloseableHttpClientFactoryBean;
 import com.earnest.video.entity.IQiYi;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpGet;
@@ -8,11 +7,12 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.data.domain.Page;
 
 import java.io.IOException;
-import java.util.Collection;
 
 public class IQiYiSearcherTest {
 
@@ -21,18 +21,18 @@ public class IQiYiSearcherTest {
     public void iQiYiSearcher() throws IOException {
 
         IQiYiPlatformSearcher platformSearcher = new IQiYiPlatformSearcher();
-        Collection<IQiYi> search = platformSearcher.search("海贼王");
-        search.stream()
+        Page<IQiYi> search = platformSearcher.search("海贼王", null);
+        search.getContent().stream()
                 .map(IQiYi::getTitle)
                 .forEach(System.out::println);
 
-        Assert.assertTrue(!search.isEmpty());
+        Assert.assertTrue(!search.getContent().isEmpty());
     }
 
     @Test
     public void httpClient() throws Exception {
 
-        CloseableHttpClient httpClient = CloseableHttpClientFactoryBean.INSTANCE.getObject();
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
         //上下文
         HttpClientContext clientContext = new HttpClientContext();
@@ -47,7 +47,7 @@ public class IQiYiSearcherTest {
 
         cookieStore.getCookies()
                 .stream()
-                .map(s->s.getName()+":"+s.getValue())
+                .map(s -> s.getName() + ":" + s.getValue())
                 .forEach(System.out::println);
 
         System.out.println("=========================");

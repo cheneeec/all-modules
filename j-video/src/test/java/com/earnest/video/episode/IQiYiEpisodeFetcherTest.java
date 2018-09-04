@@ -1,7 +1,7 @@
 package com.earnest.video.episode;
 
-import com.earnest.video.bean.CloseableHttpClientFactoryBean;
 import com.earnest.video.entity.Episode;
+import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +9,8 @@ import java.util.List;
 
 
 public class IQiYiEpisodeFetcherTest {
-    IQiYiEpisodeFetcher episodeFetcher = new IQiYiEpisodeFetcher(CloseableHttpClientFactoryBean.INSTANCE.getObject());
+
+    IQiYiEpisodeFetcher episodeFetcher = new IQiYiEpisodeFetcher(HttpClients.createDefault(), stringResponseHandler);
 
     @Test
     public void fetch() throws Exception {

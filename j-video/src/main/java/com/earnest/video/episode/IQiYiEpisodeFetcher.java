@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -35,6 +36,8 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
     private final CloseableHttpClient httpClient;
 
+    private final ResponseHandler<String> stringResponseHandler;
+
     private static final String CALLBACK_JS_FUNCTION_PREFIX = "window.Q.__callbacks__.";
 
     private static final String LETTER_AND_NUMBER = "qwertyuiopasdfghjklzxcvbnm1234567890";
@@ -45,8 +48,9 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
     private static final EpisodePage DEFAULT_EPISODE_PAGE = new EpisodePage(1, 50);
 
-    public IQiYiEpisodeFetcher(CloseableHttpClient httpClient) {
+    public IQiYiEpisodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
         this.httpClient = httpClient;
+        this.stringResponseHandler = stringResponseHandler;
     }
 
 
@@ -65,21 +69,13 @@ public class IQiYiEpisodeFetcher implements EpisodeFetcher {
 
         HttpUriRequest httpGet = createHttpRequest(url, requestUrl);
 
-        CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpGet);
+        String entityString = httpClient.execute(httpGet, stringResponseHandler);
 
-        HttpEntity entity = closeableHttpResponse.getEntity();
-
-        String entityString = EntityUtils.toString(entity);
 
         log.info("connect {} is  successful", httpGet.getRequestLine().getUri());
 
-        List<Episode> episodes = extractJsonString(entityString);
 
-        EntityUtils.consumeQuietly(entity);
-
-        closeableHttpResponse.close();
-
-        return episodes;
+        return extractJsonString(entityString);
     }
 
     //TODO 这里只是初略的记录特征

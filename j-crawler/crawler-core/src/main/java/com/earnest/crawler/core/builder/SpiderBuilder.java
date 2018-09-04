@@ -1,11 +1,11 @@
 package com.earnest.crawler.core.builder;
 
-import com.earnest.crawler.core.spider.Spider;
+import com.earnest.crawler.core.Spider;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
 import com.earnest.crawler.core.pipeline.Pipeline;
 import com.earnest.crawler.core.scheduler.Scheduler;
-import com.earnest.crawler.core.spider.AsyncSpider;
+import com.earnest.crawler.core.AsyncSpider;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -2,7 +2,7 @@ package com.earnest.crawler.core.builder;
 
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.downloader.HttpClientDownloader;
-import com.earnest.crawler.core.HttpProxy;
+import com.earnest.crawler.core.proxy.HttpProxy;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;

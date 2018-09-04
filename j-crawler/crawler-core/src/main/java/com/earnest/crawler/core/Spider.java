@@ -1,4 +1,4 @@
-package com.earnest.crawler.core.spider;
+package com.earnest.crawler.core;
 
 import java.io.Closeable;
 

@@ -3,7 +3,7 @@ package com.earnest.video.spider;
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.builder.SpiderBuilder;
-import com.earnest.crawler.core.spider.Spider;
+import com.earnest.crawler.core.Spider;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.springframework.boot.CommandLineRunner;

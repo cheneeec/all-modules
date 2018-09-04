@@ -1,7 +1,6 @@
-package com.earnest.crawler.core.spider;
+package com.earnest.crawler.core;
 
 import com.alibaba.fastjson.util.IOUtils;
-import com.earnest.crawler.core.StringResponseResult;
 import com.earnest.crawler.core.downloader.Downloader;
 import com.earnest.crawler.core.exception.TakeTimeoutException;
 import com.earnest.crawler.core.extractor.HttpRequestExtractor;
