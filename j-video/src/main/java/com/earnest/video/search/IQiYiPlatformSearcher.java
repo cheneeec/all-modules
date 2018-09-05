@@ -21,7 +21,11 @@ import java.util.Date;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * @deprecated 使用 {@link IQiYiPlatformHttpClientSearcher}替代。
+ */
 @Slf4j
+@Deprecated
 public class IQiYiPlatformSearcher implements PlatformSearcher<IQiYi> {
 
     private static final String URL_STRING = "http://so.iqiyi.com/so/q_%s";
@@ -45,7 +49,7 @@ public class IQiYiPlatformSearcher implements PlatformSearcher<IQiYi> {
         Elements elements = element.select("div.mod_result ul.mod_result_list li.list_item");
 
 
-        return new PageImpl<>(elements.stream().map(mapToIQiYiEntity()).collect(Collectors.toList()),pageRequest,20);
+        return new PageImpl<>(elements.stream().map(mapToIQiYiEntity()).collect(Collectors.toList()), pageRequest, 20);
 
 
     }

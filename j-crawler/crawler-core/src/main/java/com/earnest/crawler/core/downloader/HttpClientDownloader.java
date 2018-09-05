@@ -9,6 +9,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -32,7 +33,6 @@ public class HttpClientDownloader implements Downloader {
     private final HttpClientContext httpContext;
 
 
-
     public HttpClientDownloader(CloseableHttpClient httpClient, HttpClientContext httpContext) {
         this.httpClient = Optional.ofNullable(httpClient).orElse(HttpClients.createMinimal());
         this.httpContext = httpContext;
@@ -43,22 +43,26 @@ public class HttpClientDownloader implements Downloader {
     }
 
 
-
     @Override
     public StringResponseResult download(HttpUriRequest request) {
         Assert.notNull(request, "request is null");
-        log.trace("Start downloading {}", request.getURI());
+        //下载地址
+        String uri = request.getRequestLine().getUri();
+
+        log.trace("Start downloading {}", uri);
         if (httpContext == null) {
             log.debug("httpContext is null and session will not be saved");
         }
-
+        CloseableHttpResponse httpResponse = null;
         try {
-            CloseableHttpResponse httpResponse = httpClient.execute(request, httpContext);
-            log.debug("download successful,url={}", request.getRequestLine().getUri());
+            httpResponse = httpClient.execute(request, httpContext);
+            log.debug("download successful,url={}", uri);
             return successAdapt(httpResponse, request);
         } catch (IOException e) {
-            log.error("url:{} download failed,error:{}", request.getRequestLine().getUri(), e.getMessage());
+            log.error("url:{} download failed,error:{}", uri, e.getMessage());
             return failureAdapt(request, e);
+        } finally {
+            HttpClientUtils.closeQuietly(httpResponse);
         }
 
     }
@@ -112,7 +116,6 @@ public class HttpClientDownloader implements Downloader {
         responseResult.setContent(EntityUtils.toString(entity));
 
 
-
         //set cookies
         if (httpContext != null) {
             responseResult.setCookies(
@@ -121,14 +124,6 @@ public class HttpClientDownloader implements Downloader {
             );
         }
 
-
-        if (!responseResult.isSuccess()) {
-            EntityUtils.consume(response.getEntity());
-        }
-
-        if (response instanceof CloseableHttpResponse) {
-            ((CloseableHttpResponse) response).close();
-        }
 
         return responseResult;
     }

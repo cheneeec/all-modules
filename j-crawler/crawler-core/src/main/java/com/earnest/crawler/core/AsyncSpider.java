@@ -90,6 +90,8 @@ public class AsyncSpider extends SyncSpider {
                 }
             }
             log.info("download completed, exit...");
+            //在完成过后释放资源。
+            afterCompleted();
         });
     }
 

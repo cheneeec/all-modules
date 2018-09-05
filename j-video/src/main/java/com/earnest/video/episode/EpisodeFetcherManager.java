@@ -2,6 +2,7 @@ package com.earnest.video.episode;
 
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
 
     private final List<EpisodeFetcher> episodeFetchers = new ArrayList<>();
 
-    public EpisodeFetcherManager(CloseableHttpClient httpClient) {
+    public EpisodeFetcherManager(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
         episodeFetchers.add(new IQiYiEpisodeFetcher(httpClient, stringResponseHandler));
     }
 

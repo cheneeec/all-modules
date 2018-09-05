@@ -5,11 +5,13 @@ import com.earnest.crawler.core.downloader.HttpClientDownloader;
 import com.earnest.crawler.core.proxy.HttpProxy;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.protocol.HttpRequestExecutor;
 import org.springframework.util.Assert;
 
 import java.util.*;

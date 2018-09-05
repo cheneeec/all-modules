@@ -47,6 +47,15 @@ public class SyncSpider implements Spider {
             stringResponseResultHandle(stringResponseResult);
         }
 
+        afterCompleted();
+
+    }
+
+    /**
+     * 在完成过后的回调。
+     */
+    protected void afterCompleted() {
+        close();
     }
 
     /**

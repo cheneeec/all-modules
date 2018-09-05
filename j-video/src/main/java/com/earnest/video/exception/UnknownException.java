@@ -11,15 +11,12 @@ public class UnknownException extends RuntimeException {
     }
 
     public UnknownException(String message) {
-        super(message);
+        super("server error:" + message);
     }
 
-    public UnknownException(String message, Throwable cause) {
-        super(message, cause);
-    }
 
     public UnknownException(Throwable cause) {
-        super(cause);
+        this(cause.getMessage());
     }
 
     protected UnknownException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
