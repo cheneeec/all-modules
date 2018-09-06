@@ -12,6 +12,6 @@ public interface HttpProxyPool extends Supplier<Optional<HttpProxy>> {
     /**
      * @return 是否执行过 {@link #initializeHttpProxyPool()}。
      */
-    boolean Initialized();
+    boolean initialized();
 
 }

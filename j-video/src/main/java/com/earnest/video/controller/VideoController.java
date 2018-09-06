@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/v1/api")
+@RequestMapping("/v1/api/video")
 @SuppressWarnings("unchecked")
 public class VideoController {
 //http://www.iqiyi.com/v_19rqzi1f7s.html

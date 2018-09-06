@@ -17,7 +17,6 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,15 +24,13 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SimpleHttpProxyProvider extends AbstractHttpProxyProvider implements Closeable {
+public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements Closeable {
 
-    public static final SimpleHttpProxyProvider INSTANCE = new SimpleHttpProxyProvider();
+    public static final FixedHttpProxyProvider INSTANCE = new FixedHttpProxyProvider();
 
     private static final String PROXY_POOL_URL = "http://123.207.35.36:5010/get";
 
     private static final String COLON = ":";
-
-    private final RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
 
     private final ResponseHandler<String> stringResponseHandler = new BasicResponseHandler();
 
@@ -57,17 +54,17 @@ public class SimpleHttpProxyProvider extends AbstractHttpProxyProvider implement
 
 
     /**
-     * 一次性的获取30个代理IP。
+     * 一次性的获取5个代理IP。
      */
     @Override
     protected void doInitializeHttpProxyPool() {
         HttpGet get = new HttpGet(PROXY_POOL_URL);
         //计数器
-        CountDownLatch count = new CountDownLatch(30);
+        CountDownLatch count = new CountDownLatch(5);
 
         ExecutorService threadPool = Executors.newFixedThreadPool(5);
-        //异步获取30个代理连接
-        IntStream.range(0, 30).forEach(s ->
+        //异步获取5个代理连接
+        IntStream.range(0, 5).forEach(s ->
                 threadPool.execute(() -> {
                     //设置
                     get().map(a -> RequestConfig.custom().setProxy(a.getHttpHost()).build())

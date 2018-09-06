@@ -2,12 +2,12 @@ package com.earnest.video.configuration;
 
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPool;
-import com.earnest.crawler.core.proxy.SimpleHttpProxyProvider;
+import com.earnest.crawler.core.proxy.FixedHttpProxyProvider;
 import com.earnest.video.entity.BaseVideoEntity;
-import com.earnest.video.episode.EpisodeFetcher;
-import com.earnest.video.episode.EpisodeFetcherManager;
-import com.earnest.video.search.IQiYiPlatformHttpClientSearcher;
-import com.earnest.video.search.PlatformSearcher;
+import com.earnest.video.core.episode.EpisodeFetcher;
+import com.earnest.video.core.episode.EpisodeFetcherManager;
+import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
+import com.earnest.video.core.search.PlatformSearcher;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.impl.client.AbstractResponseHandler;
@@ -49,7 +49,7 @@ public class SingletonBeanConfig {
      */
     @Bean
     public HttpProxyPool httpProxyPool() {
-        SimpleHttpProxyProvider httpProxyProvider = SimpleHttpProxyProvider.INSTANCE;
+        FixedHttpProxyProvider httpProxyProvider = FixedHttpProxyProvider.INSTANCE;
         httpProxyProvider.initializeHttpProxyPool();
         return httpProxyProvider;
     }
@@ -58,7 +58,9 @@ public class SingletonBeanConfig {
 
     @Bean
     public EpisodeFetcher episodeFetcher() {
-        return new EpisodeFetcherManager(httpClient(), responseHandler());
+        EpisodeFetcherManager episodeFetcherManager = new EpisodeFetcherManager(httpClient(), responseHandler());
+        episodeFetcherManager.setHttpProxyPool(httpProxyPool());
+        return episodeFetcherManager;
     }
 
     @Bean

@@ -1,18 +1,16 @@
-package com.earnest.video.search;
+package com.earnest.video.core.search;
 
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPool;
+import com.earnest.crawler.core.proxy.HttpProxyPoolSetter;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.exception.UnknownException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
@@ -28,16 +26,13 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Slf4j
-public class IQiYiPlatformHttpClientSearcher implements PlatformSearcher<IQiYi>, Closeable {
+public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSetter implements PlatformSearcher<IQiYi>, Closeable {
 
     private final HttpClient httpClient;
 
     private final ResponseHandler<String> responseHandler;
-    @Setter
-    @Getter
-    private HttpProxyPool httpProxyPool;
+
 
     private final HttpUriRequest templateHttpUriRequest =
             RequestBuilder.get("http://search.video.iqiyi.com/o")
@@ -55,6 +50,14 @@ public class IQiYiPlatformHttpClientSearcher implements PlatformSearcher<IQiYi>,
         this(httpClient, responseHandler, null);
     }
 
+    public IQiYiPlatformHttpClientSearcher(HttpClient httpClient, ResponseHandler<String> responseHandler, HttpProxyPool httpProxyPool) {
+        Assert.notNull(httpClient, "httpClient is null");
+        Assert.notNull(responseHandler, "responseHandler is null");
+        this.httpClient = httpClient;
+        this.responseHandler = responseHandler;
+        setHttpProxyPool(httpProxyPool);
+    }
+
     @Override
     public Page<IQiYi> search(String keyword, Pageable pageRequest) throws IOException {
         Assert.hasText(keyword, "keyword is empty or null");
@@ -62,10 +65,10 @@ public class IQiYiPlatformHttpClientSearcher implements PlatformSearcher<IQiYi>,
 
         RequestBuilder httpUriRequestBuilder = RequestBuilder.copy(templateHttpUriRequest)
                 .addParameter("key", keyword)
-                .addParameter("pageNum", String.valueOf(pageRequest.getPageNumber() + 1))
+                .addParameter("pageNum", String.valueOf(pageRequest.getPageNumber())) //默认值为1
                 .addParameter("size", String.valueOf(pageRequest.getPageSize()));
 
-        setHttpProxyIfPresent(httpUriRequestBuilder);
+        addHttpProxySetting(httpUriRequestBuilder);
 
         HttpUriRequest httpUriRequest = httpUriRequestBuilder.build();
 
@@ -104,17 +107,10 @@ public class IQiYiPlatformHttpClientSearcher implements PlatformSearcher<IQiYi>,
             iQiYi.setCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]);
             //播放信息
             iQiYi.setPlayInfo(parsePlayInfo(albumDocInfo));
+            iQiYi.setId(RandomUtils.nextLong());
             return iQiYi;
 
         };
-    }
-
-    private void setHttpProxyIfPresent(RequestBuilder httpUriRequestBuilder) {
-        if (httpProxyPool != null) {
-            httpProxyPool.get()
-                    .map(s -> RequestConfig.custom().setProxy(s.getHttpHost()).build())
-                    .ifPresent(httpUriRequestBuilder::setConfig);
-        }
     }
 
 

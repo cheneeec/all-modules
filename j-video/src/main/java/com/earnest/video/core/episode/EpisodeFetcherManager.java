@@ -1,9 +1,11 @@
-package com.earnest.video.episode;
+package com.earnest.video.core.episode;
 
+import com.earnest.crawler.core.proxy.HttpProxyPool;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,7 +15,7 @@ import java.util.List;
 @Slf4j
 public class EpisodeFetcherManager implements EpisodeFetcher {
 
-    private final List<EpisodeFetcher> episodeFetchers = new ArrayList<>();
+    private final List<EpisodeFetcher> episodeFetchers = new ArrayList<>(5);
 
     public EpisodeFetcherManager(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
         episodeFetchers.add(new IQiYiEpisodeFetcher(httpClient, stringResponseHandler));
@@ -22,7 +24,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Episode> fetch(String url, EpisodePage episodePage) {
+    public List<Episode> fetch(String url, Pageable episodePage) {
 
         return (List<Episode>) episodeFetchers.stream()
                 .filter(episodeFetcher -> episodeFetcher.support(url))
@@ -52,4 +54,11 @@ public class EpisodeFetcherManager implements EpisodeFetcher {
             episodeFetcher.close();
         }
     }
+
+    @Override
+    public void setHttpProxyPool(HttpProxyPool httpProxyPool) {
+        episodeFetchers.forEach(s -> s.setHttpProxyPool(httpProxyPool));
+    }
+
+
 }

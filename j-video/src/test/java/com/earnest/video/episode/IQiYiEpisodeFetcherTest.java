@@ -1,5 +1,6 @@
 package com.earnest.video.episode;
 
+import com.earnest.video.core.episode.IQiYiEpisodeFetcher;
 import com.earnest.video.entity.Episode;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;

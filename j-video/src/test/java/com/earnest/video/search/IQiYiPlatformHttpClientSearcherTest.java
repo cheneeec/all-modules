@@ -1,5 +1,6 @@
 package com.earnest.video.search;
 
+import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
 import com.earnest.video.entity.IQiYi;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;
