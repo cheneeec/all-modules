@@ -16,9 +16,12 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 所有的单例<code>Bean</code>的配置。都交由<code>Spring</code>容器管理。
@@ -68,4 +71,18 @@ public class SingletonBeanConfig {
         return new IQiYiPlatformHttpClientSearcher(httpClient(), responseHandler(), httpProxyPool());
     }
     //==========================//Manager==================
+
+
+    //=========================Spring Thread Pool=================
+    public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+        threadPoolTaskExecutor.setCorePoolSize(10);//线程池维护的最少数量
+        threadPoolTaskExecutor.setMaxPoolSize(500);//线程池维护的最大数量
+        threadPoolTaskExecutor.setKeepAliveSeconds(60 * 60);
+        threadPoolTaskExecutor.setQueueCapacity(500);
+        threadPoolTaskExecutor.initialize();
+        return threadPoolTaskExecutor;
+    }
+    //=======================//Spring Thread Pool=================
+
 }

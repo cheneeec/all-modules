@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 @Slf4j
-public class HttpProxyPoolSetter implements HttpProxyPoolAware {
+public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware {
 
     @Getter
     private HttpProxyPool httpProxyPool;

@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -21,9 +20,10 @@ public class EpisodeController {
 
     private final EpisodeFetcher episodeFetcher;
 
-    @GetMapping("/query")
+    @GetMapping(value = "/query")
     public List<Episode> findEpisodes(@NotBlank String url, @PageableDefault(page = 1, size = 50) Pageable page) throws IOException {
         return episodeFetcher.fetch(url, page);
     }
+
 
 }

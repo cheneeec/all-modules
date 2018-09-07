@@ -1,7 +1,7 @@
 package com.earnest.video.core.search;
 
 import com.earnest.crawler.core.Browser;
-import com.earnest.crawler.core.proxy.HttpProxyPoolSetter;
+import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.IQiYi;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Deprecated
-public class IQiYiPlatformSearcher  extends HttpProxyPoolSetter implements PlatformSearcher<IQiYi> {
+public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implements PlatformSearcher<IQiYi> {
 
     private static final String URL_STRING = "http://so.iqiyi.com/so/q_%s";
 

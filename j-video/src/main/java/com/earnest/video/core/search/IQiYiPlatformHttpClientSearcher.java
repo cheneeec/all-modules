@@ -3,7 +3,7 @@ package com.earnest.video.core.search;
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPool;
-import com.earnest.crawler.core.proxy.HttpProxyPoolSetter;
+import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.exception.UnknownException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSetter implements PlatformSearcher<IQiYi>, Closeable {
+public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport implements PlatformSearcher<IQiYi>, Closeable {
 
     private final HttpClient httpClient;
 

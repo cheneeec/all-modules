@@ -3,7 +3,7 @@ package com.earnest.video.core.episode;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
-import com.earnest.crawler.core.proxy.HttpProxyPoolSetter;
+import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-public class IQiYiEpisodeFetcher extends HttpProxyPoolSetter implements EpisodeFetcher {
+public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements EpisodeFetcher {
 
     private final CloseableHttpClient httpClient;
 
