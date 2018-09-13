@@ -13,9 +13,12 @@ public class FixedSetScheduler implements Scheduler {
 
     private final Set<HttpUriRequest> taskSet;
 
+    private final Iterator<HttpUriRequest> iterator;
+
 
     public FixedSetScheduler(int initialCapacity) {
         taskSet = new LinkedHashSet<>(initialCapacity);
+        iterator = taskSet.iterator();
     }
 
     public FixedSetScheduler() {
@@ -29,8 +32,6 @@ public class FixedSetScheduler implements Scheduler {
 
     @Override
     public HttpUriRequest take() {
-
-        Iterator<HttpUriRequest> iterator = taskSet.iterator();
         if (iterator.hasNext()) {
             HttpUriRequest next = iterator.next();
             iterator.remove();

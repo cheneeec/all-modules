@@ -7,7 +7,7 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 
 public class FixedHttpProxyProviderTest {
-    private FixedHttpProxyProvider httpProxyProvider = FixedHttpProxyProvider.INSTANCE;
+    private FixedHttpProxyProvider httpProxyProvider = new FixedHttpProxyProvider();
 
     @Test
     public void provideHttpProxies() throws InterruptedException {

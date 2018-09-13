@@ -24,12 +24,14 @@ import java.util.stream.IntStream;
 @Slf4j
 public class PlatformSearcherManager implements PlatformSearcher<BaseVideoEntity>, Closeable {
 
-
     private final Map<Platform, PlatformSearcher<? extends BaseVideoEntity>> platformSearcherMap;
 
     @Getter
     @Setter
     private ThreadPoolTaskExecutor threadPool;
+    @Getter
+    @Setter
+    private int ignoreTimeOut = 5; //忽略多少秒后的结果
 
 
     public PlatformSearcherManager(HttpClient httpClient, ResponseHandler<String> stringResponseHandler, HttpProxyPool httpProxyPool) {
@@ -57,35 +59,7 @@ public class PlatformSearcherManager implements PlatformSearcher<BaseVideoEntity
     @Override
     public Page<BaseVideoEntity> search(String keyword, Pageable pageRequest) throws IOException {
 
-        Page[] results = new Page[platformSearcherMap.size()];
 
-        Iterator<Platform> iterator = platformSearcherMap.keySet().iterator();
-
-        CountDownLatch count = new CountDownLatch(platformSearcherMap.size());
-
-        for (int i = 0; i < results.length; i++) {
-            int finalI = i;
-            threadPool.execute(() -> {
-                PlatformSearcher<? extends BaseVideoEntity> platformSearcher;
-                //获取各自的searcher
-                synchronized (iterator) {
-                    platformSearcher = platformSearcherMap.get(iterator.next());
-                }
-                //返回结果
-                try {
-                    results[finalI] = platformSearcher.search(keyword, pageRequest);
-                } catch (IOException e) {
-                    log.error("{} search keyword:{} content failed, has been ignored", platformSearcher, keyword);
-                }
-                count.countDown();
-            });
-        }
-        //等待3秒后开始，归总
-        try {
-            count.await(8, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {//基本不会发生
-            e.printStackTrace();
-        }
 
 
         return null;
@@ -120,5 +94,6 @@ public class PlatformSearcherManager implements PlatformSearcher<BaseVideoEntity
     public void setHttpProxyPool(HttpProxyPool httpProxyPool) {
         platformSearcherMap.values().forEach(s -> s.setHttpProxyPool(httpProxyPool));
     }
+
 
 }

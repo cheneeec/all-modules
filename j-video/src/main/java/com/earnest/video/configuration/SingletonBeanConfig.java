@@ -52,7 +52,7 @@ public class SingletonBeanConfig {
      */
     @Bean
     public HttpProxyPool httpProxyPool() {
-        FixedHttpProxyProvider httpProxyProvider = FixedHttpProxyProvider.INSTANCE;
+        FixedHttpProxyProvider httpProxyProvider = new FixedHttpProxyProvider();
         httpProxyProvider.initializeHttpProxyPool();
         return httpProxyProvider;
     }

@@ -17,9 +17,11 @@ public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
 
     private final ConcurrentHashMap<Integer, HttpProxy> httpProxiesMap = new ConcurrentHashMap<>();
 
-    private final AtomicInteger size = new AtomicInteger();
+    protected final AtomicInteger size = new AtomicInteger();
 
     private final AtomicBoolean invokedInitializeHttpProxyPoolMethod = new AtomicBoolean();
+
+
 
 
     /**
