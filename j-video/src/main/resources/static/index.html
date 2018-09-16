@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+<body>
+
+这是首页
+
+<script type="application/javascript">
+    var webSocket = new WebSocket('ws://localhost:8080/message/push');
+
+    webSocket.onopen=function (ev) {
+        console.log(ev)
+    };
+    webSocket.onmessage=function (ev) {
+       console.log(ev.data)
+    };
+    webSocket.onclose=function (ev) {
+        console.log(ev,'close');
+    }
+</script>
+</body>
+</html>
