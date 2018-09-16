@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -116,11 +117,10 @@ public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements
         HttpGet get = new HttpGet(DEFAULT_PROXY_POOL_URL);
 
 //        HttpUriRequest httpUriRequest = this.httpUriRequest;
-        //计数器
-        CountDownLatch count = new CountDownLatch(5);
+
 
         //异步获取5个代理连接
-        IntStream.range(0, 5).forEach(s ->
+        IntStream.range(0, 3).forEach(s ->
                 threadPool.execute(() -> {
                     //设置
                     get().map(a -> RequestConfig.custom().setProxy(a.getHttpHost()).build())
@@ -137,20 +137,16 @@ public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements
                         String proxy = httpClient.execute(get, stringResponseHandler);
                         log.info("Get a proxy address:{}", proxy);
                         putHttpProxy(convertToHttpProxy(proxy));
-                        count.countDown();
+
                     } catch (IOException ignore) {
 
                     }
                 })
         );
+        close();
         try {
-            //等待释放资源
-            count.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            //释放资源
-            close();
+            threadPool.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
         }
     }
 

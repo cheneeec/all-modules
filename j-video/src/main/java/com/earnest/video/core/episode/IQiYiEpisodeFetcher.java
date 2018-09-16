@@ -12,6 +12,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.jsoup.Connection;
@@ -47,7 +48,7 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
 
     private static final Pattern episodeExtractPattern = Pattern.compile("\"vlist\":(\\[\\{.+\\}\\])");
 
-    private static final Pageable DEFAULT_EPISODE_PAGE = new PageRequest(1, 50);
+    private static final Pageable DEFAULT_EPISODE_PAGE = new PageRequest(0, 50);
 
     public IQiYiEpisodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
         this.httpClient = httpClient;
@@ -63,7 +64,7 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
         String[] s = url.split("\\?");
 
         String requestUrl = StringUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(s))
-                .replaceAll("\\$\\{page}", String.valueOf(episodePage.getPageNumber()))
+                .replaceAll("\\$\\{page}", String.valueOf(episodePage.getPageNumber() + 1))
                 .replaceAll("\\$\\{size}", String.valueOf(episodePage.getPageSize()))
                 + generateRandomJsCallback();
 
@@ -200,8 +201,8 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
 
 
     @Override
-    public void close() throws IOException {
-        httpClient.close();
+    public void close() {
+        HttpClientUtils.closeQuietly(httpClient);
     }
 
 }

@@ -5,6 +5,7 @@ import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPool;
 import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.IQiYi;
+import com.earnest.video.entity.Platform;
 import com.earnest.video.exception.UnknownException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport implements PlatformSearcher<IQiYi>, Closeable {
+public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport implements PlatformSearcher<IQiYi> {
 
     private final HttpClient httpClient;
 
@@ -65,7 +65,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
 
         RequestBuilder httpUriRequestBuilder = RequestBuilder.copy(templateHttpUriRequest)
                 .addParameter("key", keyword)
-                .addParameter("pageNum", String.valueOf(pageRequest.getPageNumber())) //默认值为1
+                .addParameter("pageNum", String.valueOf(pageRequest.getPageNumber() + 1)) //默认值为1
                 .addParameter("size", String.valueOf(pageRequest.getPageSize()));
 
         addHttpProxySetting(httpUriRequestBuilder);
@@ -96,6 +96,12 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
         return new PageImpl<>(resultCollections, pageRequest, dataJsonObject.getIntValue("result_num"));
     }
 
+
+    @Override
+    public Platform getPlatform() {
+        return Platform.IQIYI;
+    }
+
     private static Function<JSONObject, IQiYi> mapToIQiYiEntity() {
         return jsonObject -> {
             IQiYi iQiYi = new IQiYi();
@@ -120,7 +126,11 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
     }
 
     @Override
-    public void close() {
-        HttpClientUtils.closeQuietly(httpClient);
+    public void close() throws IOException {
+        try {
+            super.close();
+        } finally {
+            HttpClientUtils.closeQuietly(httpClient);
+        }
     }
 }

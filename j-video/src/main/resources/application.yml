@@ -5,3 +5,4 @@ security:
 logging:
   level:
     com.earnest: debug
+

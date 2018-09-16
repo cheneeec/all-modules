@@ -26,4 +26,6 @@ public class GlobalWebMvcConfig extends WebMvcConfigurerAdapter {
         fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
         converters.add(fastJsonHttpMessageConverter);
     }
+
+
 }

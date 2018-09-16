@@ -1,6 +1,6 @@
 package com.earnest.video.controller;
 
-import com.earnest.video.core.search.PlatformSearcher;
+import com.earnest.video.core.search.PlatformSearcherManager;
 import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.entity.Platform;
 import lombok.AllArgsConstructor;
@@ -21,14 +21,14 @@ import java.io.IOException;
 @AllArgsConstructor
 public class SearchController {
 
-    private final PlatformSearcher<? extends BaseVideoEntity> platformSearcher;
+    private final PlatformSearcherManager platformSearcherManager;
 
     @GetMapping("/search")
     public Page<? extends BaseVideoEntity> search(@NotBlank @RequestParam(name = "q") String keyword,
                                                   @PageableDefault(page = 1) Pageable pageRequest,
                                                   Platform platform) throws IOException {
 
-        return platformSearcher.search(keyword, pageRequest);
+        return platformSearcherManager.search(keyword, pageRequest,platform);
     }
 
 }

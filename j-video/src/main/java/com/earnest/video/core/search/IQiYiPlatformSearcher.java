@@ -3,6 +3,7 @@ package com.earnest.video.core.search;
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.IQiYi;
+import com.earnest.video.entity.Platform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.jsoup.Jsoup;
@@ -54,6 +55,12 @@ public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implemen
 
     }
 
+    @Override
+    public Platform getPlatform() {
+        return Platform.IQIYI;
+    }
+
+
     private static Function<Element, IQiYi> mapToIQiYiEntity() {
         Date now = Calendar.getInstance().getTime();
         return e -> {
@@ -76,5 +83,11 @@ public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implemen
             return iQiYi;
 
         };
+    }
+
+
+    @Override
+    public void close() throws IOException {
+
     }
 }
