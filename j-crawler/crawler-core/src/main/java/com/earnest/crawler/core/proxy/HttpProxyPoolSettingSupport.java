@@ -31,6 +31,10 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
     }
 
     public HttpUriRequest addHttpProxySetting(HttpUriRequest httpUriRequest) {
+        if (!useHttpProxy) {
+            return httpUriRequest;
+        }
+
         Assert.notNull(httpUriRequest, "httpUriRequest is null");
         if (httpUriRequest instanceof HttpRequestBase) {
             RequestConfig requestConfig = addProxyHttpHost(((HttpRequestBase) httpUriRequest).getConfig());
@@ -44,10 +48,12 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
 
 
     public void addHttpProxySetting(RequestBuilder requestBuilder) {
+        if (!useHttpProxy) {
+            return;
+        }
         Assert.notNull(requestBuilder, "requestBuilder is null");
         requestBuilder.setConfig(addProxyHttpHost(requestBuilder.getConfig()));
         log.debug("Set proxy address:{} for request {}", requestBuilder.getConfig().getProxy(), requestBuilder.getUri());
-
     }
 
     private RequestConfig addProxyHttpHost(RequestConfig requestConfig) {
@@ -56,11 +62,10 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
                 .map(RequestConfig::copy)
                 .orElse(RequestConfig.custom());
 
-        if (useHttpProxy) {
-            //为其设置代理
-            httpProxyPool.get().map(HttpProxy::getHttpHost)
-                    .ifPresent(builder::setProxy);
-        }
+        //为其设置代理
+        httpProxyPool.get().map(HttpProxy::getHttpHost)
+                .ifPresent(builder::setProxy);
+
 
         return builder.build();
 
@@ -68,7 +73,7 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
 
 
     @Override
-    public void close() throws IOException{
+    public void close() throws IOException {
         if (httpProxyPool instanceof Closeable) {
             IOUtils.close((Closeable) httpProxyPool);
         }

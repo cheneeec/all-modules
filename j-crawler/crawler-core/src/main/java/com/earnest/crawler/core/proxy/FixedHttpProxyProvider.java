@@ -18,7 +18,6 @@ import org.springframework.util.Assert;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
