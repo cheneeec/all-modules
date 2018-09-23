@@ -10,7 +10,6 @@
     <modules>
         <module>j-crawler</module>
         <module>j-video</module>
-        <module>j-security</module>
         <module>j-core</module>
     </modules>
 
