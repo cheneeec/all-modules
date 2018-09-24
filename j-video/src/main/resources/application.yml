@@ -1,7 +1,6 @@
-security:
-  user:
-    name: user
-    password: default
+spring:
+  profiles:
+    active: jdbc
 logging:
   level:
     com.earnest: debug

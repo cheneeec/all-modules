@@ -7,7 +7,6 @@ import org.apache.http.HttpHost;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class HttpProxy {
     private HttpHost httpHost;
     private String username;

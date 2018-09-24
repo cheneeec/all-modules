@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPool;
 import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
+import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.entity.Platform;
 import com.earnest.video.exception.UnknownException;
@@ -110,7 +111,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
             iQiYi.setAlbumId(albumDocInfo.getString("albumId"));
             iQiYi.setPlayValue(albumDocInfo.getString("albumLink"));
             iQiYi.setImage(albumDocInfo.getString("albumVImage"));
-            iQiYi.setCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]);
+            iQiYi.setCategory(BaseVideoEntity.Category.getCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]));
             //播放信息
             iQiYi.setPlayInfo(parsePlayInfo(albumDocInfo));
             iQiYi.setId(RandomUtils.nextLong());

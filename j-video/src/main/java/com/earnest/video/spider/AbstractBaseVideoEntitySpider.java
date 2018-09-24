@@ -4,19 +4,21 @@ import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.builder.SpiderBuilder;
 import com.earnest.crawler.core.Spider;
+import com.earnest.video.entity.BaseVideoEntity;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLineRunner {
 
     protected final Spider spider;
 
-    private final AtomicLong id = new AtomicLong(10000);
 
     public AbstractBaseVideoEntitySpider() {
         spider = createSpider();
@@ -35,16 +37,24 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
                 .build();
     }
 
-    protected abstract Consumer<HttpResponseResult<Document>> getCssSelectorPipeline();
+    protected Consumer<HttpResponseResult<Document>> getCssSelectorPipeline() {
+        return documentHttpResponseResult -> {
+            List<BaseVideoEntity> videoEntities = pipe().apply(documentHttpResponseResult);
+            if (!CollectionUtils.isEmpty(videoEntities)) {
+                consumer().accept(videoEntities);
+            }
+        };
+    }
+
+    protected abstract Function<HttpResponseResult<Document>, List<BaseVideoEntity>> pipe();
+
+    protected abstract Consumer<List<BaseVideoEntity>> consumer();
 
 
     protected abstract String getRangeRegexUrl();
 
     protected abstract String getFromUrl();
 
-    protected Long generateId() {
-        return id.getAndIncrement();
-    }
 
     @Override
     public void start() {

@@ -2,6 +2,7 @@ package com.earnest.video.core.search;
 
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
+import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.entity.Platform;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implemen
             IQiYi iQiYi = new IQiYi();
             Elements img = e.select("img");
             //分类
-            iQiYi.setCategory(e.attr("data-widget-searchlist-catageory"));
+            iQiYi.setCategory(BaseVideoEntity.Category.getCategory(e.attr("data-widget-searchlist-catageory")));
             //albumid不一定有用
             iQiYi.setAlbumId(e.attr("data-widget-searchlist-albumid"));
             iQiYi.setImage(img.attr("abs:src"));

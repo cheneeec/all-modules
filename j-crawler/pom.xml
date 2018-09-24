@@ -14,7 +14,6 @@
     <properties>
         <jsoup.version>1.8.3</jsoup.version>
         <htmlunit.version>2.31</htmlunit.version>
-        <okhttp.version>3.11.0</okhttp.version>
     </properties>
 
     <modules>
@@ -34,11 +33,6 @@
                 <groupId>net.sourceforge.htmlunit</groupId>
                 <artifactId>htmlunit</artifactId>
                 <version>${htmlunit.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.okhttp3</groupId>
-                <artifactId>okhttp</artifactId>
-                <version>${okhttp.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+
+
 @Getter
 @Setter
 @ToString(callSuper = true)
@@ -13,8 +15,7 @@ public class IQiYi extends BaseVideoEntity {
     private String albumId;
 
     public IQiYi() {
-        this.origin = "爱奇艺";
+        this.platform = Platform.IQIYI;
     }
-
 
 }

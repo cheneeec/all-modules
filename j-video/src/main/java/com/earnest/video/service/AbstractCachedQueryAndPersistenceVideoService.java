@@ -63,4 +63,9 @@ public abstract class AbstractCachedQueryAndPersistenceVideoService<T extends Ba
         Assert.notNull(id, "the id is required");
         return cachedMap.get(id);
     }
+
+    @Override
+    public Page<T> findByCategory(Pageable pageRequest, BaseVideoEntity.Category category) {
+        return null;
+    }
 }
