@@ -4,6 +4,7 @@ import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
 import com.earnest.video.spider.IQiYiAnimationSpider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +27,12 @@ public class IQiYiSpiderConfig {
                 return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
             }
         };
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService(){
+        return null;
     }
 
 

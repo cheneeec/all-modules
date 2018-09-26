@@ -15,13 +15,13 @@ public class Video extends IQiYi {
 
     @Override
     @Id
+    @GeneratedValue
     public Long getId() {
         return super.getId();
     }
 
     @Override
     @Id
-    @GeneratedValue
     public void setId(Long id) {
         super.setId(id);
     }
@@ -30,6 +30,7 @@ public class Video extends IQiYi {
 
 
     public static Video adapt(BaseVideoEntity videoEntity) {
+
         if (videoEntity instanceof Video) {
             return (Video) videoEntity;
         }
