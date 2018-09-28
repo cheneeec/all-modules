@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class JdbcVideoService implements BasicQueryAndPersistenceVideoService<Video> {
+public class MongodbVideoService implements BasicQueryAndPersistenceVideoService<Video> {
 
     private final VideoRepository videoRepository;
 
@@ -49,7 +49,7 @@ public class JdbcVideoService implements BasicQueryAndPersistenceVideoService<Vi
     @Override
     public Video get(Long id) {
         Assert.notNull(id, "id is required");
-        return videoRepository.getOne(id);
+        return videoRepository.findById(id).orElse(null);
     }
 
     @Override

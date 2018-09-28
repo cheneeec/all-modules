@@ -2,6 +2,7 @@ package com.earnest.video.configuration.spider;
 
 import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
+import com.earnest.video.service.CachedVideoService;
 import com.earnest.video.spider.IQiYiAnimationSpider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,7 +33,7 @@ public class IQiYiSpiderConfig {
     @Bean
     @ConditionalOnMissingBean
     public BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService(){
-        return null;
+        return new CachedVideoService();
     }
 
 

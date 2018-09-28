@@ -58,7 +58,7 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     @Override
     public void start() {
-        spider.start();
+//        spider.start();
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.earnest.video.core.search.PlatformSearcherManager;
 import com.earnest.video.entity.BaseVideoEntity;
 import com.earnest.video.entity.Platform;
 import lombok.AllArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
 

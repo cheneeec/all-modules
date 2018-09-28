@@ -1,9 +1,6 @@
 spring:
-  profiles:
-    active: jdbc
-  data:
-    rest:
-      base-path: /v1/api
+#  profiles:
+#    active: mongo
 
 logging:
   level:
