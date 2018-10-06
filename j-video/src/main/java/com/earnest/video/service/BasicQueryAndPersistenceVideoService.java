@@ -20,4 +20,6 @@ public interface BasicQueryAndPersistenceVideoService<T extends BaseVideoEntity>
     T get(Long id);
 
     Page<T> findByCategory(Pageable pageRequest, BaseVideoEntity.Category category);
+
+    long count();
 }

@@ -24,7 +24,6 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
     private final static String RANGE_REGEX_URL = "https://list.iqiyi.com/www/4/-------------4-${1~30}-1-iqiyi--.html";
 
 
-
     @Override
     protected Function<HttpResponseResult<Document>, List<BaseVideoEntity>> pipe() {
         return httpResponse -> {
@@ -61,5 +60,11 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
         return FROM_URL;
     }
 
+    @Override
+    public void start() {
+        if (iQiYiAnimationCachedVideoService.count() < 1) {
+            super.start();
+        }
 
+    }
 }

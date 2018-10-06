@@ -58,4 +58,9 @@ public class MongodbVideoService implements BasicQueryAndPersistenceVideoService
         pageRequest = Optional.ofNullable(pageRequest).orElse(Pageable.unpaged());
         return videoRepository.findByCategory(pageRequest, category);
     }
+
+    @Override
+    public long count() {
+        return videoRepository.count();
+    }
 }

@@ -119,4 +119,9 @@ public class CachedVideoService<T extends BaseVideoEntity> implements BasicQuery
 
     }
 
+    @Override
+    public long count() {
+        return videoMap.size();
+    }
+
 }
