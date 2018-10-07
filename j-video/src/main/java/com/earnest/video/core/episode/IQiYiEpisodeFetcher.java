@@ -136,7 +136,7 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
             episode.setDescription(e.getString("desc"));
             episode.setTitle(e.getString("shortTitle"));
             episode.setTimeLength(e.getIntValue("timeLength"));
-            episode.setPlayUrl(e.getString("vurl"));
+            episode.setPlayValue(e.getString("vurl"));
             episode.setVId(e.getString("vid"));
             episode.setShortDescription(e.getString("vt"));
             episode.setId(e.getString("id"));
