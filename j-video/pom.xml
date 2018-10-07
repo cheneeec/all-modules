@@ -33,6 +33,12 @@
 
         <dependency>
             <groupId>com.earnest</groupId>
+            <artifactId>crawler-script</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.earnest</groupId>
             <artifactId>crawler-core</artifactId>
             <version>${project.version}</version>
         </dependency>

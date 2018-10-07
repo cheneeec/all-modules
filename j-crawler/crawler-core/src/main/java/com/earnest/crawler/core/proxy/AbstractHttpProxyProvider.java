@@ -22,8 +22,6 @@ public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
     private final AtomicBoolean invokedInitializeHttpProxyPoolMethod = new AtomicBoolean();
 
 
-
-
     /**
      * @return 随机获取一个{@link HttpProxy}。
      */
@@ -53,14 +51,14 @@ public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
     }
 
     @Override
-    public void initializeHttpProxyPool() {
+    public void initializeHttpProxyPool()  throws  Exception{
         if (!invokedInitializeHttpProxyPoolMethod.get()) {
             doInitializeHttpProxyPool();
             invokedInitializeHttpProxyPoolMethod.set(true);
         }
     }
 
-    protected abstract void doInitializeHttpProxyPool();
+    protected abstract void doInitializeHttpProxyPool() throws  Exception;
 
     @Override
     public boolean initialized() {

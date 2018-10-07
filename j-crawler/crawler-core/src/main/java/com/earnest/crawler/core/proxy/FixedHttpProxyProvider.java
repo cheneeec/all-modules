@@ -27,7 +27,6 @@ import java.util.stream.IntStream;
 @Slf4j
 public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements Closeable {
 
-//    public static final FixedHttpProxyProvider INSTANCE = new FixedHttpProxyProvider();
 
     private static final String DEFAULT_PROXY_POOL_URL = "http://123.207.35.36:5010/get";
 
@@ -83,7 +82,7 @@ public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements
         this(url, DEFAULT_MAX_HTTP_PROXY_COUNT, DEFAULT_THREAD_NUMBER, DEFAULT_PERIODICALLY_CHECK);
     }
 
-    public FixedHttpProxyProvider(){
+    public FixedHttpProxyProvider() {
         this(DEFAULT_PROXY_POOL_URL);
     }
 
@@ -111,12 +110,9 @@ public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements
      * 在初始化的时候一次性的获取5个代理IP。
      */
     @Override
-    protected void doInitializeHttpProxyPool() {
+    protected void doInitializeHttpProxyPool() throws Exception {
 
         HttpGet get = new HttpGet(DEFAULT_PROXY_POOL_URL);
-
-//        HttpUriRequest httpUriRequest = this.httpUriRequest;
-
 
         //异步获取5个代理连接
         IntStream.range(0, 3).forEach(s ->
@@ -125,21 +121,15 @@ public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements
                     get().map(a -> RequestConfig.custom().setProxy(a.getHttpHost()).build())
                             .ifPresent(get::setConfig);
 
-                    /*get().map(a -> RequestConfig.custom().setProxy(a.getHttpHost()).build())
-                            .map(c -> RequestBuilder.copy(httpUriRequest).setConfig(c).build())
-                            .ifPresent(config ->
-                                    RequestBuilder.copy(httpUriRequest).setConfig(config).build();
-                            )*/
-
                     //开始请求
                     try {
                         String proxy = httpClient.execute(get, stringResponseHandler);
                         log.info("Get a proxy address:{}", proxy);
                         putHttpProxy(convertToHttpProxy(proxy));
-
-                    } catch (IOException ignore) {
-
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+
                 })
         );
         close();
@@ -148,7 +138,6 @@ public class FixedHttpProxyProvider extends AbstractHttpProxyProvider implements
         } catch (InterruptedException ignored) {
         }
     }
-
 
 
     /**

@@ -102,7 +102,7 @@ public class HtmlunitTest {
             }
         });
 
-        HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=http://www.iqiyi.com/v_19rqz6uit0.html");
+        HtmlPage page = webClient.getPage("http://jiexi.071811.cc/jx2.php?url=https://www.iqiyi.com/v_19rr5jax4g.html");
    /*     System.out.println("======================================");
         System.out.println(page.asText());
         System.out.println("======================================");
