@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 public abstract class BaseVideoEntity implements Cloneable, Serializable {
     //
-    protected Long id;
+    protected String id;
     //标题
     protected String title;
     //获取时间

@@ -74,7 +74,7 @@ public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implemen
             iQiYi.setImage(img.attr("abs:src"));
             iQiYi.setTitle(img.attr("title"));
             //id没用
-            iQiYi.setId(RandomUtils.nextLong());
+            iQiYi.setId(RandomUtils.nextLong()+"");
             iQiYi.setCollectTime(now);
             //播放信息
             iQiYi.setPlayInfo(e.select("span.icon-vInfo").text());

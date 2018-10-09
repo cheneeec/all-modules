@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 
 public class CachedVideoService<T extends BaseVideoEntity> implements BasicQueryAndPersistenceVideoService<T> {
 
-    private final Map<Long, T> videoMap;
+    private final Map<String, T> videoMap;
 
     private final Map<BaseVideoEntity.Category, List<T>> categoryTMap;
 
     private final AtomicLong idLong = new AtomicLong(1000);
 
-    public CachedVideoService(Map<Long, T> videoMap) {
+    public CachedVideoService(Map<String, T> videoMap) {
         Assert.notNull(videoMap, "the videoMap is required");
         this.videoMap = videoMap;
         this.categoryTMap = new ConcurrentHashMap<>();
@@ -41,7 +41,7 @@ public class CachedVideoService<T extends BaseVideoEntity> implements BasicQuery
                     .filter(Objects::nonNull)
                     .peek(e -> {//当没有ID时为其设置ID
                         if (e.getId() == null) {
-                            e.setId(idLong.incrementAndGet());
+                            e.setId(idLong.incrementAndGet()+"");
                         }
                     })
                     .peek(e -> videoMap.put(e.getId(), e))
@@ -64,7 +64,7 @@ public class CachedVideoService<T extends BaseVideoEntity> implements BasicQuery
     public void save(T entity) {
         if (entity != null) {
             if (entity.getId() == null) {
-                entity.setId(idLong.incrementAndGet());
+                entity.setId(idLong.incrementAndGet()+"");
             }
 
             videoMap.put(entity.getId(), entity);

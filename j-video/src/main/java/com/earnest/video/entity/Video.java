@@ -11,13 +11,13 @@ public class Video extends IQiYi {
 
     @Override
     @Id
-    public Long getId() {
+    public String getId() {
         return super.getId();
     }
 
     @Override
     @Id
-    public void setId(Long id) {
+    public void setId(String id) {
         super.setId(id);
     }
 

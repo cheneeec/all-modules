@@ -114,7 +114,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
             iQiYi.setCategory(BaseVideoEntity.Category.getCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]));
             //播放信息
             iQiYi.setPlayInfo(parsePlayInfo(albumDocInfo));
-            iQiYi.setId(RandomUtils.nextLong());
+            iQiYi.setId(RandomUtils.nextLong()+"");
             return iQiYi;
 
         };

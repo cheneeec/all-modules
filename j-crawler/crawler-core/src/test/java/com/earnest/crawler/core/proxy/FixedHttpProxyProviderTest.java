@@ -10,7 +10,7 @@ public class FixedHttpProxyProviderTest {
     private FixedHttpProxyProvider httpProxyProvider = new FixedHttpProxyProvider();
 
     @Test
-    public void provideHttpProxies() throws InterruptedException {
+    public void provideHttpProxies() throws Exception {
         httpProxyProvider.initializeHttpProxyPool();
         Optional<HttpProxy> httpProxy = httpProxyProvider.get();
 

@@ -9,6 +9,8 @@ import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
 import com.earnest.video.core.episode.EpisodeFetcher;
 import com.earnest.video.core.episode.EpisodeFetcherManager;
 import com.earnest.video.core.search.PlatformSearcherManager;
+import com.earnest.video.parser.StoneApiVideoAddressParser;
+import com.earnest.video.parser.VideoAddressParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.impl.client.AbstractResponseHandler;
@@ -46,11 +48,16 @@ public class SingletonBeanConfig {
         };
     }
 
+    @Bean
+    public VideoAddressParser videoAddressParser() {
+        return new StoneApiVideoAddressParser();
+    }
+
     /**
      * @return {@link HttpProxyPool}
      */
     @Bean
-    public HttpProxyPool httpProxyPool() {
+    public HttpProxyPool httpProxyPool() throws Exception {
         FixedHttpProxyProvider httpProxyProvider = new FixedHttpProxyProvider();
         httpProxyProvider.initializeHttpProxyPool();
         return httpProxyProvider;
@@ -59,7 +66,7 @@ public class SingletonBeanConfig {
     //==========================Manager==================
 
     @Bean
-    public EpisodeFetcher episodeFetcher() {
+    public EpisodeFetcher episodeFetcher() throws Exception {
         EpisodeFetcherManager episodeFetcherManager = new EpisodeFetcherManager();
         episodeFetcherManager.setHttpProxyPool(httpProxyPool());
         //add iQiYi
@@ -70,7 +77,7 @@ public class SingletonBeanConfig {
 
 
     @Bean
-    public PlatformSearcherManager platformSearcherManager() {
+    public PlatformSearcherManager platformSearcherManager() throws Exception {
         DefaultPlatformSearcherManager platformSearcherManager = new DefaultPlatformSearcherManager();
         platformSearcherManager.setExecutor(threadPoolTaskExecutor());
         //add IQiYi

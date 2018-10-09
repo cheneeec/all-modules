@@ -1,7 +1,6 @@
 package com.earnest.video.parser;
 
 import com.alibaba.fastjson.JSONObject;
-import com.earnest.video.entity.BaseVideoEntity;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.springframework.util.Assert;
@@ -13,6 +12,8 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
     private final WebClient webClient;
 
     private static final String STONE_API_ADDRESS = "http://jiexi.071811.cc/jx2.php?url=%s";
+
+    private final CachedAjaxController ajaxController = new CachedAjaxController();
 
     public StoneApiVideoAddressParser() {
         webClient = new WebClient(BrowserVersion.CHROME);
@@ -27,29 +28,30 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
         webClientOptions.setTimeout(5000);//设置“浏览器”的请求超时时间
         webClient.waitForBackgroundJavaScript(5000);//设置JS后台等待执行时间
 
+        webClient.setAjaxController(ajaxController);
+
     }
 
+    //TODO 待优化
     @Override
-    public <T extends BaseVideoEntity> BaseVideoEntity parse(T t) throws IOException {
+    public String parse(String playValue) throws IOException {
 
-        HtmlPage page = webClient.getPage(t.getPlayValue());
+        HtmlPage page = webClient.getPage(String.format(STONE_API_ADDRESS, playValue));
 
-        CachedAjaxController ajaxController = new CachedAjaxController();
-        webClient.setAjaxController(ajaxController);
 
         WebResponse webResponse = webClient.loadWebResponse(ajaxController.obtainResultWebRequest());
 
         String parseValue = JSONObject.parseObject(webResponse.getContentAsString()).getString("url");
 
-        t.setParseValue(parseValue);
 
         webResponse.cleanUp();
         page.cleanUp();
 
-        return t;
+        return parseValue;
     }
 
     private class CachedAjaxController extends AjaxController {
+
         private WebRequest webRequest;
 
 
@@ -61,7 +63,6 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
 
         public WebRequest obtainResultWebRequest() {
             Assert.state(webRequest != null, "error status:webRequest is null");
-
             return webRequest;
         }
     }
