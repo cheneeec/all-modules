@@ -3,6 +3,7 @@ package com.earnest.script;
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
 import com.gargoylesoftware.htmlunit.*;
+import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.HtmlUnitContextFactory;
@@ -10,6 +11,10 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine;
 import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+import net.sourceforge.htmlunit.corejs.javascript.Context;
+import net.sourceforge.htmlunit.corejs.javascript.Script;
+import net.sourceforge.htmlunit.corejs.javascript.Scriptable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Test;
@@ -31,7 +36,7 @@ public class HtmlunitTest {
         //禁用CSS
         webClientOptions.setCssEnabled(false);
         //禁用javascript支持
-        webClientOptions.setJavaScriptEnabled(true);//启用JS解释器，默认为true
+        webClientOptions.setJavaScriptEnabled(false);//启用JS解释器，默认为true
         webClientOptions.setPrintContentOnFailingStatusCode(false);//在失败的时候打印内容
         webClientOptions.setDoNotTrackEnabled(true);
         webClientOptions.setThrowExceptionOnFailingStatusCode(false);///当HTTP的状态非200时是否抛出异常
@@ -71,27 +76,35 @@ public class HtmlunitTest {
             @Override
             public void webWindowContentChanged(WebWindowEvent event) {
 
-                System.out.println(event.getNewPage().getUrl());
-                if ("http://jiexi.071811.cc/stapi.php?url=http://www.iqiyi.com/v_19rqz6uit0.html".equals(event.getNewPage().getUrl().toString())) {
-                    WebResponse webResponse = event.getNewPage().getWebResponse();
-                    System.out.println(webResponse.getContentAsString());
+                Page newPage = event.getNewPage();
+                System.out.println(newPage.getUrl());
+                if ("http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr5jax4g.html".equals(newPage.getUrl().toString())) {
+                    WebResponse webResponse = newPage.getWebResponse();
+                    ((HtmlPage) newPage).getElementsByTagName("script").stream()
+                            .map(DomNode::getTextContent)
+                            .filter(s-> StringUtils.contains(s,"hlsjsConfig"))
+                            .peek(s-> System.out.println("===================="))
+                            .forEach(System.out::println);
+
+
+
+
                 }
 
                 JavaScriptJobManager jobManager = event.getWebWindow().getJobManager();
 
 
-
                 jobManager.removeAllJobs();
 
 
-                if ("http://jiexi.071811.cc/api/xit.php".equalsIgnoreCase(event.getNewPage().getUrl().toString())) {
-                    System.out.println(event.getNewPage().getWebResponse().getContentAsString());
+                if ("http://jiexi.071811.cc/api/xit.php".equalsIgnoreCase(newPage.getUrl().toString())) {
+                    System.out.println("content=>"+ newPage.getWebResponse().getContentAsString());
                 }
 
                 // http://jiexi.071811.cc/api/xit.php
 
                 if (event.getOldPage() != null) {
-                    System.out.println(event.getOldPage().getUrl());
+                    System.out.println("=>"+event.getOldPage().getUrl());
                 }
 
             }
@@ -133,7 +146,7 @@ public class HtmlunitTest {
 
         FileCopyUtils.copy(page.getWebResponse().getContentAsStream(), new FileOutputStream("d:/a.txt"));
         System.out.println("=========================================");*/
-        JSONObject result = JSONObject.parseObject(webClient.loadWebResponse(ajax[0]).getContentAsString());
+//        JSONObject result = JSONObject.parseObject(webClient.loadWebResponse(ajax[0]).getContentAsString());
 
         //关掉javascript
         JavaScriptEngine javaScriptEngine = (JavaScriptEngine) webClient.getJavaScriptEngine();
@@ -142,13 +155,15 @@ public class HtmlunitTest {
 
         javaScriptEngine.shutdown();
 
-        String url = result.getString("url");
+//        String url = result.getString("url");
+
+
+        //获取执行后真正的结果
+//        System.out.println(url);
 
         webClient.getJavaScriptEngine().shutdown();
 
 
-        //获取执行后真正的结果
-        System.out.println(url);
 
         page.cleanUp();
         //RI3EhmdfcdR6Nr0CYuMBiXWtzmjPFaSSLmBMjwINSZA
