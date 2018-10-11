@@ -44,7 +44,7 @@ public class SyncSpider implements Spider {
                 break;
             }
             StringResponseResult stringResponseResult = downloader.download(httpUriRequest);
-            stringResponseResultHandle(stringResponseResult);
+            handleStringResponseResult(stringResponseResult);
         }
 
         afterCompleted();
@@ -63,7 +63,7 @@ public class SyncSpider implements Spider {
      *
      * @param stringResponseResult
      */
-    protected void stringResponseResultHandle(StringResponseResult stringResponseResult) {
+    protected void handleStringResponseResult(StringResponseResult stringResponseResult) {
         //提取新的链接
         Set<HttpUriRequest> httpUriRequests = httpRequestExtractor.extract(stringResponseResult);
         //将结果放入

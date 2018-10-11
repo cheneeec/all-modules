@@ -19,81 +19,34 @@ public class AsyncSpider extends SyncSpider {
 
     public AsyncSpider(Downloader downloader, Scheduler scheduler, HttpRequestExtractor httpRequestExtractor, Pipeline pipeline, Integer threadNumber) {
         super(downloader, scheduler, httpRequestExtractor, pipeline);
-        this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNumber + 1, new SpiderThreadFactory());
+        this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNumber, new SpiderThreadFactory());
     }
 
 
     @Override
     public void start() {
 
-        int threadNumber = threadPool.getMaximumPoolSize();
-
-        final BlockingQueue<StringResponseResult> responseResultsQueue = new ArrayBlockingQueue<>(100);
-
-
-        final Thread resultHandleThread = createResultHandleThread(responseResultsQueue);
-
-
         //进行下载
-        for (int i = 0; i < threadNumber - 1; i++) {
+        for (int i = 0; i < threadPool.getMaximumPoolSize(); i++) {
             threadPool.execute(() -> {
-                HttpUriRequest httpUriRequest;
                 while (true) {
                     try {
-                        httpUriRequest = scheduler.take();
+                        HttpUriRequest httpUriRequest = scheduler.take();
+                        if (httpUriRequest == null) {
+                            break;
+                        }
+                        handleStringResponseResult(downloader.download(httpUriRequest));
                     } catch (TakeTimeoutException e) {
                         break;
                     }
-
-                    if (httpUriRequest != null) {
-                        StringResponseResult responseResult = downloader.download(httpUriRequest);
-                        //放入请求
-                        try {
-                            responseResultsQueue.put(responseResult);
-                        } catch (InterruptedException e) {
-                            log.error("Interrupted when placing {}", responseResult);
-                        }
-                    } else
-                        break; //拿到null时
                 }
-                if (threadPool.getActiveCount() == 2) {//当活动线程只剩下最后一个
-                    while (!responseResultsQueue.isEmpty()) {
-                        try {
-                            //等待响应结果处理完成
-                            TimeUnit.MILLISECONDS.sleep(50);
-                        } catch (InterruptedException e) {
-                            log.error("Interrupted while processing the http response");
-                            resultHandleThread.interrupt();
-                        }
-                    }
-                    resultHandleThread.interrupt();
-                }
-
             });
         }
+        log.info("download completed, exit...");
+        afterCompleted();
 
-        //对结果进行处理
-        threadPool.execute(resultHandleThread);
     }
 
-    private Thread createResultHandleThread(BlockingQueue<StringResponseResult> responseResultsQueue) {
-        return new Thread(() -> {
-            while (true) {
-                try {
-                    //当有活动的线程才去取值
-                    if (threadPool.getActiveCount() > 1) {
-                        stringResponseResultHandle(responseResultsQueue.take());
-                    } else
-                        break;
-                } catch (InterruptedException e) {//在线程结果处理完成后发生
-                    break;
-                }
-            }
-            log.info("download completed, exit...");
-            //在完成过后释放资源。
-            afterCompleted();
-        });
-    }
 
 
     @Override
