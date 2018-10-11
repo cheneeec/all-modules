@@ -1,30 +1,39 @@
 package com.earnest.script;
 
-import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.core.Browser;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.DomNode;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.javascript.HtmlUnitContextFactory;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptEngine;
 import com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManager;
+import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLDocument;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
-import net.sourceforge.htmlunit.corejs.javascript.Context;
-import net.sourceforge.htmlunit.corejs.javascript.Script;
-import net.sourceforge.htmlunit.corejs.javascript.Scriptable;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class HtmlunitTest {
 
-    private final HttpClient httpClient = HttpClients.custom().setUserAgent(Browser.GOOGLE.userAgent()).build();
+    private final CookieStore cookieStore = new BasicCookieStore();
+    private final HttpClient httpClient = HttpClients.custom()
+            .setUserAgent(Browser.GOOGLE.userAgent())
+            .setDefaultCookieStore(cookieStore)
+            .build();
 
     @Test(timeout = Long.MAX_VALUE)
     public void show() throws Exception {
@@ -36,7 +45,7 @@ public class HtmlunitTest {
         //禁用CSS
         webClientOptions.setCssEnabled(false);
         //禁用javascript支持
-        webClientOptions.setJavaScriptEnabled(false);//启用JS解释器，默认为true
+        webClientOptions.setJavaScriptEnabled(true);//启用JS解释器，默认为true
         webClientOptions.setPrintContentOnFailingStatusCode(false);//在失败的时候打印内容
         webClientOptions.setDoNotTrackEnabled(true);
         webClientOptions.setThrowExceptionOnFailingStatusCode(false);///当HTTP的状态非200时是否抛出异常
@@ -50,7 +59,7 @@ public class HtmlunitTest {
 
 //        webClient.setAjaxController(new NicelyResynchronizingAjaxController());//设置支持ajax
 
-        final WebRequest[] ajax = new WebRequest[1];
+       /* final WebRequest[] ajax = new WebRequest[1];
 
 
         webClient.setAjaxController(new AjaxController() {
@@ -62,10 +71,7 @@ public class HtmlunitTest {
                 ajax[0] = request;
                 return super.processSynchron(page, request, async);
             }
-        });
-
-
-
+        });*/
 
 
         webClient.addWebWindowListener(new WebWindowListener() {
@@ -78,33 +84,36 @@ public class HtmlunitTest {
 
                 Page newPage = event.getNewPage();
                 System.out.println(newPage.getUrl());
-                if ("http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr5jax4g.html".equals(newPage.getUrl().toString())) {
+                if (!"http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr5jax4g.html".equals(newPage.getUrl().toString())) {
+                    JavaScriptJobManager jobManager = event.getWebWindow().getJobManager();
+                    jobManager.removeAllJobs();
                     WebResponse webResponse = newPage.getWebResponse();
                     ((HtmlPage) newPage).getElementsByTagName("script").stream()
                             .map(DomNode::getTextContent)
-                            .filter(s-> StringUtils.contains(s,"hlsjsConfig"))
-                            .peek(s-> System.out.println("===================="))
-                            .forEach(System.out::println);
+                            .filter(s -> StringUtils.contains(s, "hlsjsConfig"))
+                            .findAny()
+                            .ifPresent(s -> {
+                                ScriptResult scriptResult = ((HtmlPage) newPage).executeJavaScript("/*(*^__^*)*/ﾟωﾟﾉ= /｀ｍ´）ﾉ ~┻━┻   //*´∇｀*/ ['_']; o=(ﾟｰﾟ)  =_=3; c=(ﾟΘﾟ) =(ﾟｰﾟ)-(ﾟｰﾟ); (ﾟДﾟ) =(ﾟΘﾟ)= (o^_^o)/ (o^_^o);(ﾟДﾟ)={ﾟΘﾟ: '_' ,ﾟωﾟﾉ : ((ﾟωﾟﾉ==3) +'_') [ﾟΘﾟ] ,ﾟｰﾟﾉ :(ﾟωﾟﾉ+ '_')[o^_^o -(ﾟΘﾟ)] ,ﾟДﾟﾉ:((ﾟｰﾟ==3) +'_')[ﾟｰﾟ] }; (ﾟДﾟ) [ﾟΘﾟ] =((ﾟωﾟﾉ==3) +'_') [c^_^o];(ﾟДﾟ) ['c'] = ((ﾟДﾟ)+'_') [ (ﾟｰﾟ)+(ﾟｰﾟ)-(ﾟΘﾟ) ];(ﾟДﾟ) ['o'] = ((ﾟДﾟ)+'_') [ﾟΘﾟ];(ﾟoﾟ)=(ﾟДﾟ) ['c']+(ﾟДﾟ) ['o']+(ﾟωﾟﾉ +'_')[ﾟΘﾟ]+ ((ﾟωﾟﾉ==3) +'_') [ﾟｰﾟ] + ((ﾟДﾟ) +'_') [(ﾟｰﾟ)+(ﾟｰﾟ)]+ ((ﾟｰﾟ==3) +'_') [ﾟΘﾟ]+((ﾟｰﾟ==3) +'_') [(ﾟｰﾟ) - (ﾟΘﾟ)]+(ﾟДﾟ) ['c']+((ﾟДﾟ)+'_') [(ﾟｰﾟ)+(ﾟｰﾟ)]+ (ﾟДﾟ) ['o']+((ﾟｰﾟ==3) +'_') [ﾟΘﾟ];(ﾟДﾟ) ['_'] =(o^_^o) [ﾟoﾟ] [ﾟoﾟ];(ﾟεﾟ)=((ﾟｰﾟ==3) +'_') [ﾟΘﾟ]+ (ﾟДﾟ) .ﾟДﾟﾉ+((ﾟДﾟ)+'_') [(ﾟｰﾟ) + (ﾟｰﾟ)]+((ﾟｰﾟ==3) +'_') [o^_^o -ﾟΘﾟ]+((ﾟｰﾟ==3) +'_') [ﾟΘﾟ]+ (ﾟωﾟﾉ +'_') [ﾟΘﾟ]; (ﾟｰﾟ)+=(ﾟΘﾟ); (ﾟДﾟ)[ﾟεﾟ]='\\\\'; (ﾟДﾟ).ﾟΘﾟﾉ=(ﾟДﾟ+ ﾟｰﾟ)[o^_^o -(ﾟΘﾟ)];(oﾟｰﾟo)=(ﾟωﾟﾉ +'_')[c^_^o];(ﾟДﾟ) [ﾟoﾟ]='\\\"';(ﾟДﾟ) ['_'] ( (ﾟДﾟ) ['_'] (ﾟεﾟ+/*´∇｀*/(ﾟДﾟ)[ﾟoﾟ]+ (ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+((ﾟｰﾟ) + (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((ﾟｰﾟ) + (ﾟΘﾟ))+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+(c^_^o)+(ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+((ﾟｰﾟ) + (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+(c^_^o)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+((o^_^o) - (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((ﾟｰﾟ) + (ﾟΘﾟ))+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(c^_^o)+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(c^_^o)+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+((ﾟｰﾟ) + (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) - (ﾟΘﾟ))+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+(ﾟｰﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+(ﾟｰﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+(ﾟｰﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(c^_^o)+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(o^_^o)+((o^_^o) - (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+((ﾟｰﾟ) + (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) - (ﾟΘﾟ))+(ﾟｰﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) - (ﾟΘﾟ))+((o^_^o) +(o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((ﾟｰﾟ) + (o^_^o))+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+(c^_^o)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+(o^_^o)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((ﾟｰﾟ) + (ﾟΘﾟ))+((ﾟｰﾟ) + (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(o^_^o)+(c^_^o)+(ﾟДﾟ)[ﾟεﾟ]+((o^_^o) +(o^_^o))+((o^_^o) - (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(c^_^o)+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((ﾟｰﾟ) + (ﾟΘﾟ))+((ﾟｰﾟ) + (ﾟΘﾟ))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟΘﾟ)+(ﾟｰﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+((o^_^o) +(o^_^o))+(ﾟｰﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+(ﾟΘﾟ)+(ﾟДﾟ)[ﾟεﾟ]+(ﾟΘﾟ)+(ﾟｰﾟ)+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+(ﾟｰﾟ)+((ﾟｰﾟ) + (o^_^o))+(ﾟДﾟ)[ﾟεﾟ]+((ﾟｰﾟ) + (o^_^o))+(o^_^o)+(ﾟДﾟ)[ﾟoﾟ]) (ﾟΘﾟ)) ('_');");
+                                Object result = scriptResult.getJavaScriptResult();
+                                Page newPage1 = scriptResult.getNewPage();
+                                System.out.println(result);
+                                System.out.println(newPage1.getWebResponse().getContentAsString());
+                            });
 
-
+                    HTMLDocument scriptableObject = ((HtmlPage) newPage).getScriptableObject();
 
 
                 }
 
-                JavaScriptJobManager jobManager = event.getWebWindow().getJobManager();
-
-
-                jobManager.removeAllJobs();
-
 
                 if ("http://jiexi.071811.cc/api/xit.php".equalsIgnoreCase(newPage.getUrl().toString())) {
-                    System.out.println("content=>"+ newPage.getWebResponse().getContentAsString());
+                    System.out.println("content=>" + newPage.getWebResponse().getContentAsString());
                 }
 
                 // http://jiexi.071811.cc/api/xit.php
 
                 if (event.getOldPage() != null) {
-                    System.out.println("=>"+event.getOldPage().getUrl());
+                    System.out.println("=>" + event.getOldPage().getUrl());
                 }
 
             }
@@ -123,7 +132,6 @@ public class HtmlunitTest {
 
 
         List<NameValuePair> headers = page.getWebResponse().getResponseHeaders();
-
 
         headers.forEach(v -> System.out.println(v.getName() + "=" + v.getValue()));
 
@@ -151,7 +159,6 @@ public class HtmlunitTest {
         //关掉javascript
         JavaScriptEngine javaScriptEngine = (JavaScriptEngine) webClient.getJavaScriptEngine();
 
-        HtmlUnitContextFactory contextFactory = javaScriptEngine.getContextFactory();
 
         javaScriptEngine.shutdown();
 
@@ -164,10 +171,45 @@ public class HtmlunitTest {
         webClient.getJavaScriptEngine().shutdown();
 
 
-
         page.cleanUp();
         //RI3EhmdfcdR6Nr0CYuMBiXWtzmjPFaSSLmBMjwINSZA
         webClient.close();
+
+
+        RequestBuilder requestBuilder = RequestBuilder.post("http://jiexi.071811.cc/api/xit.php");
+
+
+
+        List<BasicNameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("time", "1539187200"));
+        params.add(new BasicNameValuePair("key", "iiJHyalLjFJBzbyNdcUitR9eO-I="));
+        params.add(new BasicNameValuePair("url", "https://www.iqiyi.com/v_19rr5jax4g.html"));
+        params.add(new BasicNameValuePair("type", "iqiyi"));
+        params.add(new BasicNameValuePair("pc", "0"));
+        params.add(new BasicNameValuePair("fuck", "agrIa9k6C6IFMS4NtLw79GwZ5NTsV39yHcmX2AmLtag"));
+
+        UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(params);
+
+        cookies.stream()
+                .map(c->new BasicClientCookie(c.getName(),c.getValue()))
+                .forEach(cookieStore::addCookie);
+
+
+
+
+        headers.
+                stream()
+                .filter(s -> !StringUtils.equalsAnyIgnoreCase(s.getName(), "Transfer-encoding"))
+                .forEach(h -> requestBuilder.addHeader(h.getName(), h.getValue()));
+
+
+        requestBuilder.setEntity(urlEncodedFormEntity);
+        HttpUriRequest build = requestBuilder.build();
+        System.out.println(build);
+        String execute = httpClient.execute(build, new BasicResponseHandler());
+        System.out.println(execute);
+
+
     }
 
 
@@ -199,8 +241,4 @@ public class HtmlunitTest {
         //
     }
 
-    public static void main(String[] args) {
-
-
-    }
 }
