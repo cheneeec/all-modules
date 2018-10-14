@@ -4,3 +4,4 @@ spring:
 logging:
   level:
     com.earnest: debug
+    org .springframework.data.mongodb.core: debug

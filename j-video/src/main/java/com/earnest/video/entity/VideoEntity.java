@@ -32,17 +32,29 @@ public abstract class VideoEntity implements Cloneable, Serializable {
 
 
     public enum Category {
-        MOVIE,
-        ANIMATION;
+        MOVIE,  //电影
+        ANIMATION, //动漫
+        ORIGINAL; //原创
 
         public static Category getCategory(String category) {
+            return getCategory(category, true);
+        }
+
+        public static Category getCategory(String category, boolean ignoredNotFound) {
             if (StringUtils.equalsAnyIgnoreCase(category, "movie", "电影")) {
                 return MOVIE;
             }
             if (StringUtils.equalsAnyIgnoreCase(category, "animation", "动漫")) {
                 return ANIMATION;
             }
-            throw new IllegalArgumentException("cannot find the category:" + category);
+            if (StringUtils.equalsAnyIgnoreCase(category, "original", "原创")) {
+                return ORIGINAL;
+            }
+            if (!ignoredNotFound) {
+                throw new IllegalArgumentException("cannot find the category:" + category);
+            }
+            return null;
+
         }
 
     }

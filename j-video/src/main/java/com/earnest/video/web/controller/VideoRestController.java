@@ -20,8 +20,9 @@ public class VideoRestController {
     private final BasicQueryAndPersistenceVideoService<Video> videoService;
 
 
+
     @GetMapping("/{type:movie|animation}")
-    public Page<? extends VideoEntity> listAll( @PathVariable String type, Pageable pageRequest) {
+    public Page<? extends VideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
         return videoService.findByCategory(pageRequest, Category.getCategory(type));
     }
 
@@ -29,6 +30,7 @@ public class VideoRestController {
     public VideoEntity get(@PathVariable String id) {
         return videoService.get(id);
     }
+
 
 
 }

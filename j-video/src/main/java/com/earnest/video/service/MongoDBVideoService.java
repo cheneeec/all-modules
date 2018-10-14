@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class MongodbVideoService implements BasicQueryAndPersistenceVideoService<Video> {
+public class MongoDBVideoService implements BasicQueryAndPersistenceVideoService<Video> {
 
     private final VideoRepository videoRepository;
 
@@ -38,6 +38,7 @@ public class MongodbVideoService implements BasicQueryAndPersistenceVideoService
 
     @Override
     public Page<Video> findAll(Pageable pageRequest) {
+
         return videoRepository.findAll(Optional.ofNullable(pageRequest).orElse(Pageable.unpaged()));
     }
 

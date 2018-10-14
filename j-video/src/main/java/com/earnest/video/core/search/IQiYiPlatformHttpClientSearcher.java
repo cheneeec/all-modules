@@ -75,7 +75,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
 
         String uri = httpUriRequest.getRequestLine().getUri();
 
-        log.debug("Start performing search request,keyword:{},url:{}", keyword, uri);
+        log.debug("Start performing 0search request,keyword:{},url:{}", keyword, uri);
 
         String result = httpClient.execute(httpUriRequest, responseHandler);
 

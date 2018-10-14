@@ -27,8 +27,7 @@ public class SearchRestController {
     public Page<? extends VideoEntity> search(@NotBlank @RequestParam(name = "q") String keyword,
                                               @PageableDefault(page = 1) Pageable pageRequest,
                                               Platform platform) throws IOException {
-
-        return platformSearcherManager.search(keyword, pageRequest,platform);
+        return platformSearcherManager.search(keyword, pageRequest, platform);
     }
 
 }

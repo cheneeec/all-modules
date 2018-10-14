@@ -54,7 +54,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
      * @throws IOException
      */
     @Override
-    public Page<VideoEntity> search(String keyword, Pageable pageRequest) throws IOException {
+    public Page<VideoEntity> search(String keyword, Pageable pageRequest) {
 
 
         List<? extends Page<? extends VideoEntity>> results = platformSearcherMap.values()
@@ -92,6 +92,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
             try {
                 return future.get(ignoreSecondTimeOut, TimeUnit.SECONDS);
             } catch (Exception e) { //发生错误时忽略
+                e.printStackTrace();
                 if (log.isDebugEnabled() && e instanceof TimeoutException) {
                     log.debug("A task timed out has been ignored,error:{}", e.getMessage());
                 }

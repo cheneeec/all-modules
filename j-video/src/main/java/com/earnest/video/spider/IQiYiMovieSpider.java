@@ -62,7 +62,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
     @Override
     public void start() {
-        if (iQiYiMovieCachedVideoService.count() < 1) {
+        if (iQiYiMovieCachedVideoService.count() < 1800) {
             super.start();
         }
     }

@@ -28,6 +28,8 @@ public class IQiYiSpiderConfig {
             protected Consumer<List<? extends VideoEntity>> consumer() {
                 return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
             }
+
+
         };
     }
 

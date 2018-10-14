@@ -4,7 +4,7 @@ import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Video;
 import com.earnest.video.repository.VideoRepository;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
-import com.earnest.video.service.MongodbVideoService;
+import com.earnest.video.service.MongoDBVideoService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,7 +22,7 @@ public class MongoSpiderBeanConfig {
 
     @Bean
     public BasicQueryAndPersistenceVideoService<Video> basicQueryAndPersistenceVideoService(VideoRepository videoRepository) {
-        return new MongodbVideoService(videoRepository);
+        return new MongoDBVideoService(videoRepository);
     }
 
     @Bean

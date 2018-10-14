@@ -53,7 +53,11 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
         }
         Assert.notNull(requestBuilder, "requestBuilder is null");
         requestBuilder.setConfig(addProxyHttpHost(requestBuilder.getConfig()));
-        log.debug("Set proxy address:{} for request {}", requestBuilder.getConfig().getProxy(), requestBuilder.getUri());
+
+        if (requestBuilder.getConfig().getProxy() != null) {
+            log.debug("Set proxy address:{} for request {}", requestBuilder.getConfig().getProxy(), requestBuilder.getUri());
+        }
+
     }
 
     private RequestConfig addProxyHttpHost(RequestConfig requestConfig) {
@@ -63,7 +67,8 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
                 .orElse(RequestConfig.custom());
 
         //为其设置代理
-        httpProxyPool.get().map(HttpProxy::getHttpHost)
+        httpProxyPool.get()
+                .map(HttpProxy::getHttpHost)
                 .ifPresent(builder::setProxy);
 
 
