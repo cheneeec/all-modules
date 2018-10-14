@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/api/video")
 @AllArgsConstructor
-public class VideoController {
+public class VideoRestController {
 //http://www.iqiyi.com/v_19rqzi1f7s.html
 
     private final BasicQueryAndPersistenceVideoService<Video> videoService;
 
 
     @GetMapping("/{type:movie|animation}")
-    public Page<? extends VideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
+    public Page<? extends VideoEntity> listAll( @PathVariable String type, Pageable pageRequest) {
         return videoService.findByCategory(pageRequest, Category.getCategory(type));
     }
 

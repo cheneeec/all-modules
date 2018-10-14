@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/api/episode")
 @AllArgsConstructor
-public class EpisodeController {
+public class EpisodeRestController {
 
     private final EpisodeFetcher episodeFetcher;
 

@@ -79,7 +79,7 @@ public class SingletonBeanConfig {
     @Bean
     public PlatformSearcherManager platformSearcherManager() throws Exception {
         DefaultPlatformSearcherManager platformSearcherManager = new DefaultPlatformSearcherManager();
-        platformSearcherManager.setExecutor(threadPoolTaskExecutor());
+        platformSearcherManager.setCompletionService(threadPoolTaskExecutor());
         //add IQiYi
         platformSearcherManager.addWork(new IQiYiPlatformHttpClientSearcher(httpClient(), responseHandler(), httpProxyPool()));
 

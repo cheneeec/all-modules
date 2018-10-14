@@ -61,7 +61,7 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
             return super.processSynchron(page, request, async);
         }
 
-        public WebRequest obtainResultWebRequest() {
+        WebRequest obtainResultWebRequest() {
             Assert.state(webRequest != null, "error status:webRequest is null");
             return webRequest;
         }

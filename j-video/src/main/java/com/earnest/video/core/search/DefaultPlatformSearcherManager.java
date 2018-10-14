@@ -2,10 +2,9 @@ package com.earnest.video.core.search;
 
 import com.alibaba.fastjson.util.IOUtils;
 import com.earnest.crawler.core.proxy.HttpProxyPool;
-import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Platform;
+import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.exception.UnsupportedPlatformException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,18 +22,27 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @NoArgsConstructor
-@AllArgsConstructor
 public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
 
     private final Map<Platform, PlatformSearcher<? extends VideoEntity>> platformSearcherMap = new LinkedHashMap<>(5);
 
     @Getter
-    @Setter
-    private Executor executor;
+    private CompletionService<Page<? extends VideoEntity>> completionService;
 
     @Getter
     @Setter
-    private int ignoreSecondTimeOut = 5; //忽略多少秒后的结果
+    private Integer ignoreSecondTimeOut = 5; //忽略多少秒后的结果
+
+
+    public DefaultPlatformSearcherManager(Integer ignoreSecondTimeOut, Executor executor) {
+        Assert.notNull(executor, "executor is required");
+        this.ignoreSecondTimeOut = Optional.ofNullable(ignoreSecondTimeOut).orElse(5);
+        this.completionService = new ExecutorCompletionService<>(executor);
+    }
+
+    public DefaultPlatformSearcherManager(Executor executor) {
+        this(null, executor);
+    }
 
 
     /**
@@ -52,8 +60,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
         List<? extends Page<? extends VideoEntity>> results = platformSearcherMap.values()
                 .stream()
                 .map(search -> (Callable<Page<? extends VideoEntity>>) () -> search.search(keyword, pageRequest))
-                .map(FutureTask::new)
-                .peek(f -> executor.execute(f)) //执行
+                .map(completionService::submit) //执行
                 .map(futureGetIgnoreError())//取结果
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -84,11 +91,10 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
             try {
                 return f.get(ignoreSecondTimeOut, TimeUnit.SECONDS);
             } catch (Exception e) { //发生错误时忽略
-                if (log.isDebugEnabled()) {
-                    if (e instanceof TimeoutException) {
-                        log.debug("A task timed out has been ignored,error:{}", e.getMessage());
-                    }
+                if (log.isDebugEnabled() && e instanceof TimeoutException) {
+                    log.debug("A task timed out has been ignored,error:{}", e.getMessage());
                 }
+                f.cancel(true);
                 return null;
             }
         };
@@ -119,8 +125,8 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
             platformSearcherMap.values()
                     .forEach(IOUtils::close);
         } finally {
-            if (executor instanceof ExecutorService) {
-                ((ExecutorService) executor).shutdown();
+            if (completionService instanceof ExecutorService) {
+                ((ExecutorService) completionService).shutdown();
             }
 
         }
@@ -136,6 +142,10 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
     public void addWork(PlatformSearcher<? extends VideoEntity> platformSearcher) {
         Assert.notNull(platformSearcher, "platformSearcher is null");
         platformSearcherMap.put(platformSearcher.getPlatform(), platformSearcher);
+    }
+
+    public void setCompletionService(Executor executor) {
+        this.completionService = new ExecutorCompletionService<>(executor);
     }
 
 

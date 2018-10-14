@@ -12,7 +12,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/v1/api")
 @AllArgsConstructor
-public class ParseController {
+public class ParseRestController {
     private final VideoAddressParser videoAddressParser;
 
     @GetMapping("/value")

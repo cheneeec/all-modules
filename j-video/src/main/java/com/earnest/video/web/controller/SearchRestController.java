@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequestMapping("/v1/api/video")
 @RestController
 @AllArgsConstructor
-public class SearchController {
+public class SearchRestController {
 
     private final PlatformSearcherManager platformSearcherManager;
 

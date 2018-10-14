@@ -20,7 +20,10 @@ public class GlobalWebMvcConfig implements WebMvcConfigurer {
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat,SerializerFeature.DisableCircularReferenceDetect);
+        fastJsonConfig.setSerializerFeatures(
+                SerializerFeature.PrettyFormat,
+                SerializerFeature.DisableCircularReferenceDetect,
+                SerializerFeature.IgnoreNonFieldGetter);
 
         List<MediaType> fastMediaTypes = new ArrayList<>();
         fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
