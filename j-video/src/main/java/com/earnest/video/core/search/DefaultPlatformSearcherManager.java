@@ -61,6 +61,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
                 .stream()
                 .map(search -> (Callable<Page<? extends VideoEntity>>) () -> search.search(keyword, pageRequest))
                 .map(completionService::submit) //执行
+                .parallel()
                 .map(futureGetIgnoreError())//取结果
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -87,14 +88,14 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
     }
 
     private Function<Future<Page<? extends VideoEntity>>, ? extends Page<? extends VideoEntity>> futureGetIgnoreError() {
-        return f -> {
+        return future -> {
             try {
-                return f.get(ignoreSecondTimeOut, TimeUnit.SECONDS);
+                return future.get(ignoreSecondTimeOut, TimeUnit.SECONDS);
             } catch (Exception e) { //发生错误时忽略
                 if (log.isDebugEnabled() && e instanceof TimeoutException) {
                     log.debug("A task timed out has been ignored,error:{}", e.getMessage());
                 }
-                f.cancel(true);
+                future.cancel(true);
                 return null;
             }
         };
