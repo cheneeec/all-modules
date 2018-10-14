@@ -1,6 +1,6 @@
 package com.earnest.video.web.controller;
 
-import com.earnest.video.parser.VideoAddressParser;
+import com.earnest.video.core.parser.VideoAddressParser;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

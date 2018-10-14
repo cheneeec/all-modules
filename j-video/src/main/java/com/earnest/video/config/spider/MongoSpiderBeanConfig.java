@@ -26,7 +26,7 @@ public class MongoSpiderBeanConfig {
     }
 
     @Bean
-    public Consumer<List<VideoEntity>> videoEntitiesConsumer(BasicQueryAndPersistenceVideoService<Video> persistenceVideoService) {
+    public Consumer<List<? extends VideoEntity>> videoEntitiesConsumer(BasicQueryAndPersistenceVideoService<Video> persistenceVideoService) {
         return entities -> {
             List<Video> videos = entities.stream()
                     .map(Video::adapt)

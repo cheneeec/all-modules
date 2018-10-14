@@ -26,6 +26,7 @@ public class AsyncSpider extends SyncSpider {
     @Override
     public void start() {
 
+        CountDownLatch completed = new CountDownLatch(threadPool.getMaximumPoolSize());
         //进行下载
         for (int i = 0; i < threadPool.getMaximumPoolSize(); i++) {
             threadPool.execute(() -> {
@@ -40,13 +41,22 @@ public class AsyncSpider extends SyncSpider {
                         break;
                     }
                 }
+                //完成标识
+                completed.countDown();
             });
         }
-        log.info("download completed, exit...");
-        afterCompleted();
+
+        try {
+            //等待任务完成
+            completed.await();
+            log.info("download completed, exit...");
+            afterCompleted();
+        } catch (InterruptedException e) {
+            log.error("Interrupted while waiting for the task to complete,error:{}", e.getMessage());
+        }
+
 
     }
-
 
 
     @Override

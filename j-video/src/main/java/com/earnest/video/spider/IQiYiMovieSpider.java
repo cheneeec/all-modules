@@ -46,7 +46,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
     }
 
     @Override
-    protected Consumer<List<VideoEntity>> consumer() {
+    protected Consumer<List<? extends VideoEntity>> consumer() {
         return iQiYiMovieCachedVideoService::save;
     }
 

@@ -47,7 +47,7 @@ public class MongodbVideoService implements BasicQueryAndPersistenceVideoService
     }
 
     @Override
-    public Video get(Long id) {
+    public Video get(String id) {
         Assert.notNull(id, "id is required");
         return videoRepository.findById(id).orElse(null);
     }

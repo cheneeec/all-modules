@@ -1,7 +1,7 @@
 package com.earnest.video.entity;
 
 public enum Platform {
-    IQIYI
-
-
+    IQIYI,
+    Tencent,
+    LeTv
 }

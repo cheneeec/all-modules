@@ -19,7 +19,7 @@ public class IQiYiPlatformHttpClientSearcherTest {
 
     @Test
     public void search() throws IOException {
-        Page<IQiYi> iQiYis = httpClientSearcher.search("海贼王", new PageRequest(0, 20));
+        Page<IQiYi> iQiYis = httpClientSearcher.search("海贼王", PageRequest.of(0, 20));
         assertTrue(iQiYis.getTotalElements() > 0);
         assertTrue(!iQiYis.getContent().isEmpty());
     }

@@ -17,7 +17,7 @@ public interface BasicQueryAndPersistenceVideoService<T extends VideoEntity> {
 
     List<T> findAll();
 
-    T get(Long id);
+    T get(String id);
 
     Page<T> findByCategory(Pageable pageRequest, VideoEntity.Category category);
 

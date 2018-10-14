@@ -18,6 +18,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
@@ -48,7 +49,7 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
 
     private static final Pattern episodeExtractPattern = Pattern.compile("\"vlist\":(\\[\\{.+\\}\\])");
 
-    private static final Pageable DEFAULT_EPISODE_PAGE = new PageRequest(0, 50);
+    private static final Pageable DEFAULT_EPISODE_PAGE = PageRequest.of(0, 50);
 
     public IQiYiEpisodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
         this.httpClient = httpClient;

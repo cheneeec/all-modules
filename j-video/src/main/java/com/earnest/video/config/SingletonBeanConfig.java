@@ -9,8 +9,8 @@ import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
 import com.earnest.video.core.episode.EpisodeFetcher;
 import com.earnest.video.core.episode.EpisodeFetcherManager;
 import com.earnest.video.core.search.PlatformSearcherManager;
-import com.earnest.video.parser.StoneApiVideoAddressParser;
-import com.earnest.video.parser.VideoAddressParser;
+import com.earnest.video.core.parser.StoneApiVideoAddressParser;
+import com.earnest.video.core.parser.VideoAddressParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.impl.client.AbstractResponseHandler;
@@ -34,7 +34,7 @@ public class SingletonBeanConfig {
     public CloseableHttpClient httpClient() {
         return HttpClients.custom()
                 .setUserAgent(Browser.GOOGLE.userAgent())
-                .setMaxConnTotal(30)
+                .setMaxConnTotal(100)
                 .build();
     }
 

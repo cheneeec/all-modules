@@ -48,7 +48,7 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     protected abstract Function<HttpResponseResult<Document>, List<VideoEntity>> pipe();
 
-    protected abstract Consumer<List<VideoEntity>> consumer();
+    protected abstract Consumer<List<? extends VideoEntity>> consumer();
 
 
     protected abstract String getRangeRegexUrl();
@@ -58,7 +58,7 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     @Override
     public void start() {
-//        spider.start();
+        spider.start();
     }
 
     @Override
@@ -79,6 +79,6 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     @Override
     public void run(String... args) throws Exception {
-//        spider.start();
+        spider.start();
     }
 }

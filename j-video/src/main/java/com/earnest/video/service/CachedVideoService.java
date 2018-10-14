@@ -97,8 +97,8 @@ public class CachedVideoService<T extends VideoEntity> implements BasicQueryAndP
     }
 
     @Override
-    public T get(Long id) {
-        Assert.notNull(id, "the id is required");
+    public T get(String id) {
+        Assert.hasText(id, "the id is required");
         return videoMap.get(id);
     }
 

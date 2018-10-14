@@ -22,8 +22,7 @@ public class GlobalWebMvcConfig implements WebMvcConfigurer {
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         fastJsonConfig.setSerializerFeatures(
                 SerializerFeature.PrettyFormat,
-                SerializerFeature.DisableCircularReferenceDetect,
-                SerializerFeature.IgnoreNonFieldGetter);
+                SerializerFeature.DisableCircularReferenceDetect);
 
         List<MediaType> fastMediaTypes = new ArrayList<>();
         fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);

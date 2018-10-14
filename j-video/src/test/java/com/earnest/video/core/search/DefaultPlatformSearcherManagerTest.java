@@ -21,7 +21,7 @@ public class DefaultPlatformSearcherManagerTest {
 
     @Test
     public void search() throws IOException {
-        Page<VideoEntity> entities = platformSearcherManager.search("海贼王", new PageRequest(0, 50));
+        Page<VideoEntity> entities = platformSearcherManager.search("海贼王", PageRequest.of(0, 50));
         Assert.assertNotNull(entities.getContent());
     }
 

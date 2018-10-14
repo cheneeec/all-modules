@@ -4,6 +4,7 @@ import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
 import com.earnest.video.service.CachedVideoService;
 import com.earnest.video.spider.IQiYiAnimationSpider;
+import com.earnest.video.spider.IQiYiMovieSpider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -20,19 +21,31 @@ import java.util.function.Consumer;
 public class IQiYiSpiderConfig {
 
     @Bean
-    public IQiYiAnimationSpider iQiYiAnimationSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<VideoEntity>> videoEntitiesConsumer) {
+    public IQiYiAnimationSpider iQiYiAnimationSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
 
         return new IQiYiAnimationSpider(basicQueryAndPersistenceVideoService) {
             @Override
-            protected Consumer<List<VideoEntity>> consumer() {
+            protected Consumer<List<? extends VideoEntity>> consumer() {
                 return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
             }
         };
     }
 
     @Bean
+    public IQiYiMovieSpider iQiYiMovieSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
+
+        return new IQiYiMovieSpider(basicQueryAndPersistenceVideoService) {
+            @Override
+            protected Consumer<List<? extends VideoEntity>> consumer() {
+                return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
+            }
+        };
+    }
+
+
+    @Bean
     @ConditionalOnMissingBean
-    public BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService(){
+    public BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService() {
         return new CachedVideoService();
     }
 

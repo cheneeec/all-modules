@@ -1,4 +1,4 @@
-package com.earnest.video.parser;
+package com.earnest.video.core.parser;
 
 import com.alibaba.fastjson.JSONObject;
 import com.gargoylesoftware.htmlunit.*;

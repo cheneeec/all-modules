@@ -25,8 +25,8 @@ public class VideoRestController {
         return videoService.findByCategory(pageRequest, Category.getCategory(type));
     }
 
-    @GetMapping("/{id:\\d+}")
-    public VideoEntity get(@PathVariable long id) {
+    @GetMapping("/{id:^[a-z0-9]+$+}")
+    public VideoEntity get(@PathVariable String id) {
         return videoService.get(id);
     }
 
