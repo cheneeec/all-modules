@@ -1,6 +1,6 @@
 package com.earnest.video.service;
 
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +13,11 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-public class CachedVideoService<T extends BaseVideoEntity> implements BasicQueryAndPersistenceVideoService<T> {
+public class CachedVideoService<T extends VideoEntity> implements BasicQueryAndPersistenceVideoService<T> {
 
     private final Map<String, T> videoMap;
 
-    private final Map<BaseVideoEntity.Category, List<T>> categoryTMap;
+    private final Map<VideoEntity.Category, List<T>> categoryTMap;
 
     private final AtomicLong idLong = new AtomicLong(1000);
 
@@ -37,7 +37,7 @@ public class CachedVideoService<T extends BaseVideoEntity> implements BasicQuery
 
         if (!CollectionUtils.isEmpty(entities)) {
             //将结果按照id添加
-            Map<BaseVideoEntity.Category, List<T>> videosByCategory = entities.stream()
+            Map<VideoEntity.Category, List<T>> videosByCategory = entities.stream()
                     .filter(Objects::nonNull)
                     .peek(e -> {//当没有ID时为其设置ID
                         if (e.getId() == null) {
@@ -45,7 +45,7 @@ public class CachedVideoService<T extends BaseVideoEntity> implements BasicQuery
                         }
                     })
                     .peek(e -> videoMap.put(e.getId(), e))
-                    .collect(Collectors.groupingBy(BaseVideoEntity::getCategory));
+                    .collect(Collectors.groupingBy(VideoEntity::getCategory));
 
             //将结果进行分类添加
             videosByCategory.keySet()
@@ -103,7 +103,7 @@ public class CachedVideoService<T extends BaseVideoEntity> implements BasicQuery
     }
 
     @Override
-    public Page<T> findByCategory(Pageable pageRequest, BaseVideoEntity.Category category) {
+    public Page<T> findByCategory(Pageable pageRequest, VideoEntity.Category category) {
         Assert.notNull(pageRequest, "pageRequest is required");
         List<T> content = categoryTMap.get(category);
         if (content == null) {

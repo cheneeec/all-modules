@@ -6,7 +6,7 @@ import lombok.Data;
  * 剧集描述
  */
 @Data
-public class Episode  extends  BaseVideoEntity{
+public class Episode  extends VideoEntity {
     //短的剧集描述
     private String shortDescription;
     //集数

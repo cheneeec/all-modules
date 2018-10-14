@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-public class IQiYi extends BaseVideoEntity {
+public class IQiYi extends VideoEntity {
 
     //爱奇艺获取集数时，需要此参数。
     private String albumId;

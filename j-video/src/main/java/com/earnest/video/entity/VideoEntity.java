@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Data
-public abstract class BaseVideoEntity implements Cloneable, Serializable {
+public abstract class VideoEntity implements Cloneable, Serializable {
     //
     protected String id;
     //标题
@@ -45,16 +45,15 @@ public abstract class BaseVideoEntity implements Cloneable, Serializable {
             throw new IllegalArgumentException("cannot find the category:" + category);
         }
 
-
     }
 
 
     @Override
-    protected BaseVideoEntity clone() {
+    protected VideoEntity clone() {
         try {
-            return (BaseVideoEntity) super.clone();
+            return (VideoEntity) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new IllegalStateException("clone error:"+e.getMessage());
+            throw new IllegalStateException("clone error:" + e.getMessage());
         }
 
     }

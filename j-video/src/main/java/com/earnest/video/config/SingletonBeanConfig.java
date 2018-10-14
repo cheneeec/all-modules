@@ -1,4 +1,4 @@
-package com.earnest.video.configuration;
+package com.earnest.video.config;
 
 import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.proxy.HttpProxyPool;

@@ -1,7 +1,7 @@
 package com.earnest.video.spider;
 
 import com.earnest.crawler.core.HttpResponseResult;
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
 
     @Override
-    protected Function<HttpResponseResult<Document>, List<BaseVideoEntity>> pipe() {
+    protected Function<HttpResponseResult<Document>, List<VideoEntity>> pipe() {
         return httpResponse -> {
             Element element = httpResponse.getContent().body();
             Elements elements = element.select("body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li");
@@ -39,14 +39,14 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setPlayValue(a.attr("href"));
                 iQiYi.setTitle(a.attr("title"));
                 iQiYi.setImage(a.select("img").attr("src"));
-                iQiYi.setCategory(BaseVideoEntity.Category.MOVIE);
+                iQiYi.setCategory(VideoEntity.Category.MOVIE);
                 return iQiYi;
             }).collect(Collectors.toList());
         };
     }
 
     @Override
-    protected Consumer<List<BaseVideoEntity>> consumer() {
+    protected Consumer<List<VideoEntity>> consumer() {
         return iQiYiMovieCachedVideoService::save;
     }
 

@@ -1,4 +1,4 @@
-package com.earnest.video.controller;
+package com.earnest.video.web.controller;
 
 import com.earnest.video.parser.VideoAddressParser;
 import lombok.AllArgsConstructor;

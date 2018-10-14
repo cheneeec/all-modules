@@ -1,8 +1,8 @@
-package com.earnest.video.controller;
+package com.earnest.video.web.controller;
 
 
-import com.earnest.video.entity.BaseVideoEntity;
-import com.earnest.video.entity.BaseVideoEntity.Category;
+import com.earnest.video.entity.VideoEntity;
+import com.earnest.video.entity.VideoEntity.Category;
 import com.earnest.video.entity.Video;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
 import lombok.AllArgsConstructor;
@@ -21,12 +21,12 @@ public class VideoController {
 
 
     @GetMapping("/{type:movie|animation}")
-    public Page<? extends BaseVideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
+    public Page<? extends VideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
         return videoService.findByCategory(pageRequest, Category.getCategory(type));
     }
 
     @GetMapping("/{id:\\d+}")
-    public BaseVideoEntity get(@PathVariable long id) {
+    public VideoEntity get(@PathVariable long id) {
         return videoService.get(id);
     }
 

@@ -1,6 +1,6 @@
 package com.earnest.video.service;
 
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Video;
 import com.earnest.video.repository.VideoRepository;
 import lombok.AllArgsConstructor;
@@ -53,7 +53,7 @@ public class MongodbVideoService implements BasicQueryAndPersistenceVideoService
     }
 
     @Override
-    public Page<Video> findByCategory(Pageable pageRequest, BaseVideoEntity.Category category) {
+    public Page<Video> findByCategory(Pageable pageRequest, VideoEntity.Category category) {
         Assert.notNull(category, "category is required");
         pageRequest = Optional.ofNullable(pageRequest).orElse(Pageable.unpaged());
         return videoRepository.findByCategory(pageRequest, category);

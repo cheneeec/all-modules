@@ -1,4 +1,4 @@
-package com.earnest.video.controller;
+package com.earnest.video.web.controller;
 
 import com.earnest.video.core.episode.EpisodeFetcher;
 import com.earnest.video.entity.Episode;

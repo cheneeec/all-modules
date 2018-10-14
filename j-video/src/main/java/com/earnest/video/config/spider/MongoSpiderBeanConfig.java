@@ -1,6 +1,6 @@
-package com.earnest.video.configuration.spider;
+package com.earnest.video.config.spider;
 
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Video;
 import com.earnest.video.repository.VideoRepository;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
@@ -26,7 +26,7 @@ public class MongoSpiderBeanConfig {
     }
 
     @Bean
-    public Consumer<List<BaseVideoEntity>> videoEntitiesConsumer(BasicQueryAndPersistenceVideoService<Video> persistenceVideoService) {
+    public Consumer<List<VideoEntity>> videoEntitiesConsumer(BasicQueryAndPersistenceVideoService<Video> persistenceVideoService) {
         return entities -> {
             List<Video> videos = entities.stream()
                     .map(Video::adapt)

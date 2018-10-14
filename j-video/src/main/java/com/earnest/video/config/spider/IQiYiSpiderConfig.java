@@ -1,6 +1,6 @@
-package com.earnest.video.configuration.spider;
+package com.earnest.video.config.spider;
 
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
 import com.earnest.video.service.CachedVideoService;
 import com.earnest.video.spider.IQiYiAnimationSpider;
@@ -20,11 +20,11 @@ import java.util.function.Consumer;
 public class IQiYiSpiderConfig {
 
     @Bean
-    public IQiYiAnimationSpider iQiYiAnimationSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<BaseVideoEntity>> videoEntitiesConsumer) {
+    public IQiYiAnimationSpider iQiYiAnimationSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<VideoEntity>> videoEntitiesConsumer) {
 
         return new IQiYiAnimationSpider(basicQueryAndPersistenceVideoService) {
             @Override
-            protected Consumer<List<BaseVideoEntity>> consumer() {
+            protected Consumer<List<VideoEntity>> consumer() {
                 return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
             }
         };

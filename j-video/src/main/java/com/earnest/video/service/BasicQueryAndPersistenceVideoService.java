@@ -1,12 +1,12 @@
 package com.earnest.video.service;
 
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface BasicQueryAndPersistenceVideoService<T extends BaseVideoEntity> {
+public interface BasicQueryAndPersistenceVideoService<T extends VideoEntity> {
 
     void save(List<T> entities);
 
@@ -19,7 +19,7 @@ public interface BasicQueryAndPersistenceVideoService<T extends BaseVideoEntity>
 
     T get(Long id);
 
-    Page<T> findByCategory(Pageable pageRequest, BaseVideoEntity.Category category);
+    Page<T> findByCategory(Pageable pageRequest, VideoEntity.Category category);
 
     long count();
 }

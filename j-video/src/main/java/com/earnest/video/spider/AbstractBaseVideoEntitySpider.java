@@ -4,7 +4,7 @@ import com.earnest.crawler.core.Browser;
 import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.crawler.core.builder.SpiderBuilder;
 import com.earnest.crawler.core.Spider;
-import com.earnest.video.entity.BaseVideoEntity;
+import com.earnest.video.entity.VideoEntity;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.springframework.boot.CommandLineRunner;
@@ -39,16 +39,16 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
 
     protected Consumer<HttpResponseResult<Document>> getCssSelectorPipeline() {
         return documentHttpResponseResult -> {
-            List<BaseVideoEntity> videoEntities = pipe().apply(documentHttpResponseResult);
+            List<VideoEntity> videoEntities = pipe().apply(documentHttpResponseResult);
             if (!CollectionUtils.isEmpty(videoEntities)) {
                 consumer().accept(videoEntities);
             }
         };
     }
 
-    protected abstract Function<HttpResponseResult<Document>, List<BaseVideoEntity>> pipe();
+    protected abstract Function<HttpResponseResult<Document>, List<VideoEntity>> pipe();
 
-    protected abstract Consumer<List<BaseVideoEntity>> consumer();
+    protected abstract Consumer<List<VideoEntity>> consumer();
 
 
     protected abstract String getRangeRegexUrl();

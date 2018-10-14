@@ -22,7 +22,7 @@ public class Video extends IQiYi {
     }
 
 
-    public static Video adapt(BaseVideoEntity videoEntity) {
+    public static Video adapt(VideoEntity videoEntity) {
 
         if (videoEntity == null) {
             return null;
