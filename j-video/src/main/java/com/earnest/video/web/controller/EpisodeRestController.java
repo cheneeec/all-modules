@@ -18,10 +18,12 @@ import java.util.List;
 @AllArgsConstructor
 public class EpisodeRestController {
 
+
     private final EpisodeFetcher episodeFetcher;
 
     @GetMapping(value = "/query")
     public List<Episode> findEpisodes(@NotBlank String url, @PageableDefault(page = 1, size = 50) Pageable page) throws IOException {
+
         return episodeFetcher.fetch(url, page);
     }
 

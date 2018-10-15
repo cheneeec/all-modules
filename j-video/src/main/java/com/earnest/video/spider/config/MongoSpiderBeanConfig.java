@@ -1,10 +1,10 @@
-package com.earnest.video.config.spider;
+package com.earnest.video.spider.config;
 
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Video;
 import com.earnest.video.repository.VideoRepository;
-import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
-import com.earnest.video.service.MongoDBVideoService;
+import com.earnest.video.spider.persistence.VideoPersistence;
+import com.earnest.video.spider.persistence.MongoDBVideoPersistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 public class MongoSpiderBeanConfig {
 
     @Bean
-    public BasicQueryAndPersistenceVideoService<Video> basicQueryAndPersistenceVideoService(VideoRepository videoRepository) {
-        return new MongoDBVideoService(videoRepository);
+    public VideoPersistence<Video> basicQueryAndPersistenceVideoService(VideoRepository videoRepository) {
+        return new MongoDBVideoPersistence(videoRepository);
     }
 
     @Bean
-    public Consumer<List<? extends VideoEntity>> videoEntitiesConsumer(BasicQueryAndPersistenceVideoService<Video> persistenceVideoService) {
+    public Consumer<List<? extends VideoEntity>> videoEntitiesConsumer(VideoPersistence<Video> persistenceVideoService) {
         return entities -> {
             List<Video> videos = entities.stream()
                     .map(Video::adapt)

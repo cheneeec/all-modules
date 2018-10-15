@@ -1,8 +1,8 @@
-package com.earnest.video.config.spider;
+package com.earnest.video.spider.config;
 
 import com.earnest.video.entity.VideoEntity;
-import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
-import com.earnest.video.service.CachedVideoService;
+import com.earnest.video.spider.persistence.VideoPersistence;
+import com.earnest.video.spider.persistence.MemoryVideoPersistence;
 import com.earnest.video.spider.IQiYiAnimationSpider;
 import com.earnest.video.spider.IQiYiMovieSpider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +21,9 @@ import java.util.function.Consumer;
 public class IQiYiSpiderConfig {
 
     @Bean
-    public IQiYiAnimationSpider iQiYiAnimationSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
+    public IQiYiAnimationSpider iQiYiAnimationSpider(VideoPersistence videoPersistence, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
 
-        return new IQiYiAnimationSpider(basicQueryAndPersistenceVideoService) {
+        return new IQiYiAnimationSpider(videoPersistence) {
             @Override
             protected Consumer<List<? extends VideoEntity>> consumer() {
                 return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
@@ -34,9 +34,9 @@ public class IQiYiSpiderConfig {
     }
 
     @Bean
-    public IQiYiMovieSpider iQiYiMovieSpider(BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
+    public IQiYiMovieSpider iQiYiMovieSpider(VideoPersistence videoPersistence, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
 
-        return new IQiYiMovieSpider(basicQueryAndPersistenceVideoService) {
+        return new IQiYiMovieSpider(videoPersistence) {
             @Override
             protected Consumer<List<? extends VideoEntity>> consumer() {
                 return Optional.ofNullable(videoEntitiesConsumer).orElse(super.consumer());
@@ -47,8 +47,8 @@ public class IQiYiSpiderConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public BasicQueryAndPersistenceVideoService basicQueryAndPersistenceVideoService() {
-        return new CachedVideoService();
+    public VideoPersistence videoPersistenceService() {
+        return new MemoryVideoPersistence();
     }
 
 

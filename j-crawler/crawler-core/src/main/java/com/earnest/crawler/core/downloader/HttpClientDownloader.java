@@ -3,6 +3,7 @@ package com.earnest.crawler.core.downloader;
 import com.earnest.crawler.core.StringResponseResult;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -17,10 +18,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -105,12 +103,17 @@ public class HttpClientDownloader implements Downloader {
 
 
         HttpEntity entity = response.getEntity();
+        Header contentType = entity.getContentType();
 
-        // set charset
-        Arrays.stream(entity.getContentType().getElements())
-                .map(e -> e.getParameterByName("charset"))
-                .findAny()
-                .map(NameValuePair::getValue).ifPresent(responseResult::setCharset);
+        if (contentType != null) {
+            // set charset
+            Arrays.stream(contentType.getElements())
+                    .map(e -> e.getParameterByName("charset"))
+                    .filter(Objects::nonNull)
+                    .findAny()
+                    .map(NameValuePair::getValue).ifPresent(responseResult::setCharset);
+        }
+
 
         //set entity
         responseResult.setContent(EntityUtils.toString(entity));

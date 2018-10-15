@@ -3,7 +3,7 @@ package com.earnest.video.spider;
 import com.earnest.crawler.core.HttpResponseResult;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.IQiYi;
-import com.earnest.video.service.BasicQueryAndPersistenceVideoService;
+import com.earnest.video.spider.persistence.VideoPersistence;
 import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
-    private final BasicQueryAndPersistenceVideoService iQiYiMovieCachedVideoService;
+    private final VideoPersistence iQiYiMovieCachedVideoService;
 
     private final static String FROM_URL = "https://list.iqiyi.com/www/1/-------------24-1-1-iqiyi--.html";
 
@@ -62,7 +62,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
     @Override
     public void start() {
-        if (iQiYiMovieCachedVideoService.count() < 1800) {
+        if (iQiYiMovieCachedVideoService.count() < 900) {
             super.start();
         }
     }

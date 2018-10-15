@@ -1,54 +1,37 @@
 package com.earnest.video.web.config;
 
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import org.springframework.web.reactive.config.DelegatingWebFluxConfiguration;
-import org.springframework.web.reactive.config.EnableWebFlux;
+import java.util.ArrayList;
+import java.util.List;
 
 
-@EnableWebFlux
 @Configuration
-public class WebMvcConfig  extends DelegatingWebFluxConfiguration {
-
-    /*
-    @Autowired
-    private Optional<PageableHandlerMethodArgumentResolverCustomizer> pageableResolverCustomizer;
-
-    @Autowired
-    private Optional<SortHandlerMethodArgumentResolverCustomizer> sortResolverCustomizer;
+@EnableWebMvc
+public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
-    public void configureArgumentResolvers(ArgumentResolverConfigurer configurer) {
-        configurer.addCustomResolver((HandlerMethodArgumentResolver) new PageableHandlerMethodArgumentResolver());
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
+        FastJsonConfig fastJsonConfig = new FastJsonConfig();
+        fastJsonConfig.setSerializerFeatures(
+                SerializerFeature.PrettyFormat,
+                SerializerFeature.DisableCircularReferenceDetect
+                );
+        //处理中文乱码
+        List<MediaType> fastMediaTypes = new ArrayList<>();
+        fastMediaTypes.add(MediaType.APPLICATION_JSON_UTF8);
+        fastJsonHttpMessageConverter.setSupportedMediaTypes(fastMediaTypes);
+        fastJsonHttpMessageConverter.setFastJsonConfig(fastJsonConfig);
 
+        converters.add(fastJsonHttpMessageConverter);
     }
-
-
-
-    @Bean
-    public PageableHandlerMethodArgumentResolver pageableResolver() {
-
-        PageableHandlerMethodArgumentResolver pageableResolver = //
-                new PageableHandlerMethodArgumentResolver(sortResolver());
-        customizePageableResolver(pageableResolver);
-        return pageableResolver;
-    }
-
-    @Bean
-    public SortHandlerMethodArgumentResolver sortResolver() {
-
-        SortHandlerMethodArgumentResolver sortResolver = new SortHandlerMethodArgumentResolver();
-        customizeSortResolver(sortResolver);
-        return sortResolver;
-    }
-
-    protected void customizePageableResolver(PageableHandlerMethodArgumentResolver pageableResolver) {
-        pageableResolverCustomizer.ifPresent(c -> c.customize(pageableResolver));
-    }
-
-    protected void customizeSortResolver(SortHandlerMethodArgumentResolver sortResolver) {
-        sortResolverCustomizer.ifPresent(c -> c.customize(sortResolver));
-    }*/
-
 }
