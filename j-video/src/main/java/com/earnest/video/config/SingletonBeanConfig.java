@@ -1,8 +1,8 @@
 package com.earnest.video.config;
 
-import com.earnest.crawler.core.Browser;
-import com.earnest.crawler.core.proxy.HttpProxyPool;
-import com.earnest.crawler.core.proxy.FixedHttpProxyProvider;
+import com.earnest.crawler.Browser;
+import com.earnest.crawler.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.FixedHttpProxyProvider;
 import com.earnest.video.core.episode.IQiYiEpisodeFetcher;
 import com.earnest.video.core.search.DefaultPlatformSearcherManager;
 import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;

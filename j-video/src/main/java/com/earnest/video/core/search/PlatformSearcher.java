@@ -1,6 +1,6 @@
 package com.earnest.video.core.search;
 
-import com.earnest.crawler.core.proxy.HttpProxyPoolAware;
+import com.earnest.crawler.proxy.HttpProxyPoolAware;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Platform;
 import org.springframework.data.domain.Page;

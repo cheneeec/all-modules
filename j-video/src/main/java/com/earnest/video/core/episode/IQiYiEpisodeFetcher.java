@@ -2,8 +2,8 @@ package com.earnest.video.core.episode;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.earnest.crawler.core.Browser;
-import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
+import com.earnest.crawler.Browser;
+import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -18,7 +18,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;

@@ -34,22 +34,11 @@
 
     <dependencyManagement>
         <dependencies>
-
-
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
-
-
-            <dependency>
-                <groupId>net.sourceforge.htmlunit</groupId>
-                <artifactId>htmlunit</artifactId>
-                <version>${htmlunit.version}</version>
-            </dependency>
-
-
         </dependencies>
     </dependencyManagement>
 

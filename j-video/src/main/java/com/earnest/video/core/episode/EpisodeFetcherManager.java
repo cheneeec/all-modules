@@ -1,11 +1,9 @@
 package com.earnest.video.core.episode;
 
-import com.earnest.crawler.core.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.HttpProxyPool;
 import com.earnest.video.core.Manager;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
 

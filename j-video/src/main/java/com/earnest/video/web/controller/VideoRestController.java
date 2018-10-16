@@ -19,7 +19,7 @@ public class VideoRestController {
 
 
 
-    @GetMapping("/{type:movie|animation}")
+    @GetMapping("/category/{type:movie|animation}")
     public Page<? extends VideoEntity> listAll(@PathVariable String type, Pageable pageRequest) {
         return videoService.findByCategory(pageRequest, VideoEntity.Category.getCategory(type));
     }

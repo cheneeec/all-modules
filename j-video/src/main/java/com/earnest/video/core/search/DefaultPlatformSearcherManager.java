@@ -1,7 +1,7 @@
 package com.earnest.video.core.search;
 
 import com.alibaba.fastjson.util.IOUtils;
-import com.earnest.crawler.core.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.HttpProxyPool;
 import com.earnest.video.entity.Platform;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.exception.UnsupportedPlatformException;

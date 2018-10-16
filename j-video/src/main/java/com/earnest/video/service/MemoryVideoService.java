@@ -29,6 +29,7 @@ public class MemoryVideoService implements VideoService {
     public Page<Video> findByCategory(Pageable pageRequest, VideoEntity.Category category) {
         Assert.notNull(pageRequest, "pageRequest is required");
         List<Video> content = categoryTMap.get(category);
+
         if (content == null) {
             return Page.empty();
         }
@@ -38,7 +39,7 @@ public class MemoryVideoService implements VideoService {
                 content.stream().skip(pageRequest.getOffset())
                         .limit(pageRequest.getPageSize())
                         .collect(Collectors.toList()),
-                pageRequest, videoMap.size());
+                pageRequest, content.size());
     }
 
     @Override

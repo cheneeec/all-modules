@@ -1,6 +1,6 @@
 package com.earnest.video.core.episode;
 
-import com.earnest.crawler.core.proxy.HttpProxyPoolAware;
+import com.earnest.crawler.proxy.HttpProxyPoolAware;
 import com.earnest.video.entity.Episode;
 import org.springframework.data.domain.Pageable;
 

@@ -34,7 +34,8 @@ public class IQiYiSpiderConfig {
     }
 
     @Bean
-    public IQiYiMovieSpider iQiYiMovieSpider(VideoPersistence videoPersistence, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
+    public IQiYiMovieSpider iQiYiMovieSpider(VideoPersistence videoPersistence,
+                                             @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
 
         return new IQiYiMovieSpider(videoPersistence) {
             @Override

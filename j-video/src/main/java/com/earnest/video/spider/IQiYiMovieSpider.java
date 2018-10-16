@@ -1,6 +1,6 @@
 package com.earnest.video.spider;
 
-import com.earnest.crawler.core.HttpResponseResult;
+import com.earnest.crawler.HttpResponseResult;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.spider.persistence.VideoPersistence;
@@ -62,7 +62,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
     @Override
     public void start() {
-        if (iQiYiMovieCachedVideoService.count() < 900) {
+        if (iQiYiMovieCachedVideoService.count() < 901) {
             super.start();
         }
     }

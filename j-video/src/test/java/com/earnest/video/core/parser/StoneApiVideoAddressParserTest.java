@@ -1,6 +1,6 @@
 package com.earnest.video.core.parser;
 
-import com.earnest.crawler.core.Browser;
+import com.earnest.crawler.Browser;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;

@@ -1,9 +1,9 @@
 package com.earnest.video.spider;
 
-import com.earnest.crawler.core.Browser;
-import com.earnest.crawler.core.HttpResponseResult;
-import com.earnest.crawler.core.builder.SpiderBuilder;
-import com.earnest.crawler.core.Spider;
+import com.earnest.crawler.Browser;
+import com.earnest.crawler.HttpResponseResult;
+import com.earnest.crawler.builder.SpiderBuilder;
+import com.earnest.crawler.Spider;
 import com.earnest.video.entity.VideoEntity;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;

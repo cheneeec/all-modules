@@ -1,9 +1,9 @@
 package com.earnest.video.core.search;
 
 import com.alibaba.fastjson.JSONObject;
-import com.earnest.crawler.core.Browser;
-import com.earnest.crawler.core.proxy.HttpProxyPool;
-import com.earnest.crawler.core.proxy.HttpProxyPoolSettingSupport;
+import com.earnest.crawler.Browser;
+import com.earnest.crawler.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.entity.Platform;
