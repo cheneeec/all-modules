@@ -74,11 +74,6 @@ public class SyncSpider implements Spider {
 
 
     @Override
-    public boolean isRunning() {
-        return Thread.currentThread().isAlive();
-    }
-
-    @Override
     public void close() {
         closeComponents(downloader, scheduler, httpRequestExtractor, pipeline);
     }

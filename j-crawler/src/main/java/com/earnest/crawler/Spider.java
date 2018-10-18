@@ -11,6 +11,5 @@ public interface Spider extends Closeable {
         throw new UnsupportedOperationException(this.getClass()+" can't stop");
     }
 
-    boolean isRunning();
 
 }

@@ -8,6 +8,7 @@ import com.earnest.crawler.pipeline.Pipeline;
 import com.earnest.crawler.scheduler.Scheduler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.springframework.util.Assert;
 import org.springframework.util.CustomizableThreadCreator;
 
 import java.util.concurrent.*;
@@ -15,20 +16,43 @@ import java.util.concurrent.*;
 @Slf4j
 public class AsyncSpider extends SyncSpider {
 
-    private final ThreadPoolExecutor threadPool;
+    private final ExecutorService threadPool;
+    private final int threadNumber;
 
-    public AsyncSpider(Downloader downloader, Scheduler scheduler, HttpRequestExtractor httpRequestExtractor, Pipeline pipeline, Integer threadNumber) {
+
+    public AsyncSpider(Downloader downloader,
+                       Scheduler scheduler,
+                       HttpRequestExtractor httpRequestExtractor,
+                       Pipeline pipeline,
+                       ExecutorService threadPool,
+                       int threadNumber) {
         super(downloader, scheduler, httpRequestExtractor, pipeline);
-        this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNumber, new SpiderThreadFactory());
+        Assert.isTrue(threadNumber > 0, "threadNumber <1");
+        Assert.notNull(threadPool, "threadPool is required");
+        this.threadPool = threadPool;
+        this.threadNumber = threadNumber;
+        if (threadPool instanceof ThreadPoolExecutor) {
+            ((ThreadPoolExecutor) threadPool).setThreadFactory(new SpiderThreadFactory());
+        }
+
+    }
+
+    public AsyncSpider(Downloader downloader,
+                       Scheduler scheduler,
+                       HttpRequestExtractor httpRequestExtractor,
+                       Pipeline pipeline,
+                       ThreadPoolExecutor threadPool) {
+        this(downloader, scheduler, httpRequestExtractor, pipeline, threadPool, threadPool.getMaximumPoolSize());
+
     }
 
 
     @Override
     public void start() {
 
-        CountDownLatch completed = new CountDownLatch(threadPool.getMaximumPoolSize());
+        CountDownLatch completed = new CountDownLatch(threadNumber);
         //进行下载
-        for (int i = 0; i < threadPool.getMaximumPoolSize(); i++) {
+        for (int i = 0; i < threadNumber; i++) {
             threadPool.execute(() -> {
                 while (true) {
                     try {
@@ -62,12 +86,6 @@ public class AsyncSpider extends SyncSpider {
     @Override
     public void stop() {
         threadPool.shutdown();
-    }
-
-
-    @Override
-    public boolean isRunning() {
-        return threadPool.getActiveCount() != 0;
     }
 
 
