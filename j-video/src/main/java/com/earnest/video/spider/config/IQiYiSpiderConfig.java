@@ -1,5 +1,6 @@
 package com.earnest.video.spider.config;
 
+import com.earnest.video.entity.Video;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.spider.persistence.VideoPersistence;
 import com.earnest.video.spider.persistence.MemoryVideoPersistence;
@@ -48,8 +49,8 @@ public class IQiYiSpiderConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public VideoPersistence videoPersistenceService() {
-        return new MemoryVideoPersistence();
+    public VideoPersistence<Video> videoPersistence() {
+        return new MemoryVideoPersistence<>();
     }
 
 

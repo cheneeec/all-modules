@@ -27,6 +27,7 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
     @Override
     protected Function<HttpResponseResult<Document>, List<VideoEntity>> pipe() {
+
         return httpResponse -> {
             Element element = httpResponse.getContent().body();
             Elements elements = element.select("body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li");

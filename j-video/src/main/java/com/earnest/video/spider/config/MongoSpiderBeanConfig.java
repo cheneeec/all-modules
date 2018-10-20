@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class MongoSpiderBeanConfig {
 
     @Bean
-    public VideoPersistence<Video> basicQueryAndPersistenceVideoService(VideoRepository videoRepository) {
+    public VideoPersistence<Video> videoPersistence(VideoRepository videoRepository) {
         return new MongoDBVideoPersistence(videoRepository);
     }
 

@@ -8,6 +8,7 @@ import com.earnest.crawler.scheduler.Scheduler;
 import com.earnest.crawler.AsyncSpider;
 
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -112,8 +113,7 @@ public class SpiderBuilder extends SharedSpiderConfigurer implements Builder<Spi
         //thread
         Integer thread = (Integer) sharedObjectMap.get(Integer.class).get(0);
 
-
-        return new AsyncSpider(downloader, scheduler, httpRequestExtractor, pipeline, thread);
+        return new AsyncSpider(downloader, scheduler, httpRequestExtractor, pipeline, Executors.newFixedThreadPool(thread),thread);
     }
 
 }

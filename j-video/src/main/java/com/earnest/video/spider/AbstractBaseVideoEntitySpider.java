@@ -67,10 +67,7 @@ public abstract class AbstractBaseVideoEntitySpider implements Spider, CommandLi
     }
 
 
-    @Override
-    public boolean isRunning() {
-        return spider.isRunning();
-    }
+
 
     @Override
     public void close() throws IOException {
