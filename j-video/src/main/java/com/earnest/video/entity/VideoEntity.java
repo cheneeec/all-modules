@@ -13,6 +13,8 @@ public abstract class VideoEntity implements Cloneable, Serializable {
     protected String id;
     //标题
     protected String title;
+
+    protected String videoInfo;
     //获取时间
     protected Date collectTime;
     //播放时长

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: mongo
+    active:
 logging:
   level:
     com.earnest: debug
