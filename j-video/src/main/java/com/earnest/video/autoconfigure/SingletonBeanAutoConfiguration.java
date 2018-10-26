@@ -1,4 +1,4 @@
-package com.earnest.video.config;
+package com.earnest.video.autoconfigure;
 
 import com.earnest.crawler.Browser;
 import com.earnest.crawler.proxy.HttpProxyPool;
@@ -28,7 +28,7 @@ import java.nio.charset.Charset;
  * 所有的单例<code>Bean</code>的配置。都交由<code>Spring</code>容器管理。
  */
 @Configuration
-public class SingletonBeanConfig {
+public class SingletonBeanAutoConfiguration {
 
     @Bean
     public CloseableHttpClient httpClient() {

@@ -1,4 +1,4 @@
-package com.earnest.video.spider.config;
+package com.earnest.video.autoconfigure.spider.mongo;
 
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.Video;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Profile("mongo")
 @Configuration
-public class MongoSpiderBeanConfig {
+public class MongoSpiderAutoConfiguration {
 
     @Bean
     public VideoPersistence<Video> videoPersistence(VideoRepository videoRepository) {
@@ -45,7 +45,7 @@ public class MongoSpiderBeanConfig {
     }
 
     @Bean
-    public VideoService mongoVideoService(VideoRepository videoRepository) {
+    public VideoService videoService(VideoRepository videoRepository) {
         return new MongoVideoService(videoRepository);
     }
 }

@@ -1,4 +1,4 @@
-package com.earnest.video.spider.config;
+package com.earnest.video.autoconfigure.spider;
 
 import com.earnest.video.entity.Video;
 import com.earnest.video.entity.VideoEntity;
@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * iQiYi的爬虫配置
  */
 @Configuration
-public class IQiYiSpiderConfig {
+public class SpiderAutoConfiguration {
 
     @Bean
     public IQiYiAnimationSpider iQiYiAnimationSpider(VideoPersistence videoPersistence, @Autowired(required = false) Consumer<List<? extends VideoEntity>> videoEntitiesConsumer) {
@@ -56,11 +56,10 @@ public class IQiYiSpiderConfig {
     }
 
 
-
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(value = VideoService.class)
     @SuppressWarnings("unchecked")
-    public VideoService memoryVideoService(VideoPersistence memoryVideoPersistence) {
+    public VideoService videoService(VideoPersistence memoryVideoPersistence) {
         return new MemoryVideoService((MemoryVideoPersistence<Video>) memoryVideoPersistence);
     }
 

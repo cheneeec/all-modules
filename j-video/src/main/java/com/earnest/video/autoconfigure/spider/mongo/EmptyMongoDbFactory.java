@@ -1,4 +1,4 @@
-package com.earnest.video.spider.mongo;
+package com.earnest.video.autoconfigure.spider.mongo;
 
 import com.mongodb.DB;
 import com.mongodb.client.MongoDatabase;
