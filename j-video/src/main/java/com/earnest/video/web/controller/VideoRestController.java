@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 
+
 @RestController
 @RequestMapping("/v1/api/video")
 @AllArgsConstructor
@@ -16,7 +17,6 @@ public class VideoRestController {
 //http://www.iqiyi.com/v_19rqzi1f7s.html
 
     private final VideoService videoService;
-
 
 
     @GetMapping("/category/{type:movie|animation}")

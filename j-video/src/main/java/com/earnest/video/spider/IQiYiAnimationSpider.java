@@ -37,8 +37,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setPlayValue(a.attr("href"));
                 iQiYi.setImage("http:" + a.select("img").attr("src"));
                 iQiYi.setTitle(a.select("img").attr("title"));
-                //body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li:nth-child(1) > div.site-piclist_info > div.role_info
-//                iQiYi.setVideoInfo();
+
                 iQiYi.setPlayInfo(a.select("span.icon-vInfo").text());
                 iQiYi.setCategory(VideoEntity.Category.ANIMATION);
                 iQiYi.setAlbumId(a.attr("data-qidanadd-albumid"));
