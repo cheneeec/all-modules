@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotBlank;
 import java.io.IOException;
 
 
@@ -24,7 +23,7 @@ public class SearchRestController {
     private final PlatformSearcherManager platformSearcherManager;
 
     @GetMapping("/search")
-    public Page<? extends VideoEntity> search(@NotBlank @RequestParam(name = "q") String keyword,
+    public Page<? extends VideoEntity> search(@RequestParam(name = "q") String keyword,
                                               @PageableDefault(page = 1) Pageable pageRequest,
                                               Platform platform) throws IOException {
         return platformSearcherManager.search(keyword, pageRequest, platform);

@@ -103,6 +103,4 @@ public class SingletonBeanAutoConfiguration {
     }
     //=======================//Spring Thread Pool=================
 
-
-
 }

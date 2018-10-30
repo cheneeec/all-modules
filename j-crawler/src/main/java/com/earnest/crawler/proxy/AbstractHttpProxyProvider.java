@@ -60,8 +60,4 @@ public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
 
     protected abstract void doInitializeHttpProxyPool() throws  Exception;
 
-    @Override
-    public boolean initialized() {
-        return invokedInitializeHttpProxyPoolMethod.get();
-    }
 }
