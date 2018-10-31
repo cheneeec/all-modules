@@ -6,12 +6,15 @@ import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.webstart.WebStartHandler;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -20,13 +23,20 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -39,6 +49,7 @@ public class StoneApiVideoAddressParserTest {
 
     @Test
     public void parse() throws IOException {
+
 
         System.out.println(stoneApiVideoAddressParser.parse("https://www.iqiyi.com/v_19rr5jax4g.html"));
 
@@ -185,13 +196,12 @@ public class StoneApiVideoAddressParserTest {
                 if (event.getNewPage() != null) {
                     System.out.println(event.getNewPage().getUrl());
                 }
+                //http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html
                 if (event.getOldPage() != null) {
                     System.out.println(event.getOldPage().getUrl());
                     DomElement script = ((HtmlPage) event.getOldPage()).getElementsByTagName("script").get(8);
                     String textContent = script.getTextContent();
                     System.out.println(textContent);
-
-
                 }
 
             }
@@ -243,6 +253,11 @@ public class StoneApiVideoAddressParserTest {
         page.cleanUp();
 
         System.out.println("==============================");
+        httpClient();
+    }
+
+    @Test
+    public void httpClient() throws IOException {
         CloseableHttpClient aDefault = HttpClients.createDefault();
 
         Map<String, String> params = new LinkedHashMap<>();
@@ -261,7 +276,7 @@ public class StoneApiVideoAddressParserTest {
         RequestBuilder requestBuilder = RequestBuilder.post("http://jiexi.071811.cc/api/xit.php")
                 .setEntity(urlEncodedFormEntity);
 
-        headers.forEach(requestBuilder::addHeader);
+//        headers.forEach(requestBuilder::addHeader);
         HttpClientContext httpClientContext = new HttpClientContext();
 //        CookieStore cookieStore = new BasicCookieStore();
 //        cookieManager.getCookies().forEach(cookie -> cookieStore.addCookie(new BasicClientCookie(cookie.getName(), cookie.getValue())));
@@ -280,6 +295,26 @@ public class StoneApiVideoAddressParserTest {
 
     @Test
     public void reg() throws Exception {
+        Resource resource = new ClassPathResource("example.js");
+        String s = FileUtils.readFileToString(resource.getFile(), Charset.defaultCharset());
+        Pattern pattern = Pattern.compile("\"api/xit.php\", .*(\\{.+fuck})");
+        Matcher matcher = pattern.matcher(s);
+        if (matcher.find()) {
+            String group = matcher.group(1);
+            System.out.println(group);
+            JSONObject jsonObject = JSONObject.parseObject(group);
+            System.out.println(jsonObject.getString("fuck"));
 
+
+//            javascript.eval(matcher.group(1));
+//            System.out.println(javascript.get("fuck"));
+        }
+
+    }
+
+    @Test
+    public void aa() {
+        String s = "{\"time\":\"1540828800\", \"key\": \"8xBC7ZU8YXVM1Shiswnwpg6VqiM=\", \"url\": \"https://www.iqiyi.com/v_19rr2vbjpo.html\",\"type\": \"iqiyi\",\"pc\": \"0\",'fuck':'1'}";
+        System.out.println(JSONObject.parseObject(s).getInnerMap());
     }
 }
