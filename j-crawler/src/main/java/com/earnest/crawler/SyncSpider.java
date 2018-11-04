@@ -8,6 +8,7 @@ import com.earnest.crawler.pipeline.Pipeline;
 import com.earnest.crawler.scheduler.Scheduler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.io.Closeable;
 import java.util.Arrays;

@@ -101,18 +101,17 @@ public class HttpClientDownloader implements Downloader {
         responseResult.setSuccess("OK".equalsIgnoreCase(reasonPhrase));
         responseResult.setReason(reasonPhrase);
 
-
         HttpEntity entity = response.getEntity();
-        Header contentType = entity.getContentType();
 
-        if (contentType != null) {
-            // set charset
-            Arrays.stream(contentType.getElements())
-                    .map(e -> e.getParameterByName("charset"))
-                    .filter(Objects::nonNull)
-                    .findAny()
-                    .map(NameValuePair::getValue).ifPresent(responseResult::setCharset);
-        }
+        // set charset
+        Optional.ofNullable(entity.getContentType())
+                .map(Header::getElements)
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(e -> e.getParameterByName("charset"))
+                .filter(Objects::nonNull)
+                .findAny()
+                .map(NameValuePair::getValue).ifPresent(responseResult::setCharset);
 
 
         //set entity

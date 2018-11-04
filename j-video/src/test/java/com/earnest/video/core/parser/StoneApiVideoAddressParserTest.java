@@ -54,6 +54,8 @@ public class StoneApiVideoAddressParserTest {
         System.out.println(stoneApiVideoAddressParser.parse("https://www.iqiyi.com/v_19rr5jax4g.html"));
 
 
+
+
     }
 
     /**
@@ -248,6 +250,8 @@ public class StoneApiVideoAddressParserTest {
             System.out.println("result=>" + parseValue);
             webResponse.cleanUp();
         }*/
+
+        System.out.println(page.getTextContent());
 
 
         page.cleanUp();

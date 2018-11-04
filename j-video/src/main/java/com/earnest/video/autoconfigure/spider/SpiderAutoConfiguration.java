@@ -57,7 +57,7 @@ public class SpiderAutoConfiguration {
 
 
     @Bean
-    @ConditionalOnMissingBean(value = VideoService.class)
+    @ConditionalOnMissingBean
     @SuppressWarnings("unchecked")
     public VideoService videoService(VideoPersistence memoryVideoPersistence) {
         return new MemoryVideoService((MemoryVideoPersistence<Video>) memoryVideoPersistence);

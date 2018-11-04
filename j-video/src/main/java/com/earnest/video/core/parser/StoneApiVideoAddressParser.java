@@ -4,10 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.earnest.video.core.ValueParseException;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.springframework.util.Assert;
@@ -32,6 +36,9 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
 
     private final HttpClient httpClient;
 
+    private final ResponseHandler<String> responseHandler;
+
+
     //颜文字的正则表达式
     private final Pattern aaPattern = Pattern.compile("(\\/\\*\\(\\*\\^__\\^\\*\\)\\*\\/ﾟωﾟﾉ= /｀ｍ´）ﾉ ~┻━┻   //\\*´∇｀\\*/\\ \\['_'];.+;).*function ");
     //提交参数的正则表达式
@@ -40,8 +47,9 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
     private final ThreadLocal<String> requestParamsScriptString = new ThreadLocal<>();
 
 
-    public StoneApiVideoAddressParser(HttpClient httpClient) {
+    public StoneApiVideoAddressParser(HttpClient httpClient, ResponseHandler<String> responseHandler) {
         Assert.notNull(httpClient, "httpClient is required");
+        Assert.notNull(responseHandler, "responseHandler is required");
         webClient = new WebClient(BrowserVersion.CHROME);
         WebClientOptions webClientOptions = webClient.getOptions();
         webClientOptions.setCssEnabled(false);
@@ -55,32 +63,33 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
 
         webClient.addWebWindowListener(new WebWindowAdapter() {
             @Override
-            public void webWindowClosed(WebWindowEvent event) {
-                Page page = event.getOldPage();
-                if (page != null && StringUtils.contains(page.getUrl().toString(), "http://jiexi.071811.cc/stapi.php")) {
-                    requestParamsScriptString.set(((HtmlPage) event.getOldPage()).getElementsByTagName("script").get(8).getTextContent());
+            public void webWindowContentChanged(WebWindowEvent event) {
+                Page newPage = event.getNewPage();
+                if (newPage != null && StringUtils.contains(newPage.getUrl().toString(), "http://jiexi.071811.cc/stapi.php")) {
+                    requestParamsScriptString.set(((HtmlPage) newPage).getElementsByTagName("script").get(8).getTextContent());
                 }
             }
         });
 
         this.httpClient = httpClient;
+        this.responseHandler = responseHandler;
+
+    }
+
+    public StoneApiVideoAddressParser(ResponseHandler<String> responseHandler) {
+        this(HttpClients.createDefault(), responseHandler);
+
     }
 
     public StoneApiVideoAddressParser() {
-        this(HttpClients.createDefault());
+        this(HttpClients.createDefault(), new BasicResponseHandler());
     }
 
     //TODO 待优化
     @Override
-    public String parse(String playValue) throws IOException {
+    public List<String> parse(String playValue) throws IOException {
 
         HtmlPage page = webClient.getPage(String.format(STONE_API_ADDRESS, playValue));
-
-
-//        WebResponse webResponse = webClient.loadWebResponse(ajaxController.obtainResultWebRequest());
-
-
-//        String parseValue = JSONObject.parseObject(webResponse.getContentAsString()).getString("url");
 
 
         String requestParamsScriptString = this.requestParamsScriptString.get();
@@ -93,13 +102,41 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
             throw new ValueParseException("parse failed");
         }
 
-        UrlEncodedFormEntity urlEncodedFormEntity = buildRequestParams(aaMatcher, paramsMatcher, scriptEngine);
+        WebResponse webResponse = page.getWebResponse();
+
+        HttpUriRequest httpUriRequest = createHttpUriRequest(webResponse, buildRequestParams(aaMatcher, paramsMatcher, scriptEngine));
 
 
-//        webResponse.cleanUp();
+        String result = httpClient.execute(httpUriRequest, responseHandler);
+
+        if (StringUtils.isBlank(result)) {
+            throw new ValueParseException("parse failed");
+        }
+
+        webResponse.cleanUp();
         page.cleanUp();
+        this.requestParamsScriptString.remove();
 
-        return null;
+        return List.of(JSONObject.parseObject(result).getString("url"));
+    }
+
+    /**
+     * 创建{@link HttpUriRequest}。
+     *
+     * @param webResponse
+     * @param urlEncodedFormEntity
+     * @return
+     */
+    private static HttpUriRequest createHttpUriRequest(WebResponse webResponse, UrlEncodedFormEntity urlEncodedFormEntity) {
+        //组装请求
+        RequestBuilder requestBuilder = RequestBuilder.post("http://jiexi.071811.cc/api/xit.php");
+
+        //添加请求头
+        webResponse.getWebRequest().getAdditionalHeaders()
+                .forEach(requestBuilder::addHeader);
+
+
+        return requestBuilder.setEntity(urlEncodedFormEntity).build();
     }
 
     /**
@@ -119,17 +156,21 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
             scriptEngine.eval(aaMatcher.group(1));
             String fuck = (String) scriptEngine.get("fuck");
             //获取提交参数
-            String params = paramsMatcher.group(1);
+            String params = RegExUtils.removeAll(paramsMatcher.group(1), "\'");
             //替换最后一个参数
-            String requestParams = StringUtils.replaceAll(params, "fuck", fuck).replaceFirst(fuck, "fuck");
 
-            List<BasicNameValuePair> nameValuePairs = JSONObject.parseObject(requestParams).getInnerMap()
+            String requestParams = RegExUtils.replaceAll(params, "fuck", "\"" + fuck + "\"")
+                    .replaceFirst(fuck, "fuck");
+
+            //获取提交内容参数
+            List<BasicNameValuePair> requestParamsBody = JSONObject.parseObject(requestParams).getInnerMap()
                     .entrySet()
                     .stream()
                     .map(r -> new BasicNameValuePair(r.getKey(), r.getValue().toString()))
                     .collect(Collectors.toList());
 
-            return new UrlEncodedFormEntity(nameValuePairs);
+
+            return new UrlEncodedFormEntity(requestParamsBody);
 
 
         } catch (ScriptException e) {
@@ -137,21 +178,5 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
         }
     }
 
-    private class CachedAjaxController extends AjaxController {
-
-        private WebRequest webRequest;
-
-
-        @Override
-        public boolean processSynchron(HtmlPage page, WebRequest request, boolean async) {
-            this.webRequest = request;
-            return super.processSynchron(page, request, async);
-        }
-
-        WebRequest obtainResultWebRequest() {
-            Assert.state(webRequest != null, "error status:webRequest is null");
-            return webRequest;
-        }
-    }
 
 }

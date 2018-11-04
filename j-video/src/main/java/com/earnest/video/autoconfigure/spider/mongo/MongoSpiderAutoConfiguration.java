@@ -28,11 +28,6 @@ import java.util.stream.Collectors;
 public class MongoSpiderAutoConfiguration {
 
     @Bean
-    public VideoPersistence<Video> videoPersistence(VideoRepository videoRepository) {
-        return new MongoDBVideoPersistence(videoRepository);
-    }
-
-    @Bean
     public Consumer<List<? extends VideoEntity>> videoEntitiesConsumer(VideoPersistence<Video> persistenceVideoService) {
         return entities -> {
             List<Video> videos = entities.stream()
@@ -47,5 +42,10 @@ public class MongoSpiderAutoConfiguration {
     @Bean
     public VideoService videoService(VideoRepository videoRepository) {
         return new MongoVideoService(videoRepository);
+    }
+
+    @Bean
+    public VideoPersistence<Video> videoPersistence(VideoRepository videoRepository) {
+        return new MongoDBVideoPersistence(videoRepository);
     }
 }

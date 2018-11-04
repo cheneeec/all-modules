@@ -2,8 +2,6 @@ package com.earnest.crawler.builder;
 
 
 abstract class Configurer {
-
-
     abstract void init();
 
 
