@@ -6,7 +6,7 @@ import com.earnest.crawler.Browser;
 import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ResponseHandler;
@@ -25,6 +25,7 @@ import org.springframework.util.Assert;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,11 +41,10 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
 
     private final ResponseHandler<String> stringResponseHandler;
 
-    private static final String CALLBACK_JS_FUNCTION_PREFIX = "window.Q.__callbacks__.";
 
-    private static final String LETTER_AND_NUMBER = "qwertyuiopasdfghjklzxcvbnm1234567890";
 
-    private static final String API_URL = "http://cache.video.iqiyi.com/jp/avlist/${albumId}/${page}/${size}/?albumId=${albumId}&pageNum=${size}&pageNo=${page}&callback=" + CALLBACK_JS_FUNCTION_PREFIX;
+    private static final String API_URL = "http://cache.video.iqiyi.com/jp/avlist/${albumId}/${page}/${size}/?albumId=${albumId}&pageNum=${size}&pageNo=${page}";
+//    private static final String API_URL = "http://mixer.video.iqiyi.com/jp/recommend/videos?albumId=${albumId}&channelId=4&area=bee&size=7&type=video&pru=&playPlatform=PC_QIYI";
 
     private static final Pattern episodeExtractPattern = Pattern.compile("\"vlist\":(\\[\\{.+\\}\\])");
 
@@ -63,10 +63,9 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
 
         String[] s = url.split("\\?");
 
-        String requestUrl = StringUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(s))
+        String requestUrl = RegExUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(s))
                 .replaceAll("\\$\\{page}", String.valueOf(episodePage.getPageNumber() + 1))
-                .replaceAll("\\$\\{size}", String.valueOf(episodePage.getPageSize()))
-                + generateRandomJsCallback();
+                .replaceAll("\\$\\{size}", String.valueOf(episodePage.getPageSize()));
 
         log.debug("Get the API request address:{},start sending http request", requestUrl);
 
@@ -127,7 +126,7 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
                         .map(mapToEpisodeEntity()).collect(Collectors.toList());
             }
         }
-        return episodes;
+        return episodes==null? Collections.emptyList():episodes;
     }
 
     private static Function<JSONObject, Episode> mapToEpisodeEntity() {
@@ -195,9 +194,6 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
 
     }
 
-    private static String generateRandomJsCallback() {
-        return RandomStringUtils.random(8, LETTER_AND_NUMBER);
-    }
 
 
     @Override

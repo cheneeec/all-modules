@@ -41,6 +41,8 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setTitle(a.attr("title"));
                 iQiYi.setImage(a.select("img").attr("src"));
                 iQiYi.setCategory(VideoEntity.Category.MOVIE);
+                //body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li:nth-child(1) > div.site-piclist_pic > a >
+                iQiYi.setPlayInfo(a.select("div > div > p > span").text());
                 return iQiYi;
             }).collect(Collectors.toList());
         };

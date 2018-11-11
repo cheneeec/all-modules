@@ -48,7 +48,7 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
 
 
     public void addHttpProxySetting(RequestBuilder requestBuilder) {
-        if (!useHttpProxy) {
+        if (!useHttpProxy||httpProxyPool==null) {
             return;
         }
         Assert.notNull(requestBuilder, "requestBuilder is null");

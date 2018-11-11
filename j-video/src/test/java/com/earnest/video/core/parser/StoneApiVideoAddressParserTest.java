@@ -5,22 +5,24 @@ import com.earnest.crawler.Browser;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.httpclient.HtmlUnitRedirectStrategie;
 import com.gargoylesoftware.htmlunit.webstart.WebStartHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
+import org.apache.http.ProtocolException;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.*;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -31,6 +33,10 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.*;
@@ -49,13 +55,7 @@ public class StoneApiVideoAddressParserTest {
 
     @Test
     public void parse() throws IOException {
-
-
         System.out.println(stoneApiVideoAddressParser.parse("https://www.iqiyi.com/v_19rr5jax4g.html"));
-
-
-
-
     }
 
     /**
@@ -84,8 +84,15 @@ public class StoneApiVideoAddressParserTest {
      */
     @Test
     public void httpClientParse() throws Exception {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(60 * 1000)
+                .setConnectTimeout(60 * 1000)
+                .setConnectionRequestTimeout(60 * 1000)
+                .build();
         // 1.创建连接
         CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .setRedirectStrategy(new HtmlUnitRedirectStrategie())
                 .setConnectionTimeToLive(10, TimeUnit.SECONDS)
                 .build();
 
@@ -94,22 +101,22 @@ public class StoneApiVideoAddressParserTest {
                 .addHeader(Browser.USER_AGENT, Browser.GOOGLE.userAgent())
                 .build();
         //2. 创建cookie存储
-//        CookieStore cookieStore = new BasicCookieStore();
-//
-//        Map<String, String> cookies = new LinkedHashMap<>();
-//        cookies.put("CNZZDATA1259275400", "1958109893-1539138416-%7C1539138416");
-//        cookies.put("Hm_lpvt_4460507abd2c41a601e451bf3aa9bb81", "1539140747");
-//        cookies.put("Hm_lvt_4460507abd2c41a601e451bf3aa9bb81", "1539140658");
-//        cookies.put("PHPSESSID", "vs22a6rcruoc9qr3dkia1o2bb2");
-//        cookies.put("UM_distinctid", "1665beea22e404-0e6fa8b11a6e86-3c7f0257-100200-1665beea22fa8d");
-//        cookies.entrySet()
-//                .stream()
-//                .map(e -> new BasicClientCookie(e.getKey(), e.getValue()))
-//                .forEach(cookieStore::addCookie);
+        CookieStore cookieStore = new BasicCookieStore();
+
+        Map<String, String> cookies = new LinkedHashMap<>();
+        cookies.put("CNZZDATA1259275400", "1958109893-1539138416-%7C1539138416");
+        cookies.put("Hm_lpvt_4460507abd2c41a601e451bf3aa9bb81", "1539140747");
+        cookies.put("Hm_lvt_4460507abd2c41a601e451bf3aa9bb81", "1539140658");
+        cookies.put("PHPSESSID", "vs22a6rcruoc9qr3dkia1o2bb2");
+        cookies.put("UM_distinctid", "1665beea22e404-0e6fa8b11a6e86-3c7f0257-100200-1665beea22fa8d");
+        cookies.entrySet()
+                .stream()
+                .map(e -> new BasicClientCookie(e.getKey(), e.getValue()))
+                .forEach(cookieStore::addCookie);
 
         //3. 创建上下文
         HttpClientContext context = new HttpClientContext();
-//        context.setCookieStore(cookieStore);
+        context.setCookieStore(cookieStore);
 
 
         String execute = httpClient.execute(httpGet, responseHandler, context);
@@ -126,7 +133,7 @@ public class StoneApiVideoAddressParserTest {
         System.out.println("=========response=========");
         System.out.println(execute);
 
-
+        TimeUnit.SECONDS.sleep(3);
         System.out.println("=========the second request============");  //
         RequestBuilder requestBuilder = RequestBuilder.copy(httpGet)
                 .setUri("http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html");
@@ -136,13 +143,32 @@ public class StoneApiVideoAddressParserTest {
 
 
         System.out.println("=========the second response============");
+
         System.out.println(httpClient.execute(requestBuilder.build(), responseHandler, context));
 
 
     }
 
     @Test
-    public void seleniumTest() {
+    public void seleniumTest() throws Exception {
+
+        System.out.println("===============1=================");
+        HttpClient httpClient = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NEVER)
+                .build();
+
+        HttpRequest httpRequest = HttpRequest.newBuilder(URI.create("http://jiexi.071811.cc/jx2.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html"))
+                .header(Browser.USER_AGENT, Browser.GOOGLE.userAgent())
+                .GET().build();
+
+        HttpResponse<String> stringHttpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        stringHttpResponse.request().headers()
+                .map().forEach((a, b) -> System.out.println(a + b));
+        System.out.println(stringHttpResponse.body());
+
+        System.out.println("================2===============");
+
 
     }
 

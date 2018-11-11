@@ -13,7 +13,7 @@ public class Episode  extends VideoEntity {
     private int number;
     //剧集描述
     private String description;
-    //播放时长
+    //播放时长(以秒为单位)
     private int timeLength;
     //vId
     private String vId;
