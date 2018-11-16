@@ -14,6 +14,8 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.Assert;
 
 import javax.script.ScriptEngine;
@@ -25,7 +27,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+@CacheConfig(cacheNames ="stone" )
 public class StoneApiVideoAddressParser implements VideoAddressParser {
 
     private final WebClient webClient;
@@ -66,7 +68,7 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
             public void webWindowContentChanged(WebWindowEvent event) {
                 Page newPage = event.getNewPage();
                 if (newPage != null && StringUtils.contains(newPage.getUrl().toString(), "http://jiexi.071811.cc/stapi.php")) {
-                    requestParamsScriptString.set(((HtmlPage) newPage).getElementsByTagName("script").get(8).getTextContent());
+                    requestParamsScriptString.set(((HtmlPage) newPage).getElementsByTagName("script").get(6).getTextContent());
                 }
             }
         });
@@ -86,6 +88,7 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
     }
 
     //TODO 待优化
+    @Cacheable()
     @Override
     public List<String> parse(String playValue) throws IOException {
 
@@ -171,7 +174,6 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
 
 
             return new UrlEncodedFormEntity(requestParamsBody);
-
 
         } catch (ScriptException e) {
             throw new ValueParseException(e.getMessage(), e);

@@ -3,9 +3,10 @@ spring:
     allow-bean-definition-overriding: true
   profiles:
     active: mongo
-  redis:
-    host: 192.168.10.129
+#  redis:
+#    host: 192.168.10.129
 logging:
   level:
     com.earnest: debug
     org .springframework.data.mongodb.core: debug
+

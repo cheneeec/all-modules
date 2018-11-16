@@ -14,6 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.earnest.video.util.VideoUtils.isPlayTime;
+
 @AllArgsConstructor
 public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
 
@@ -38,10 +40,15 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setImage("http:" + a.select("img").attr("src"));
                 iQiYi.setTitle(a.select("img").attr("title"));
 
-                iQiYi.setPlayInfo(a.select("span.icon-vInfo").text());
+                String playInfo =a.select("span.icon-vInfo").text() ;
+                iQiYi.setPlayInfo(playInfo);
+                iQiYi.setSingle(isPlayTime(playInfo));
+
                 iQiYi.setCategory(VideoEntity.Category.ANIMATION);
                 iQiYi.setAlbumId(a.attr("data-qidanadd-albumid"));
+
                 iQiYi.setVideoInfo(li.select("div.site-piclist_info > div.role_info").text());
+
 
                 return iQiYi;
             }).collect(Collectors.toList());

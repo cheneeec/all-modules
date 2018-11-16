@@ -17,12 +17,15 @@ import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * 所有的单例<code>Bean</code>的配置。都交由<code>Spring</code>容器管理。
@@ -63,19 +66,24 @@ public class SingletonBeanAutoConfiguration {
         return httpProxyProvider;
     }
 
-    //==========================Manager==================
+    //==========================episodeFetcher==================
 
     @Bean
-    public EpisodeFetcher episodeFetcher() throws Exception {
+    public EpisodeFetcher episodeFetcher(List<EpisodeFetcher>  episodeFetchers,@Autowired(required = false) HttpProxyPool httpProxyPool) throws Exception {
         EpisodeFetcherManager episodeFetcherManager = new EpisodeFetcherManager();
-        episodeFetcherManager.setHttpProxyPool(httpProxyPool());
+        episodeFetcherManager.setHttpProxyPool(httpProxyPool);
         //add iQiYi
-        episodeFetcherManager.addWork(new IQiYiEpisodeFetcher(httpClient(), responseHandler()));
+        episodeFetchers.forEach(episodeFetcherManager::addWork);
 
         return episodeFetcherManager;
     }
 
+    @Bean
+    public IQiYiEpisodeFetcher iQiYiEpisodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
+        return new IQiYiEpisodeFetcher(httpClient,stringResponseHandler);
+    }
 
+    //==========================//episodeFetcher==================
     @Bean
     public PlatformSearcherManager platformSearcherManager() throws Exception {
         DefaultPlatformSearcherManager platformSearcherManager = new DefaultPlatformSearcherManager();

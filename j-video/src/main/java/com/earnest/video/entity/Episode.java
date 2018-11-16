@@ -6,7 +6,7 @@ import lombok.Data;
  * 剧集描述
  */
 @Data
-public class Episode  extends VideoEntity {
+public class Episode extends VideoEntity {
     //短的剧集描述
     private String shortDescription;
     //集数
@@ -17,4 +17,9 @@ public class Episode  extends VideoEntity {
     private int timeLength;
     //vId
     private String vId;
+
+    public Episode() {
+        //剧集默认为单一
+        this.single = true;
+    }
 }

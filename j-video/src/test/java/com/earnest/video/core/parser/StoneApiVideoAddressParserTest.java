@@ -9,17 +9,22 @@ import com.gargoylesoftware.htmlunit.httpclient.HtmlUnitRedirectStrategie;
 import com.gargoylesoftware.htmlunit.webstart.WebStartHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.impl.client.*;
+import org.apache.http.impl.conn.DefaultRoutePlanner;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
@@ -94,6 +99,16 @@ public class StoneApiVideoAddressParserTest {
                 .setDefaultRequestConfig(requestConfig)
                 .setRedirectStrategy(new HtmlUnitRedirectStrategie())
                 .setConnectionTimeToLive(10, TimeUnit.SECONDS)
+                .setMaxConnPerRoute(1000000)
+                .setRoutePlanner(new DefaultRoutePlanner(null){
+                    @Override
+                    public HttpRoute determineRoute(HttpHost host, org.apache.http.HttpRequest request, HttpContext context) throws HttpException {
+                        System.out.println(host);
+                        HttpRoute httpRoute = super.determineRoute(host, request, context);
+                        System.out.println(httpRoute);
+                        return httpRoute;
+                    }
+                })
                 .build();
 
         BasicResponseHandler responseHandler = new BasicResponseHandler();
@@ -101,22 +116,9 @@ public class StoneApiVideoAddressParserTest {
                 .addHeader(Browser.USER_AGENT, Browser.GOOGLE.userAgent())
                 .build();
         //2. 创建cookie存储
-        CookieStore cookieStore = new BasicCookieStore();
-
-        Map<String, String> cookies = new LinkedHashMap<>();
-        cookies.put("CNZZDATA1259275400", "1958109893-1539138416-%7C1539138416");
-        cookies.put("Hm_lpvt_4460507abd2c41a601e451bf3aa9bb81", "1539140747");
-        cookies.put("Hm_lvt_4460507abd2c41a601e451bf3aa9bb81", "1539140658");
-        cookies.put("PHPSESSID", "vs22a6rcruoc9qr3dkia1o2bb2");
-        cookies.put("UM_distinctid", "1665beea22e404-0e6fa8b11a6e86-3c7f0257-100200-1665beea22fa8d");
-        cookies.entrySet()
-                .stream()
-                .map(e -> new BasicClientCookie(e.getKey(), e.getValue()))
-                .forEach(cookieStore::addCookie);
 
         //3. 创建上下文
         HttpClientContext context = new HttpClientContext();
-        context.setCookieStore(cookieStore);
 
 
         String execute = httpClient.execute(httpGet, responseHandler, context);
@@ -131,44 +133,65 @@ public class StoneApiVideoAddressParserTest {
                 .map(h -> h.getName() + ":" + h.getValue())
                 .forEach(System.out::println);
         System.out.println("=========response=========");
-        System.out.println(execute);
+
 
         TimeUnit.SECONDS.sleep(3);
         System.out.println("=========the second request============");  //
         RequestBuilder requestBuilder = RequestBuilder.copy(httpGet)
-                .setUri("http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html");
+                .setUri("http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html")
+                .addHeader(Browser.REFERER,"http://jiexi.071811.cc/jx2.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html")
+                .addHeader("Host","jiexi.071811.cc");
+
+
+        Arrays.stream(context.getRequest().getAllHeaders())
+                .map(s->s.getName()+";"+s.getValue())
+                .forEach(System.out::println);
 
         Arrays.stream(context.getResponse().getAllHeaders())
                 .forEach(h -> requestBuilder.addHeader(h.getName(), h.getValue()));
 
 
         System.out.println("=========the second response============");
+        CloseableHttpResponse closeableHttpResponse = httpClient.execute(requestBuilder.build(), context);
 
-        System.out.println(httpClient.execute(requestBuilder.build(), responseHandler, context));
+        System.out.println();
 
 
     }
 
     @Test
     public void seleniumTest() throws Exception {
-
-        System.out.println("===============1=================");
         HttpClient httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NEVER)
                 .build();
 
+        System.out.println("===============1=================");
+
+
         HttpRequest httpRequest = HttpRequest.newBuilder(URI.create("http://jiexi.071811.cc/jx2.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html"))
                 .header(Browser.USER_AGENT, Browser.GOOGLE.userAgent())
+//                .expectContinue(true)
                 .GET().build();
 
         HttpResponse<String> stringHttpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
+        System.out.println("=====================request headers=========================");
         stringHttpResponse.request().headers()
-                .map().forEach((a, b) -> System.out.println(a + b));
-        System.out.println(stringHttpResponse.body());
+                .map()
+                .forEach((a,b)-> System.out.println(a+b));
+        System.out.println("=====================response headers=========================");
+        stringHttpResponse.headers().map()
+                .forEach((a,b)-> System.out.println(a+b));
+
 
         System.out.println("================2===============");
+        HttpRequest httpRequest2 = HttpRequest.newBuilder(URI.create("http://jiexi.071811.cc/stapi.php?url=https://www.iqiyi.com/v_19rr2vbjpo.html"))
+                .header(Browser.USER_AGENT, Browser.GOOGLE.userAgent())
+                .GET().build();
 
+
+        HttpResponse<String> stringHttpResponse1 = httpClient.send(httpRequest2, HttpResponse.BodyHandlers.ofString());
+        System.out.println(stringHttpResponse1.body());
 
     }
 

@@ -13,7 +13,7 @@ public abstract class VideoEntity implements Cloneable, Serializable {
     protected String id;
     //标题
     protected String title;
-
+    //視頻信息
     protected String videoInfo;
     //获取时间
     protected Date collectTime;
@@ -29,9 +29,10 @@ public abstract class VideoEntity implements Cloneable, Serializable {
     private Category category;
     //播放原地址
     protected String playValue;
-    //
+    //解析後的值
     protected String parseValue;
-
+    //單一視頻（true：只有一集）
+    protected Boolean single;
 
     public enum Category {
         MOVIE,  //电影

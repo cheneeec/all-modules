@@ -4,7 +4,9 @@ import com.earnest.crawler.HttpResponseResult;
 import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.entity.IQiYi;
 import com.earnest.video.spider.persistence.VideoPersistence;
+import com.earnest.video.util.VideoUtils;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.earnest.video.util.VideoUtils.isPlayTime;
 
 @AllArgsConstructor
 public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
@@ -42,7 +46,9 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setImage(a.select("img").attr("src"));
                 iQiYi.setCategory(VideoEntity.Category.MOVIE);
                 //body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li:nth-child(1) > div.site-piclist_pic > a >
-                iQiYi.setPlayInfo(a.select("div > div > p > span").text());
+                String playInfo = a.select("div > div > p > span").text();
+                iQiYi.setPlayInfo(playInfo);
+                iQiYi.setSingle(isPlayTime(playInfo));
                 return iQiYi;
             }).collect(Collectors.toList());
         };

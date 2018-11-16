@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.Browser;
 import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
+import com.earnest.video.core.EpisodeExtractException;
 import com.earnest.video.entity.Episode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
@@ -18,9 +19,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,12 +40,12 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
+@CacheConfig(cacheNames = "iqiyi:episode")
 public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements EpisodeFetcher {
 
     private final CloseableHttpClient httpClient;
 
     private final ResponseHandler<String> stringResponseHandler;
-
 
 
     private static final String API_URL = "http://cache.video.iqiyi.com/jp/avlist/${albumId}/${page}/${size}/?albumId=${albumId}&pageNum=${size}&pageNo=${page}";
@@ -56,20 +61,20 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
     }
 
 
+    @Cacheable(key = "#url+'['+#episodePage.getPageNumber()+','+#episodePage.getPageSize()+']'")
     @Override
     public List<Episode> fetch(String url, Pageable episodePage) throws IOException {
 
         episodePage = Optional.ofNullable(episodePage).orElse(DEFAULT_EPISODE_PAGE);
 
-        String[] s = url.split("\\?");
 
-        String requestUrl = RegExUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(s))
+        String requestUrl = RegExUtils.replaceAll(API_URL, "\\$\\{albumId}", getAlbumId(url))
                 .replaceAll("\\$\\{page}", String.valueOf(episodePage.getPageNumber() + 1))
                 .replaceAll("\\$\\{size}", String.valueOf(episodePage.getPageSize()));
 
         log.debug("Get the API request address:{},start sending http request", requestUrl);
 
-        HttpUriRequest httpGet = createHttpRequest(s[0], requestUrl);
+        HttpUriRequest httpGet = createHttpRequest(url, requestUrl);
 
         String entityString = httpClient.execute(httpGet, stringResponseHandler);
 
@@ -81,23 +86,18 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
     }
 
     /**
-     * 当Url中携带了<code>albumId</code>时，则进行解析。否则执行{@link #getAlbumIdByHttp(String)}。
+     * 当请求中携带了<code>albumId</code>时，则进行获取。否则执行{@link #getAlbumIdByHttp(String)}。
      *
-     * @param s 请求跳转的<code>Url</code>和携带的<code>albumId</code>（如果有的话）。
+     * @param url 请求跳转的<code>Url</code>和携带的<code>albumId</code>（如果有的话）。
      * @return <code>AlbumId</code>。
      * @throws IOException 在执行{@link #getAlbumIdByHttp(String)}时抛出。
      */
-    private static String getAlbumId(String[] s) throws IOException {
-        String url = s[0]; //请求的地址
-        if (s.length < 2) {
-            return getAlbumIdByHttp(url);
-        }
-        return URLEncodedUtils.parse(s[1], Charset.defaultCharset())
-                .stream()
-                .filter(nameValuePair -> StringUtils.equalsIgnoreCase("albumId", nameValuePair.getName()))
-                .map(NameValuePair::getValue)
-                .findAny()
+    private static String getAlbumId(String url) throws IOException {
+
+        return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
+                .map(requestAttributes -> ((String) requestAttributes.getAttribute("albumId", RequestAttributes.SCOPE_REQUEST)))
                 .orElse(getAlbumIdByHttp(url));
+
     }
 
     //TODO 这里只是初略的记录特征
@@ -113,7 +113,7 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
      * @param entityString
      * @return
      */
-    private static List<Episode> extractJsonString(String entityString) {
+    private static List<Episode> extractJsonString(String entityString) throws IOException {
         Matcher matcher = episodeExtractPattern.matcher(entityString);
 
         List<Episode> episodes = null;
@@ -125,8 +125,12 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
                         .map(e -> (JSONObject) e)
                         .map(mapToEpisodeEntity()).collect(Collectors.toList());
             }
+        } else {
+            log.error("extract failed for value:{}", entityString);
+            throw new EpisodeExtractException("extract failed for value:" + entityString);
         }
-        return episodes==null? Collections.emptyList():episodes;
+
+        return episodes == null ? Collections.emptyList() : episodes;
     }
 
     private static Function<JSONObject, Episode> mapToEpisodeEntity() {
@@ -195,10 +199,10 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
     }
 
 
-
     @Override
     public void close() {
         HttpClientUtils.closeQuietly(httpClient);
     }
+
 
 }
