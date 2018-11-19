@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -69,8 +70,9 @@ public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implemen
             Elements img = e.select("img");
             //分类
             iQiYi.setCategory(VideoEntity.Category.getCategory(e.attr("data-widget-searchlist-catageory")));
-            //albumid不一定有用
-            iQiYi.setAlbumId(e.attr("data-widget-searchlist-albumid"));
+            //
+            iQiYi.setProperties(Map.of("albumId",e.attr("data-widget-searchlist-albumid")) );
+
             iQiYi.setImage(img.attr("abs:src"));
             iQiYi.setTitle(img.attr("title"));
             //id没用

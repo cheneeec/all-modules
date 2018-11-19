@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @NoArgsConstructor
+@CacheConfig(cacheNames = "search")
 public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
 
     private final Map<Platform, PlatformSearcher<? extends VideoEntity>> platformSearcherMap = new LinkedHashMap<>(5);
@@ -54,6 +57,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
      * @throws IOException
      */
     @Override
+    @Cacheable(key = "#keyword+'['+#pageRequest.getPageNumber()+','+#pageRequest.getPageSize()+']'")
     public Page<VideoEntity> search(String keyword, Pageable pageRequest) {
 
 
@@ -105,6 +109,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
 
     @Override
     @SuppressWarnings("unchecked")
+    @Cacheable(key = "#keyword+'['+#pageRequest.getPageNumber()+','+#pageRequest.getPageSize()+']:'+#platform")
     public Page<VideoEntity> search(String keyword, Pageable pageRequest, Platform platform) throws IOException {
 
         if (platform == null) {

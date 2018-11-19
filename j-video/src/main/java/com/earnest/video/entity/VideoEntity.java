@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Data
 public abstract class VideoEntity implements Cloneable, Serializable {
@@ -33,6 +35,8 @@ public abstract class VideoEntity implements Cloneable, Serializable {
     protected String parseValue;
     //單一視頻（true：只有一集）
     protected Boolean single;
+    //视频的属性
+    protected Map<String, Object> properties;
 
     public enum Category {
         MOVIE,  //电影

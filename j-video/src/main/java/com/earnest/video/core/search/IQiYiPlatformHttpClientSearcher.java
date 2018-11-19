@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
 
         String uri = httpUriRequest.getRequestLine().getUri();
 
-        log.debug("Start performing 0search request,keyword:{},url:{}", keyword, uri);
+        log.debug("Start performing search request,keyword:{},url:{}", keyword, uri);
 
         String result = httpClient.execute(httpUriRequest, responseHandler);
 
@@ -108,9 +109,10 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
             IQiYi iQiYi = new IQiYi();
             JSONObject albumDocInfo = jsonObject.getJSONObject("albumDocInfo");
             iQiYi.setTitle(albumDocInfo.getString("albumTitle"));
-            iQiYi.setAlbumId(albumDocInfo.getString("albumId"));
+            iQiYi.setProperties(Map.of("albumId",albumDocInfo.getString("albumId")));
             iQiYi.setPlayValue(albumDocInfo.getString("albumLink"));
             iQiYi.setImage(albumDocInfo.getString("albumVImage"));
+            iQiYi.setSingle(albumDocInfo.getJSONArray("videoinfos").size()<2);
             iQiYi.setCategory(VideoEntity.Category.getCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]));
             //播放信息
             iQiYi.setPlayInfo(parsePlayInfo(albumDocInfo));

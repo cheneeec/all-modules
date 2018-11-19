@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setSingle(isPlayTime(playInfo));
 
                 iQiYi.setCategory(VideoEntity.Category.ANIMATION);
-                iQiYi.setAlbumId(a.attr("data-qidanadd-albumid"));
+                iQiYi.setProperties(Map.of("albumId",a.attr("data-qidanadd-albumid")));
 
                 iQiYi.setVideoInfo(li.select("div.site-piclist_info > div.role_info").text());
 

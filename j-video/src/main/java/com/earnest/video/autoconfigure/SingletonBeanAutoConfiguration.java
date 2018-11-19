@@ -8,6 +8,7 @@ import com.earnest.video.core.search.DefaultPlatformSearcherManager;
 import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
 import com.earnest.video.core.episode.EpisodeFetcher;
 import com.earnest.video.core.episode.EpisodeFetcherManager;
+import com.earnest.video.core.search.IQiYiPlatformSearcher;
 import com.earnest.video.core.search.PlatformSearcherManager;
 import com.earnest.video.core.parser.StoneApiVideoAddressParser;
 import com.earnest.video.core.parser.VideoAddressParser;
