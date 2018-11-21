@@ -1,8 +1,8 @@
 package com.earnest.video.spider;
 
 import com.earnest.crawler.HttpResponseResult;
-import com.earnest.video.entity.VideoEntity;
-import com.earnest.video.entity.IQiYi;
+import com.earnest.video.entity.Platform;
+import com.earnest.video.entity.Video;
 import com.earnest.video.spider.persistence.VideoPersistence;
 import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
@@ -28,12 +28,15 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
 
 
     @Override
-    protected Function<HttpResponseResult<Document>, List<VideoEntity>> pipe() {
+    protected Function<HttpResponseResult<Document>, List<Video>> pipe() {
         return httpResponse -> {
             Element element = httpResponse.getContent().body();
             Elements elements = element.select("body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li");
             return elements.stream().map(li -> {
-                IQiYi iQiYi = new IQiYi();
+
+                Video iQiYi = new Video();
+                iQiYi.setPlatform(Platform.IQIYI);
+
                 iQiYi.setFromUrl(httpResponse.getHttpRequest().getRequestLine().getUri());
 
                 Elements a = li.select("div.site-piclist_pic > a");
@@ -41,12 +44,12 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
                 iQiYi.setImage("http:" + a.select("img").attr("src"));
                 iQiYi.setTitle(a.select("img").attr("title"));
 
-                String playInfo =a.select("span.icon-vInfo").text() ;
+                String playInfo = a.select("span.icon-vInfo").text();
                 iQiYi.setPlayInfo(playInfo);
                 iQiYi.setSingle(isPlayTime(playInfo));
 
-                iQiYi.setCategory(VideoEntity.Category.ANIMATION);
-                iQiYi.setProperties(Map.of("albumId",a.attr("data-qidanadd-albumid")));
+                iQiYi.setCategory(Video.Category.ANIMATION);
+                iQiYi.setProperties(Map.of("albumId", a.attr("data-qidanadd-albumid")));
 
                 iQiYi.setVideoInfo(li.select("div.site-piclist_info > div.role_info").text());
 
@@ -58,7 +61,7 @@ public class IQiYiAnimationSpider extends AbstractBaseVideoEntitySpider {
     }
 
     @Override
-    protected Consumer<List<? extends VideoEntity>> consumer() {
+    protected Consumer<List<? extends Video>> consumer() {
         return iQiYiAnimationCachedVideoService::save;
     }
 

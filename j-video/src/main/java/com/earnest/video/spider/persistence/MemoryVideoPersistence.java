@@ -1,6 +1,6 @@
 package com.earnest.video.spider.persistence;
 
-import com.earnest.video.entity.VideoEntity;
+import com.earnest.video.entity.Video;
 import lombok.Getter;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -11,16 +11,16 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-public class MemoryVideoPersistence<T extends VideoEntity> implements VideoPersistence<T> {
+public class MemoryVideoPersistence implements VideoPersistence {
 
     @Getter
-    private final Map<String, T> videoMap;
+    private final Map<String, Video> videoMap;
     @Getter
-    private final Map<VideoEntity.Category, List<T>> categoryTMap;
+    private final Map<Video.Category, List<Video>> categoryTMap;
 
     private final AtomicLong idLong = new AtomicLong(1000);
 
-    public MemoryVideoPersistence(Map<String, T> videoMap) {
+    public MemoryVideoPersistence(Map<String, Video> videoMap) {
         Assert.notNull(videoMap, "the videoMap is required");
         this.videoMap = videoMap;
         this.categoryTMap = new ConcurrentHashMap<>();
@@ -32,11 +32,10 @@ public class MemoryVideoPersistence<T extends VideoEntity> implements VideoPersi
 
 
     @Override
-    public void save(List<T> entities) {
-
+    public void save(List<? extends Video> entities) {
         if (!CollectionUtils.isEmpty(entities)) {
             //将结果按照id添加
-            Map<VideoEntity.Category, List<T>> videosByCategory = entities.stream()
+            Map<Video.Category, List<Video>> videosByCategory = entities.stream()
                     .filter(Objects::nonNull)
                     .peek(e -> {//当没有ID时为其设置ID
                         if (e.getId() == null) {
@@ -44,7 +43,7 @@ public class MemoryVideoPersistence<T extends VideoEntity> implements VideoPersi
                         }
                     })
                     .peek(e -> videoMap.put(e.getId(), e))
-                    .collect(Collectors.groupingBy(VideoEntity::getCategory));
+                    .collect(Collectors.groupingBy(Video::getCategory));
 
             //将结果进行分类添加
             videosByCategory.keySet()

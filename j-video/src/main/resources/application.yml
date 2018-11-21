@@ -10,3 +10,5 @@ logging:
     com.earnest: debug
     org .springframework.data.mongodb.core: debug
 
+spider:
+  enable: false

@@ -4,8 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.Browser;
 import com.earnest.crawler.proxy.HttpProxyPool;
 import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
-import com.earnest.video.entity.VideoEntity;
-import com.earnest.video.entity.IQiYi;
+import com.earnest.video.entity.Video;
 import com.earnest.video.entity.Platform;
 import com.earnest.video.exception.UnknownException;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport implements PlatformSearcher<IQiYi> {
+public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport implements PlatformSearcher<Video> {
 
     private final HttpClient httpClient;
 
@@ -61,7 +60,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
     }
 
     @Override
-    public Page<IQiYi> search(String keyword, Pageable pageRequest) throws IOException {
+    public Page<Video> search(String keyword, Pageable pageRequest) throws IOException {
         Assert.hasText(keyword, "keyword is empty or null");
 
 
@@ -89,7 +88,7 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
 
         JSONObject dataJsonObject = resultJsonObject.getJSONObject("data");
 
-        List<IQiYi> resultCollections = dataJsonObject.getJSONArray("docinfos")
+        List<Video> resultCollections = dataJsonObject.getJSONArray("docinfos")
                 .stream()
                 .map(e -> (JSONObject) e)
                 .map(mapToIQiYiEntity()).collect(Collectors.toList());
@@ -104,19 +103,21 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
         return Platform.IQIYI;
     }
 
-    private static Function<JSONObject, IQiYi> mapToIQiYiEntity() {
+    private static Function<JSONObject, Video> mapToIQiYiEntity() {
         return jsonObject -> {
-            IQiYi iQiYi = new IQiYi();
+            Video iQiYi = new Video();
+
+            iQiYi.setPlatform(Platform.IQIYI);
             JSONObject albumDocInfo = jsonObject.getJSONObject("albumDocInfo");
             iQiYi.setTitle(albumDocInfo.getString("albumTitle"));
-            iQiYi.setProperties(Map.of("albumId",albumDocInfo.getString("albumId")));
+            iQiYi.setProperties(Map.of("albumId", albumDocInfo.getString("albumId")));
             iQiYi.setPlayValue(albumDocInfo.getString("albumLink"));
             iQiYi.setImage(albumDocInfo.getString("albumVImage"));
-            iQiYi.setSingle(albumDocInfo.getJSONArray("videoinfos").size()<2);
-            iQiYi.setCategory(VideoEntity.Category.getCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]));
+            iQiYi.setSingle(albumDocInfo.getJSONArray("videoinfos").size() < 2);
+            iQiYi.setCategory(Video.Category.getCategory(StringUtils.split(albumDocInfo.getString("channel"), ",")[0]));
             //播放信息
             iQiYi.setPlayInfo(parsePlayInfo(albumDocInfo));
-            iQiYi.setId(RandomUtils.nextLong()+"");
+            iQiYi.setId(RandomUtils.nextLong() + "");
             return iQiYi;
 
         };

@@ -1,12 +1,12 @@
 package com.earnest.video.spider.persistence;
 
-import com.earnest.video.entity.VideoEntity;
+import com.earnest.video.entity.Video;
 
 import java.util.List;
 
-public interface VideoPersistence<T extends VideoEntity> {
+public interface VideoPersistence {
 
-    void save(List<T> entities);
+    void save(List<? extends Video> entities);
 
     long count();
 }

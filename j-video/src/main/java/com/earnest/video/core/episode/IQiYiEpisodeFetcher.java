@@ -32,6 +32,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -140,9 +141,13 @@ public class IQiYiEpisodeFetcher extends HttpProxyPoolSettingSupport implements 
             episode.setTitle(e.getString("shortTitle"));
             episode.setTimeLength(e.getIntValue("timeLength"));
             episode.setPlayValue(e.getString("vurl"));
-            episode.setVId(e.getString("vid"));
+
+            episode.setProperties(Map.of("vId",e.getString("vid")));
+
             episode.setShortDescription(e.getString("vt"));
+
             episode.setId(e.getString("id"));
+
             episode.setNumber(e.getIntValue("pd"));
             episode.setImage(e.getString("vpic"));
             return episode;

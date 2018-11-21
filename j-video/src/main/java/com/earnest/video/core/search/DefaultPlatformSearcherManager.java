@@ -3,7 +3,7 @@ package com.earnest.video.core.search;
 import com.alibaba.fastjson.util.IOUtils;
 import com.earnest.crawler.proxy.HttpProxyPool;
 import com.earnest.video.entity.Platform;
-import com.earnest.video.entity.VideoEntity;
+import com.earnest.video.entity.Video;
 import com.earnest.video.exception.UnsupportedPlatformException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 @CacheConfig(cacheNames = "search")
 public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
 
-    private final Map<Platform, PlatformSearcher<? extends VideoEntity>> platformSearcherMap = new LinkedHashMap<>(5);
+    private final Map<Platform, PlatformSearcher<? extends Video>> platformSearcherMap = new LinkedHashMap<>(5);
 
     @Getter
-    private CompletionService<Page<? extends VideoEntity>> completionService;
+    private CompletionService<Page<? extends Video>> completionService;
 
     @Getter
     @Setter
@@ -58,12 +58,12 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
      */
     @Override
     @Cacheable(key = "#keyword+'['+#pageRequest.getPageNumber()+','+#pageRequest.getPageSize()+']'")
-    public Page<VideoEntity> search(String keyword, Pageable pageRequest) {
+    public Page<Video> search(String keyword, Pageable pageRequest) {
 
 
-        List<? extends Page<? extends VideoEntity>> results = platformSearcherMap.values()
+        List<? extends Page<? extends Video>> results = platformSearcherMap.values()
                 .stream()
-                .map(search -> (Callable<Page<? extends VideoEntity>>) () -> search.search(keyword, pageRequest))
+                .map(search -> (Callable<Page<? extends Video>>) () -> search.search(keyword, pageRequest))
                 .map(completionService::submit) //执行
                 .parallel()
                 .map(futureGetIgnoreError())//取结果
@@ -73,10 +73,10 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
         //收集
         long totalElements = 0L;
 
-        List<VideoEntity> content = new ArrayList<>(pageRequest.getPageSize() * results.size());
+        List<Video> content = new ArrayList<>(pageRequest.getPageSize() * results.size());
 
 
-        for (Page<? extends VideoEntity> baseVideoEntities : results) {
+        for (Page<? extends Video> baseVideoEntities : results) {
             totalElements += baseVideoEntities.getTotalElements();
             content.addAll(baseVideoEntities.getContent());
         }
@@ -91,7 +91,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
         return null;
     }
 
-    private Function<Future<Page<? extends VideoEntity>>, ? extends Page<? extends VideoEntity>> futureGetIgnoreError() {
+    private Function<Future<Page<? extends Video>>, ? extends Page<? extends Video>> futureGetIgnoreError() {
         return future -> {
             try {
                 return future.get(ignoreSecondTimeOut, TimeUnit.SECONDS);
@@ -110,16 +110,16 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
     @Override
     @SuppressWarnings("unchecked")
     @Cacheable(key = "#keyword+'['+#pageRequest.getPageNumber()+','+#pageRequest.getPageSize()+']:'+#platform")
-    public Page<VideoEntity> search(String keyword, Pageable pageRequest, Platform platform) throws IOException {
+    public Page<Video> search(String keyword, Pageable pageRequest, Platform platform) throws IOException {
 
         if (platform == null) {
             return search(keyword, pageRequest);
         }
 
-        PlatformSearcher<? extends VideoEntity> platformSearcher = platformSearcherMap.get(platform);
+        PlatformSearcher<? extends Video> platformSearcher = platformSearcherMap.get(platform);
 
         if (platformSearcher != null) {
-            return (Page<VideoEntity>) platformSearcher.search(keyword, pageRequest);
+            return (Page<Video>) platformSearcher.search(keyword, pageRequest);
         }
 
         throw new UnsupportedPlatformException(platform + " Platform does not support or is not specified");
@@ -146,7 +146,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
 
 
     @Override
-    public void addWork(PlatformSearcher<? extends VideoEntity> platformSearcher) {
+    public void addWork(PlatformSearcher<? extends Video> platformSearcher) {
         Assert.notNull(platformSearcher, "platformSearcher is null");
         platformSearcherMap.put(platformSearcher.getPlatform(), platformSearcher);
     }

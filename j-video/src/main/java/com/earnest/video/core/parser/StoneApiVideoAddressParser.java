@@ -109,7 +109,6 @@ public class StoneApiVideoAddressParser implements VideoAddressParser {
 
         HttpUriRequest httpUriRequest = createHttpUriRequest(webResponse, buildRequestParams(aaMatcher, paramsMatcher, scriptEngine));
 
-
         String result = httpClient.execute(httpUriRequest, responseHandler);
 
         if (StringUtils.isBlank(result)) {

@@ -1,12 +1,10 @@
 package com.earnest.video.spider;
 
 import com.earnest.crawler.HttpResponseResult;
-import com.earnest.video.entity.VideoEntity;
-import com.earnest.video.entity.IQiYi;
+import com.earnest.video.entity.Platform;
+import com.earnest.video.entity.Video;
 import com.earnest.video.spider.persistence.VideoPersistence;
-import com.earnest.video.util.VideoUtils;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -30,32 +28,35 @@ public class IQiYiMovieSpider extends AbstractBaseVideoEntitySpider {
 
 
     @Override
-    protected Function<HttpResponseResult<Document>, List<VideoEntity>> pipe() {
+    protected Function<HttpResponseResult<Document>, List<Video>> pipe() {
 
         return httpResponse -> {
             Element element = httpResponse.getContent().body();
             Elements elements = element.select("body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li");
 
             return elements.stream().map(e -> {
-                IQiYi iQiYi = new IQiYi();
+                Video iQiYi = new Video();
+
+                iQiYi.setPlatform(Platform.IQIYI);
                 iQiYi.setFromUrl(httpResponse.getHttpRequest().getRequestLine().getUri());
 
                 Elements a = e.select("div.site-piclist_pic > a");
                 iQiYi.setPlayValue(a.attr("href"));
                 iQiYi.setTitle(a.attr("title"));
                 iQiYi.setImage(a.select("img").attr("src"));
-                iQiYi.setCategory(VideoEntity.Category.MOVIE);
+                iQiYi.setCategory(Video.Category.MOVIE);
                 //body > div.page-list.page-list-type1 > div > div > div.wrapper-cols > div > ul > li:nth-child(1) > div.site-piclist_pic > a >
                 String playInfo = a.select("div > div > p > span").text();
                 iQiYi.setPlayInfo(playInfo);
                 iQiYi.setSingle(isPlayTime(playInfo));
+
                 return iQiYi;
             }).collect(Collectors.toList());
         };
     }
 
     @Override
-    protected Consumer<List<? extends VideoEntity>> consumer() {
+    protected Consumer<List<? extends Video>> consumer() {
         return iQiYiMovieCachedVideoService::save;
     }
 

@@ -2,8 +2,7 @@ package com.earnest.video.core.search;
 
 import com.earnest.crawler.Browser;
 import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
-import com.earnest.video.entity.VideoEntity;
-import com.earnest.video.entity.IQiYi;
+import com.earnest.video.entity.Video;
 import com.earnest.video.entity.Platform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -29,13 +28,13 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Deprecated
-public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implements PlatformSearcher<IQiYi> {
+public class IQiYiPlatformSearcher extends HttpProxyPoolSettingSupport implements PlatformSearcher<Video> {
 
     private static final String URL_STRING = "http://so.iqiyi.com/so/q_%s";
 
 
     @Override
-    public Page<IQiYi> search(String keyword, Pageable pageRequest) throws IOException {
+    public Page<Video> search(String keyword, Pageable pageRequest) throws IOException {
         Assert.hasText(keyword, "keyword is empty or null");
 
         String url = String.format(URL_STRING, UriUtils.encode(keyword, Charset.defaultCharset().displayName()));
@@ -63,20 +62,21 @@ public class IQiYiPlatformSearcher  extends HttpProxyPoolSettingSupport implemen
     }
 
 
-    private static Function<Element, IQiYi> mapToIQiYiEntity() {
+    private static Function<Element, Video> mapToIQiYiEntity() {
         Date now = Calendar.getInstance().getTime();
         return e -> {
-            IQiYi iQiYi = new IQiYi();
+            Video iQiYi = new Video();
+            iQiYi.setPlatform(Platform.IQIYI);
             Elements img = e.select("img");
             //分类
-            iQiYi.setCategory(VideoEntity.Category.getCategory(e.attr("data-widget-searchlist-catageory")));
+            iQiYi.setCategory(Video.Category.getCategory(e.attr("data-widget-searchlist-catageory")));
             //
-            iQiYi.setProperties(Map.of("albumId",e.attr("data-widget-searchlist-albumid")) );
+            iQiYi.setProperties(Map.of("albumId", e.attr("data-widget-searchlist-albumid")));
 
             iQiYi.setImage(img.attr("abs:src"));
             iQiYi.setTitle(img.attr("title"));
             //id没用
-            iQiYi.setId(RandomUtils.nextLong()+"");
+            iQiYi.setId(RandomUtils.nextLong() + "");
             iQiYi.setCollectTime(now);
             //播放信息
             iQiYi.setPlayInfo(e.select("span.icon-vInfo").text());

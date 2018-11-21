@@ -1,7 +1,6 @@
 package com.earnest.video.service;
 
 import com.earnest.video.entity.Video;
-import com.earnest.video.entity.VideoEntity;
 import com.earnest.video.spider.persistence.MemoryVideoPersistence;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,15 +17,15 @@ import java.util.stream.Collectors;
 public class MemoryVideoService implements VideoService {
 
     private final Map<String, Video> videoMap;
-    private final Map<VideoEntity.Category, List<Video>> categoryTMap;
+    private final Map<Video.Category, List<Video>> categoryTMap;
 
-    public MemoryVideoService(MemoryVideoPersistence<Video> memoryVideoPersistence) {
+    public MemoryVideoService(MemoryVideoPersistence memoryVideoPersistence) {
         this.videoMap = memoryVideoPersistence.getVideoMap();
         this.categoryTMap = memoryVideoPersistence.getCategoryTMap();
     }
 
     @Override
-    public Page<Video> findByCategory(Pageable pageRequest, VideoEntity.Category category) {
+    public Page<Video> findByCategory(Pageable pageRequest, Video.Category category) {
         Assert.notNull(pageRequest, "pageRequest is required");
         List<Video> content = categoryTMap.get(category);
 
