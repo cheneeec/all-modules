@@ -7,6 +7,7 @@ import com.earnest.crawler.extractor.HttpRequestExtractor;
 import com.earnest.crawler.extractor.RegexHttpRequestExtractor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.RequestLine;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -97,7 +98,7 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer {
 
             IntStream.range(ranges[0], ranges[1] + 1)
                     .mapToObj(page ->
-                            new String[]{StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(page)), String.valueOf(page)}
+                            new String[]{RegExUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(page)), String.valueOf(page)}
                     )
                     .filter(uriArray ->
                             httpUriRequests.stream().map(HttpUriRequest::getRequestLine)
@@ -109,7 +110,7 @@ public class HttpUriRequestExtractorConfigurer extends SharedSpiderConfigurer {
                                 RequestBuilder requestBuilder = httpUriRequestOptional.map(RequestBuilder::copy).orElseGet(RequestBuilder::get);
                                 requestBuilder.setUri(u[0]);
                                 if (Integer.valueOf(u[1]) != ranges[0]) {
-                                    requestBuilder.setHeader(Browser.REFERER, StringUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(Integer.valueOf(u[1]) - 1)));
+                                    requestBuilder.setHeader(Browser.REFERER, RegExUtils.replacePattern(uriTemplate, pattern.pattern(), String.valueOf(Integer.valueOf(u[1]) - 1)));
                                 }
                                 return requestBuilder.build();
                             }

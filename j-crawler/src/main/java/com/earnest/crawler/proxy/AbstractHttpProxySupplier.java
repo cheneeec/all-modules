@@ -6,20 +6,18 @@ import org.apache.commons.lang3.RandomUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 提供一个代理连接的供给。
  */
 @Slf4j
-public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
+public abstract class AbstractHttpProxySupplier implements HttpProxySupplier {
 
-    private final ConcurrentHashMap<Integer, HttpProxy> httpProxiesMap = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Integer, HttpProxy> httpProxiesMap = new ConcurrentHashMap<>();
 
     protected final AtomicInteger size = new AtomicInteger();
 
-    private final AtomicBoolean invokedInitializeHttpProxyPoolMethod = new AtomicBoolean();
 
 
     /**
@@ -34,8 +32,7 @@ public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
 
     protected int putHttpProxies(List<HttpProxy> httpProxies) {
         int start = size.get();
-        httpProxies
-                .forEach(httpProxy -> httpProxiesMap.put(size.getAndIncrement(), httpProxy));
+        httpProxies.forEach(httpProxy -> httpProxiesMap.put(size.getAndIncrement(), httpProxy));
         int end = size.get();
         return end - start;
     }
@@ -45,18 +42,8 @@ public abstract class AbstractHttpProxyProvider implements HttpProxyPool {
     }
 
 
-    @Override
-    public int getSize() {
-        return httpProxiesMap.size();
-    }
 
-    @Override
-    public void initializeHttpProxyPool()  throws  Exception{
-        if (!invokedInitializeHttpProxyPoolMethod.get()) {
-            doInitializeHttpProxyPool();
-            invokedInitializeHttpProxyPoolMethod.set(true);
-        }
-    }
+
 
     protected abstract void doInitializeHttpProxyPool() throws  Exception;
 

@@ -1,4 +1,4 @@
-package com.earnest.video.core;
+package com.earnest.video.core.exception;
 
 import java.io.IOException;
 

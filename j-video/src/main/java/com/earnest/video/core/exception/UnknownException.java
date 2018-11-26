@@ -1,4 +1,4 @@
-package com.earnest.video.exception;
+package com.earnest.video.core.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,6 +17,10 @@ public class UnknownException extends RuntimeException {
 
     public UnknownException(Throwable cause) {
         this(cause.getMessage());
+    }
+
+    public UnknownException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     protected UnknownException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {

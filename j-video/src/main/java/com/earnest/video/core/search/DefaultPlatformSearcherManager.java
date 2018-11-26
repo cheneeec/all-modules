@@ -1,10 +1,11 @@
 package com.earnest.video.core.search;
 
 import com.alibaba.fastjson.util.IOUtils;
-import com.earnest.crawler.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.HttpProxySupplier;
 import com.earnest.video.entity.Platform;
 import com.earnest.video.entity.Video;
-import com.earnest.video.exception.UnsupportedPlatformException;
+import com.earnest.video.core.exception.UnknownException;
+import com.earnest.video.core.exception.UnsupportedPlatformException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,7 +35,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
 
     @Getter
     @Setter
-    private Integer ignoreSecondTimeOut = 5; //忽略多少秒后的结果
+    private Integer ignoreSecondTimeOut = 10; //忽略多少秒后的结果
 
 
     public DefaultPlatformSearcherManager(Integer ignoreSecondTimeOut, Executor executor) {
@@ -66,7 +67,7 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
                 .map(search -> (Callable<Page<? extends Video>>) () -> search.search(keyword, pageRequest))
                 .map(completionService::submit) //执行
                 .parallel()
-                .map(futureGetIgnoreError())//取结果
+                .map(getResult())//取结果
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
@@ -91,17 +92,17 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
         return null;
     }
 
-    private Function<Future<Page<? extends Video>>, ? extends Page<? extends Video>> futureGetIgnoreError() {
+    private Function<Future<Page<? extends Video>>, ? extends Page<? extends Video>> getResult() {
         return future -> {
             try {
                 return future.get(ignoreSecondTimeOut, TimeUnit.SECONDS);
             } catch (Exception e) { //发生错误时忽略
-                e.printStackTrace();
                 if (log.isDebugEnabled() && e instanceof TimeoutException) {
                     log.debug("A task timed out has been ignored,error:{}", e.getMessage());
                 }
                 future.cancel(true);
-                return null;
+                System.err.println(e.getMessage());
+                throw new UnknownException(e.getMessage(),e);
             }
         };
     }
@@ -140,8 +141,8 @@ public class DefaultPlatformSearcherManager implements PlatformSearcherManager {
     }
 
     @Override
-    public void setHttpProxyPool(HttpProxyPool httpProxyPool) {
-        platformSearcherMap.values().forEach(s -> s.setHttpProxyPool(httpProxyPool));
+    public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
+        platformSearcherMap.values().forEach(s -> s.setHttpProxySupplier(httpProxySupplier));
     }
 
 

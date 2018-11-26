@@ -22,4 +22,6 @@ public class Episode extends Video {
         //剧集默认为单一
         this.single = true;
     }
+
+
 }

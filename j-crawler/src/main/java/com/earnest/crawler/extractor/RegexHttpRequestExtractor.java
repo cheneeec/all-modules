@@ -3,6 +3,7 @@ package com.earnest.crawler.extractor;
 import com.earnest.crawler.HttpResponseResult;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.jsoup.helper.StringUtil;
@@ -34,7 +35,7 @@ public class RegexHttpRequestExtractor extends AbstractHttpRequestExtractor {
         HttpUriRequest httpRequest = responseResult.getHttpRequest();
         Set<String> newUrls = new HashSet<>();
 
-        String baseUri = StringUtils.replaceFirst(httpRequest.getURI().toString(), "/*", "");
+        String baseUri = RegExUtils.replaceFirst(httpRequest.getURI().toString(), "/*", "");
 
         while (matcher.find()) {
             String subUrl = matcher.group();

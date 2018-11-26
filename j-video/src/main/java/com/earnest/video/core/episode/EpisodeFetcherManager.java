@@ -1,11 +1,13 @@
 package com.earnest.video.core.episode;
 
-import com.earnest.crawler.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.HttpProxySupplier;
 import com.earnest.video.core.Manager;
 import com.earnest.video.entity.Episode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.Assert;
 
@@ -15,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
+@CacheConfig(cacheNames = "pisode")
 public class EpisodeFetcherManager implements EpisodeFetcher, Manager<EpisodeFetcher> {
 
     private final List<EpisodeFetcher> episodeFetchers = new ArrayList<>(5);
@@ -22,6 +25,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher, Manager<EpisodeFet
 
     @Override
     @SuppressWarnings("unchecked")
+    @Cacheable(key = "#url+'['+#episodePage.getPageNumber()+','+#episodePage.getPageSize()+']'")
     public List<Episode> fetch(String url, Pageable episodePage) throws IOException {
 
         EpisodeFetcher fetcher = episodeFetchers.stream()
@@ -51,8 +55,8 @@ public class EpisodeFetcherManager implements EpisodeFetcher, Manager<EpisodeFet
     }
 
     @Override
-    public void setHttpProxyPool(HttpProxyPool httpProxyPool) {
-        episodeFetchers.forEach(s -> s.setHttpProxyPool(httpProxyPool));
+    public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
+        episodeFetchers.forEach(s -> s.setHttpProxySupplier(httpProxySupplier));
     }
 
 
@@ -78,7 +82,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher, Manager<EpisodeFet
         }
 
         @Override
-        public void setHttpProxyPool(HttpProxyPool httpProxyPool) {
+        public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
 
         }
 

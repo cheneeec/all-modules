@@ -2,11 +2,11 @@ package com.earnest.video.core.search;
 
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.Browser;
-import com.earnest.crawler.proxy.HttpProxyPool;
+import com.earnest.crawler.proxy.HttpProxySupplier;
 import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.Video;
 import com.earnest.video.entity.Platform;
-import com.earnest.video.exception.UnknownException;
+import com.earnest.video.core.exception.UnknownException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,12 +51,12 @@ public class IQiYiPlatformHttpClientSearcher extends HttpProxyPoolSettingSupport
         this(httpClient, responseHandler, null);
     }
 
-    public IQiYiPlatformHttpClientSearcher(HttpClient httpClient, ResponseHandler<String> responseHandler, HttpProxyPool httpProxyPool) {
+    public IQiYiPlatformHttpClientSearcher(HttpClient httpClient, ResponseHandler<String> responseHandler, HttpProxySupplier httpProxySupplier) {
         Assert.notNull(httpClient, "httpClient is null");
         Assert.notNull(responseHandler, "responseHandler is null");
         this.httpClient = httpClient;
         this.responseHandler = responseHandler;
-        setHttpProxyPool(httpProxyPool);
+        setHttpProxySupplier(httpProxySupplier);
     }
 
     @Override

@@ -1,18 +1,18 @@
 package com.earnest.video.autoconfigure;
 
 import com.earnest.crawler.Browser;
-import com.earnest.crawler.proxy.HttpProxyPool;
-import com.earnest.crawler.proxy.FixedHttpProxyProvider;
+import com.earnest.crawler.proxy.HttpProxySupplier;
+import com.earnest.crawler.proxy.DefaultApiHttpProxySupplier;
 import com.earnest.video.core.episode.IQiYiEpisodeFetcher;
 import com.earnest.video.core.search.DefaultPlatformSearcherManager;
 import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
 import com.earnest.video.core.episode.EpisodeFetcher;
 import com.earnest.video.core.episode.EpisodeFetcherManager;
-import com.earnest.video.core.search.IQiYiPlatformSearcher;
 import com.earnest.video.core.search.PlatformSearcherManager;
 import com.earnest.video.core.parser.StoneApiVideoAddressParser;
 import com.earnest.video.core.parser.VideoAddressParser;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.impl.client.AbstractResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -21,7 +21,6 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class SingletonBeanAutoConfiguration {
 
     @Bean
     public ResponseHandler<String> responseHandler() {
-        return new AbstractResponseHandler<String>() {
+        return new AbstractResponseHandler<>() {
             @Override
             public String handleEntity(HttpEntity entity) throws IOException {
                 return EntityUtils.toString(entity, Charset.defaultCharset());
@@ -58,40 +57,35 @@ public class SingletonBeanAutoConfiguration {
     }
 
     /**
-     * @return {@link HttpProxyPool}
+     * @return {@link HttpProxySupplier}
      */
     @Bean
-    public HttpProxyPool httpProxyPool() throws Exception {
-        FixedHttpProxyProvider httpProxyProvider = new FixedHttpProxyProvider();
-        httpProxyProvider.initializeHttpProxyPool();
-        return httpProxyProvider;
+    public HttpProxySupplier httpProxySupplier(HttpClient httpClient, ResponseHandler<String> responseHandler) {
+
+        return new DefaultApiHttpProxySupplier("http://192.168.10.131:5010", httpClient, responseHandler);
     }
 
     //==========================episodeFetcher==================
 
     @Bean
-    public EpisodeFetcher episodeFetcher(List<EpisodeFetcher>  episodeFetchers,@Autowired(required = false) HttpProxyPool httpProxyPool) throws Exception {
+    public EpisodeFetcher episodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler,@Autowired(required = false) HttpProxySupplier httpProxySupplier) throws Exception {
         EpisodeFetcherManager episodeFetcherManager = new EpisodeFetcherManager();
-        episodeFetcherManager.setHttpProxyPool(httpProxyPool);
+        episodeFetcherManager.setHttpProxySupplier(httpProxySupplier);
         //add iQiYi
-        episodeFetchers.forEach(episodeFetcherManager::addWork);
+        episodeFetcherManager.addWork(new IQiYiEpisodeFetcher(httpClient, stringResponseHandler));
+
 
         return episodeFetcherManager;
     }
 
-    @Bean
-    public IQiYiEpisodeFetcher iQiYiEpisodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler) {
-        return new IQiYiEpisodeFetcher(httpClient,stringResponseHandler);
-    }
 
     //==========================//episodeFetcher==================
     @Bean
-    public PlatformSearcherManager platformSearcherManager() throws Exception {
+    public PlatformSearcherManager platformSearcherManager(HttpClient httpClient, ResponseHandler<String> responseHandler,@Autowired(required = false) HttpProxySupplier httpProxySupplier) throws Exception {
         DefaultPlatformSearcherManager platformSearcherManager = new DefaultPlatformSearcherManager();
         platformSearcherManager.setCompletionService(threadPoolTaskExecutor());
         //add IQiYi
-        platformSearcherManager.addWork(new IQiYiPlatformHttpClientSearcher(httpClient(), responseHandler(), httpProxyPool()));
-
+        platformSearcherManager.addWork(new IQiYiPlatformHttpClientSearcher(httpClient, responseHandler,httpProxySupplier));
 
         return platformSearcherManager;
     }

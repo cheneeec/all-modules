@@ -3,7 +3,7 @@ package com.earnest.crawler.pipeline;
 import com.earnest.crawler.StringResponseResult;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.RegExUtils;
 
 import java.net.URI;
 
@@ -16,7 +16,7 @@ public class UriPathFileNameGenerator implements FileNameGenerator {
     @Override
     public String generate(StringResponseResult result) {
         URI uri = result.getHttpRequest().getURI();
-        return StringUtils.replaceAll(uri.getHost() + uri.getPath(), "\\/", "_");
+        return RegExUtils.replaceAll(uri.getHost() + uri.getPath(), "\\/", "_");
     }
 
 

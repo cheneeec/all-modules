@@ -19,15 +19,27 @@ import java.util.Optional;
 public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeable {
 
     @Getter
-    private HttpProxyPool httpProxyPool;
+    private HttpProxySupplier httpProxySupplier;
 
     @Setter
     @Getter
     protected boolean useHttpProxy = true;
 
+
+
     @Override
-    public void setHttpProxyPool(HttpProxyPool httpProxyPool) {
-        this.httpProxyPool = httpProxyPool;
+    public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
+        this.httpProxySupplier = httpProxySupplier;
+    }
+
+
+
+
+    /**
+     * 检查{@link HttpProxyPoolSettingSupport#httpProxySupplier}是否可用。
+     */
+    private static void checkHttpSupplierAvailable() {
+
     }
 
     public HttpUriRequest addHttpProxySetting(HttpUriRequest httpUriRequest) {
@@ -48,7 +60,7 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
 
 
     public void addHttpProxySetting(RequestBuilder requestBuilder) {
-        if (!useHttpProxy||httpProxyPool==null) {
+        if (!useHttpProxy || httpProxySupplier == null) {
             return;
         }
         Assert.notNull(requestBuilder, "requestBuilder is null");
@@ -67,7 +79,7 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
                 .orElse(RequestConfig.custom());
 
         //为其设置代理
-        httpProxyPool.get()
+        httpProxySupplier.get()
                 .map(HttpProxy::getHttpHost)
                 .ifPresent(builder::setProxy);
 
@@ -79,9 +91,7 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
 
     @Override
     public void close() throws IOException {
-        if (httpProxyPool instanceof Closeable) {
-            IOUtils.close((Closeable) httpProxyPool);
-        }
+        IOUtils.close(httpProxySupplier);
 
     }
 }
