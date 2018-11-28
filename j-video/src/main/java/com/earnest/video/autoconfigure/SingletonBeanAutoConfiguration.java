@@ -8,6 +8,7 @@ import com.earnest.video.core.search.DefaultPlatformSearcherManager;
 import com.earnest.video.core.search.IQiYiPlatformHttpClientSearcher;
 import com.earnest.video.core.episode.EpisodeFetcher;
 import com.earnest.video.core.episode.EpisodeFetcherManager;
+import com.earnest.video.core.search.PlatformSearcher;
 import com.earnest.video.core.search.PlatformSearcherManager;
 import com.earnest.video.core.parser.StoneApiVideoAddressParser;
 import com.earnest.video.core.parser.VideoAddressParser;
@@ -25,7 +26,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * 所有的单例<code>Bean</code>的配置。都交由<code>Spring</code>容器管理。
@@ -68,11 +72,16 @@ public class SingletonBeanAutoConfiguration {
     //==========================episodeFetcher==================
 
     @Bean
-    public EpisodeFetcher episodeFetcher(CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler,@Autowired(required = false) HttpProxySupplier httpProxySupplier) throws Exception {
+    public EpisodeFetcher episodeFetcher(@Autowired(required = false) List<EpisodeFetcher> episodeFetchers,
+                                         CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler,
+                                         @Autowired(required = false) HttpProxySupplier httpProxySupplier) {
         EpisodeFetcherManager episodeFetcherManager = new EpisodeFetcherManager();
         episodeFetcherManager.setHttpProxySupplier(httpProxySupplier);
         //add iQiYi
         episodeFetcherManager.addWork(new IQiYiEpisodeFetcher(httpClient, stringResponseHandler));
+
+        Optional.ofNullable(episodeFetchers).stream()
+                .flatMap(Collection::stream).forEach(episodeFetcherManager::addWork);
 
 
         return episodeFetcherManager;
@@ -81,11 +90,16 @@ public class SingletonBeanAutoConfiguration {
 
     //==========================//episodeFetcher==================
     @Bean
-    public PlatformSearcherManager platformSearcherManager(HttpClient httpClient, ResponseHandler<String> responseHandler,@Autowired(required = false) HttpProxySupplier httpProxySupplier) throws Exception {
+    public PlatformSearcherManager platformSearcherManager(@Autowired(required = false) List<PlatformSearcher> platformSearchers,
+                                                           HttpClient httpClient, ResponseHandler<String> responseHandler,
+                                                           @Autowired(required = false) HttpProxySupplier httpProxySupplier){
         DefaultPlatformSearcherManager platformSearcherManager = new DefaultPlatformSearcherManager();
         platformSearcherManager.setCompletionService(threadPoolTaskExecutor());
         //add IQiYi
-        platformSearcherManager.addWork(new IQiYiPlatformHttpClientSearcher(httpClient, responseHandler,httpProxySupplier));
+        platformSearcherManager.addWork(new IQiYiPlatformHttpClientSearcher(httpClient, responseHandler, httpProxySupplier));
+        //add custom
+        Optional.ofNullable(platformSearchers).stream()
+                .flatMap(Collection::stream).forEach(platformSearcherManager::addWork);
 
         return platformSearcherManager;
     }

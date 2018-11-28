@@ -1,6 +1,9 @@
 package com.earnest.crawler.downloader;
 
 import com.earnest.crawler.StringResponseResult;
+import io.reactivex.Flowable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.internal.subscribers.BlockingBaseSubscriber;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
@@ -19,6 +22,7 @@ import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -126,7 +130,7 @@ public class HttpClientDownloader implements Downloader {
             );
         }
 
-
         return responseResult;
     }
+
 }
