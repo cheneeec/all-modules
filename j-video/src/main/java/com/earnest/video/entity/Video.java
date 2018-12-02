@@ -1,41 +1,45 @@
 package com.earnest.video.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
-@Data
+@Getter
+@Setter
 public class Video implements Cloneable, Serializable {
     //
-    protected String id;
+    private String id;
     //标题
-    protected String title;
+    private String title;
     //視頻信息
-    protected String videoInfo;
+    private String videoInfo;
     //获取时间
-    protected Date collectTime;
+    private Date collectTime;
     //播放时长
-    protected String playInfo;
+    private String playInfo;
     //图片
-    protected String image;
+    private String image;
     //来源地
-    protected Platform platform;
+    private Platform platform;
     //来源网址
-    protected String fromUrl;
+    private String fromUrl;
     //分类
     private Category category;
     //播放原地址
-    protected String playValue;
+    private String rawValue;
     //解析後的值
-    protected String parseValue;
+    private List<PlayAddress> parseValue;
     //單一視頻（true：只有一集）
-    protected Boolean single;
-    //视频的属性
-    protected Map<String, Object> properties;
+    private Boolean single;
+    //视频的属性　兼容平台差异性
+    private Map<String, ?> properties;
 
     public enum Category {
         MOVIE,  //电影
@@ -65,14 +69,24 @@ public class Video implements Cloneable, Serializable {
     }
 
 
-
     @Override
-    protected Video clone() {
+    public Video clone() {
         try {
             return (Video) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new IllegalStateException("clone error:" + e.getMessage());
         }
 
+    }
+
+    @Data
+    public static class PlayAddress {
+        private String quality;//画质
+        private String codecs;//码率
+        private String url;//播放地址
+        private int width;
+        private int height;
+        private String type;
+        private String script;//脚本字符串
     }
 }

@@ -10,6 +10,6 @@ public interface HttpProxySupplier extends Supplier<Optional<HttpProxy>>, Closea
      */
     boolean hasAvailableProxy();
 
-    void delete(HttpProxy httpProxy);
+    void remove(HttpProxy httpProxy);
 
 }

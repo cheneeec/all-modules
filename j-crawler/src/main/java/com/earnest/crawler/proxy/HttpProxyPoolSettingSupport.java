@@ -26,21 +26,11 @@ public class HttpProxyPoolSettingSupport implements HttpProxyPoolAware, Closeabl
     protected boolean useHttpProxy = true;
 
 
-
     @Override
     public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
         this.httpProxySupplier = httpProxySupplier;
     }
 
-
-
-
-    /**
-     * 检查{@link HttpProxyPoolSettingSupport#httpProxySupplier}是否可用。
-     */
-    private static void checkHttpSupplierAvailable() {
-
-    }
 
     public HttpUriRequest addHttpProxySetting(HttpUriRequest httpUriRequest) {
         if (!useHttpProxy) {

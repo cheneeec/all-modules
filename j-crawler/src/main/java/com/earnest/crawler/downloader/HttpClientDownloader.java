@@ -1,9 +1,6 @@
 package com.earnest.crawler.downloader;
 
 import com.earnest.crawler.StringResponseResult;
-import io.reactivex.Flowable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.internal.subscribers.BlockingBaseSubscriber;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;

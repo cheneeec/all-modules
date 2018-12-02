@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -37,6 +38,8 @@ public class DefaultApiHttpProxySupplier implements HttpProxySupplier {
     private final HttpClient httpClient;
 
     private final ResponseHandler<String> responseHandler;
+
+
 
 
     private static HttpProxy convertToHttpProxy(String proxy) {
@@ -110,8 +113,18 @@ public class DefaultApiHttpProxySupplier implements HttpProxySupplier {
     }
 
     @Override
-    public void delete(HttpProxy httpProxy) {
-
+    public void remove(@Nullable HttpProxy httpProxy) {
+        if (httpProxy == null) {
+            return;
+        }
+        HttpHost httpHost = httpProxy.getHttpHost();
+        HttpGet get = new HttpGet(apiAddress + "delete?proxy=" + httpHost.getHostName() + ":" + httpHost.getPort());
+        try {
+            HttpResponse httpResponse = httpClient.execute(get);
+            HttpClientUtils.closeQuietly(httpResponse);
+        } catch (IOException ignore) {
+            //ignore
+        }
     }
 
     @Override

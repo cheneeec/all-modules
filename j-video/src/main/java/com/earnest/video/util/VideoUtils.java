@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public abstract class VideoUtils {
     //播放时长正则
-    private static final Pattern playTimePattern = Pattern.compile("^\\d+:\\d+(:\\d+)?$");
+    private static final Pattern PLAY_TIME_PATTERN = Pattern.compile("^\\d+:\\d+(:\\d+)?$");
 
     /**
      * 判断是否为播放时长。为空或者空字符串时，返回<code>true</code>。
@@ -25,7 +25,7 @@ public abstract class VideoUtils {
         if (StringUtils.isBlank(playInfo)) {
             return true;
         }
-        return playTimePattern.matcher(playInfo).find();
+        return PLAY_TIME_PATTERN.matcher(playInfo).find();
     }
 
 }

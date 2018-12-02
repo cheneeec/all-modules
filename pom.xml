@@ -18,6 +18,7 @@
         <module>j-crawler</module>
         <module>j-video</module>
         <module>j-core</module>
+        <module>j-video-web</module>
     </modules>
 
     <packaging>pom</packaging>
