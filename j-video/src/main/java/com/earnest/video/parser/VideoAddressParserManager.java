@@ -1,5 +1,6 @@
 package com.earnest.video.parser;
 
+import com.earnest.crawler.proxy.HttpProxySupplier;
 import com.earnest.video.Manager;
 import com.earnest.video.exception.ValueParseException;
 import com.earnest.video.entity.Episode;
@@ -32,10 +33,12 @@ public class VideoAddressParserManager implements VideoAddressParser, Manager<Vi
                     .findFirst()
                     .orElseThrow(() -> new ValueParseException("Cannot find a parser that support " + rawValue));
 
+            log.debug("for the rawValue:{},parser=>{} is matched",rawValue,videoAddressParser);
+
             try {
                 result = videoAddressParser.parse(rawValue, properties);
             } catch (ValueParseException e) {
-                log.warn("Parser:{} is not available for value:{} ", videoAddressParser.getClass(), rawValue);
+                log.warn("Parser:{} is not available for value:{} ", videoAddressParser.getClass().getName(), rawValue);
                 unavailableVideoAddressParsers.add(videoAddressParser);
             }
 
@@ -48,7 +51,9 @@ public class VideoAddressParserManager implements VideoAddressParser, Manager<Vi
 
     @Override
     public boolean support(String rawValue) {
-        return false;
+        return videoAddressParsers.stream()
+                .map(s -> s.support(rawValue))
+                .reduce((p, n) -> p || n).orElse(false);
     }
 
     @Override
@@ -59,4 +64,13 @@ public class VideoAddressParserManager implements VideoAddressParser, Manager<Vi
     }
 
 
+    @Override
+    public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
+
+    }
+
+    @Override
+    public void close() throws IOException {
+
+    }
 }

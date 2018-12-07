@@ -29,7 +29,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         fastJsonConfig.setSerializerFeatures(
                 SerializerFeature.PrettyFormat,
-                SerializerFeature.DisableCircularReferenceDetect
+                SerializerFeature.DisableCircularReferenceDetect,
+                SerializerFeature.IgnoreErrorGetter,
+                SerializerFeature.IgnoreNonFieldGetter
         );
         //处理中文乱码
         List<MediaType> fastMediaTypes = new ArrayList<>();

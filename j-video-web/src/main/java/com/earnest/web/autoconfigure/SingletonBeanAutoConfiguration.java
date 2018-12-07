@@ -19,9 +19,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -36,7 +38,7 @@ import java.util.Optional;
 public class SingletonBeanAutoConfiguration {
 
     /**
-     * 全局公用一个{@link HttpClient}。
+     * 全局共用一个{@link HttpClient}。
      *
      * @return
      */
@@ -58,77 +60,20 @@ public class SingletonBeanAutoConfiguration {
         return new AbstractResponseHandler<>() {
             @Override
             public String handleEntity(HttpEntity entity) throws IOException {
-                return EntityUtils.toString(entity, Charset.defaultCharset());
+                return EntityUtils.toString(entity, Charset.defaultCharset());//避免网站乱码
             }
         };
     }
 
-    @Bean
-    public VideoAddressParser videoAddressParser(HttpClient httpClient,
-                                                 ResponseHandler<String> responseHandler,
-                                                 @Autowired(required = false) HttpProxySupplier httpProxySupplier) {
-        VideoAddressParserManager videoAddressParserManager = new VideoAddressParserManager();
-
-        //add iqiyi
-        IQiYiVideoAddressParser iQiYiVideoAddressParser = new IQiYiVideoAddressParser(httpClient, responseHandler);
-        iQiYiVideoAddressParser.setHttpProxySupplier(httpProxySupplier);
-        videoAddressParserManager.addWork(iQiYiVideoAddressParser);
-        //add qq
-
-        //add awk
-        AwkVideoAddressParser awkVideoAddressParser = new AwkVideoAddressParser(httpClient, responseHandler);
-        awkVideoAddressParser.setHttpProxySupplier(httpProxySupplier);
-
-
-
-        return videoAddressParserManager;
-    }
 
     /**
      * @return {@link HttpProxySupplier}
      */
-//    @Bean
+    @Bean
+    @ConditionalOnProperty(name = "app.proxy-pool.enable", havingValue = "true")
     public HttpProxySupplier httpProxySupplier(HttpClient httpClient, ResponseHandler<String> responseHandler) {
-
         return new DefaultApiHttpProxySupplier("http://192.168.10.131:5010", httpClient, responseHandler);
     }
-
-    //==========================episodeFetcher==================
-
-    @Bean
-    public EpisodeFetcher episodeFetcher(@Autowired(required = false) List<EpisodeFetcher> episodeFetchers,
-                                         CloseableHttpClient httpClient, ResponseHandler<String> stringResponseHandler,
-                                         @Autowired(required = false) HttpProxySupplier httpProxySupplier) {
-        EpisodeFetcherManager episodeFetcherManager = new EpisodeFetcherManager();
-        episodeFetcherManager.setHttpProxySupplier(httpProxySupplier);
-        //add iQiYi
-        episodeFetcherManager.addWork(new IQiYiEpisodeFetcher(httpClient, stringResponseHandler));
-
-        Optional.ofNullable(episodeFetchers).stream()
-                .flatMap(Collection::stream).forEach(episodeFetcherManager::addWork);
-
-
-        return episodeFetcherManager;
-    }
-
-
-    //==========================//episodeFetcher==================
-    @Bean
-    public PlatformSearcherManager platformSearcherManager(@Autowired(required = false) List<PlatformSearcher> platformSearchers,
-                                                           HttpClient httpClient, ResponseHandler<String> responseHandler,
-                                                           @Autowired(required = false) HttpProxySupplier httpProxySupplier) {
-        DefaultPlatformSearcherManager platformSearcherManager = new DefaultPlatformSearcherManager();
-        platformSearcherManager.setCompletionService(threadPoolTaskExecutor());
-        //add IQiYi
-        platformSearcherManager.addWork(new IQiYiPlatformHttpClientSearcher(httpClient, responseHandler, httpProxySupplier));
-        //add custom
-        Optional.ofNullable(platformSearchers).stream()
-                .flatMap(Collection::stream).forEach(platformSearcherManager::addWork);
-
-        return platformSearcherManager;
-    }
-
-    //==========================//Manager==================
 
 
     //=========================Spring Thread Pool=================

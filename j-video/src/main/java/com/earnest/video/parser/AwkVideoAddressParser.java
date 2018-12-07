@@ -6,10 +6,13 @@ import com.earnest.video.entity.Episode;
 import com.earnest.video.entity.Video;
 import com.earnest.video.exception.ValueParseException;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.io.*;
 import java.util.List;
@@ -23,18 +26,21 @@ import static java.lang.String.format;
  * 使用<a href="https://2wk.com/api/qiyi.php">爱悟空</a>的<code>API</code>接口进行解析。
  */
 @AllArgsConstructor
+@CacheConfig(cacheNames = "playAddress")
 public class AwkVideoAddressParser extends HttpProxyPoolSettingSupport implements VideoAddressParser {
 
     //    private static final String API_ADDRESS = "https://2wk.com/api/qiyi.php?url=https://www.iqiyi.com/v_19rr3rqkqk.html";
     private static final String API_ADDRESS = "https://2wk.com/api/qiyi.php?url=%s";
 
     private final HttpClient httpClient;
+
     private final ResponseHandler<String> responseHandler;
 
     private static final Pattern SCRIPT_PATTERN = Pattern.compile("<script>(\\n{0,}.+\\n{0,}.+\\n{0,})</script>");
 
     private static final Pattern URL_PATTERN = Pattern.compile("<video\\s+src=\"(.+)\"\\s+controls");
 
+    @Cacheable(key = "#rawValue")
     @Override
     public Episode parse(String rawValue, Map<String, Object> properties) throws IOException, ValueParseException {
         String responseString = httpClient.execute(createHttpUriRequest(rawValue), responseHandler);
@@ -43,11 +49,13 @@ public class AwkVideoAddressParser extends HttpProxyPoolSettingSupport implement
         if (scriptMatcher.find()) {
             resultScript += scriptMatcher.group(1);
 
-        }
+        } else
+            throw new ValueParseException("script is not found");
         Matcher urlMatcher = URL_PATTERN.matcher(responseString);
         if (urlMatcher.find()) {
-            resultScript += urlMatcher.group(1);
-        }
+            resultScript += StringUtils.removeEnd(StringUtils.removeEnd(("'https://2wk.com" + urlMatcher.group(1)), "'"), "+");
+        } else
+            throw new ValueParseException("url is not found");
 
         Video.PlayAddress playAddress = new Video.PlayAddress();
         playAddress.setScript(resultScript);
@@ -64,7 +72,7 @@ public class AwkVideoAddressParser extends HttpProxyPoolSettingSupport implement
 
     @Override
     public int priority() {
-        return 1;
+        return 6;//6
     }
 
 

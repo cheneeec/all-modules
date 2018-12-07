@@ -1,14 +1,18 @@
 package com.earnest.video.parser;
 
+import com.earnest.crawler.proxy.HttpProxyPoolAware;
 import com.earnest.video.exception.ValueParseException;
 import com.earnest.video.entity.Episode;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Map;
 
-public interface VideoAddressParser {
+public interface VideoAddressParser extends Closeable, HttpProxyPoolAware {
+
+
     /**
      * 对提交的地址进行解析。
      *

@@ -8,6 +8,7 @@ import com.earnest.video.exception.ValueParseException;
 import com.earnest.video.entity.Episode;
 import com.earnest.video.entity.Video;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -17,6 +18,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +74,7 @@ public class IQiYiVideoAddressParser extends HttpProxyPoolSettingSupport impleme
 
     @Override
     public int priority() {
-        return 1;
+        return 5;
     }
 
     private Episode createEpisode(String playValue, Map<String, Object> otherProperties) throws IOException, ValueParseException {
@@ -140,7 +142,9 @@ public class IQiYiVideoAddressParser extends HttpProxyPoolSettingSupport impleme
                     }
 
                     return playAddress;
-                }).collect(Collectors.toList());
+                })
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     private HttpUriRequest createHttpRequest(String url) {

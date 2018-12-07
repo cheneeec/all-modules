@@ -80,7 +80,7 @@ public class Video implements Cloneable, Serializable {
     }
 
     @Data
-    public static class PlayAddress {
+    public static class PlayAddress implements Comparable<PlayAddress> {
         private String quality;//画质
         private String codecs;//码率
         private String url;//播放地址
@@ -88,5 +88,19 @@ public class Video implements Cloneable, Serializable {
         private int height;
         private String type;
         private String script;//脚本字符串
+
+        @Override
+        public int compareTo(PlayAddress o) {
+            if (this.getWidth() != o.getWidth()) {
+                return Integer.compare(o.getWidth(), this.getWidth());
+            }
+            if (StringUtils.equals(this.getCodecs(), o.getCodecs())) {
+                return StringUtils.compare(o.getCodecs(), this.getCodecs());
+            }
+            if (StringUtils.equals(this.getQuality(), o.getQuality())) {
+                return StringUtils.compare(o.getQuality(), this.getQuality());
+            }
+            return 0;
+        }
     }
 }

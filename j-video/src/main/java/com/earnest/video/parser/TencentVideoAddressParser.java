@@ -2,6 +2,7 @@ package com.earnest.video.parser;
 
 import com.alibaba.fastjson.JSONObject;
 import com.earnest.crawler.Browser;
+import com.earnest.crawler.proxy.HttpProxyPoolSettingSupport;
 import com.earnest.video.entity.Episode;
 import com.earnest.video.entity.Video;
 import com.earnest.video.exception.ValueParseException;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
  */
 @AllArgsConstructor
 //TODO 腾讯的视频是分段的,待优化
-public class TencentVideoAddressParser implements VideoAddressParser {
+public class TencentVideoAddressParser extends HttpProxyPoolSettingSupport implements VideoAddressParser {
 
     private static final String VIDEO_INFO_API = "http://vv.video.qq.com/getinfo?otype=json&appver=3.2.19.333&platform=%s&defnpayver=1&defn=shd&vid=%s";
     private static final String KEY_API = "http://vv.video.qq.com/getkey?otype=json&platform=11&format=%s&vid=%s&filename=%s&appver=3.2.19.333";
@@ -175,7 +176,7 @@ public class TencentVideoAddressParser implements VideoAddressParser {
 
     @Override
     public int priority() {
-        return 1;
+        return 5;
     }
 
 

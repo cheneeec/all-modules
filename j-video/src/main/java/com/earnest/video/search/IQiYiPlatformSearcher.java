@@ -51,7 +51,8 @@ public class IQiYiPlatformSearcher extends HttpProxyPoolSettingSupport implement
         Elements elements = element.select("div.mod_result ul.mod_result_list li.list_item");
 
 
-        return new PageImpl<>(elements.stream().map(mapToIQiYiEntity()).collect(Collectors.toList()), pageRequest, 20);
+        return new PageImpl<>(elements.stream().map(mapToIQiYiEntity())
+                .collect(Collectors.toList()), pageRequest, 20);
 
 
     }

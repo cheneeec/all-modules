@@ -6,10 +6,14 @@ import com.earnest.web.spider.IQiYiAnimationSpider;
 import com.earnest.web.spider.IQiYiMovieSpider;
 import com.earnest.web.spider.persistence.MemoryVideoPersistence;
 import com.earnest.web.spider.persistence.VideoPersistence;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
+
+import javax.annotation.PostConstruct;
 
 
 /**
@@ -27,15 +31,23 @@ public class SpiderAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @SuppressWarnings("unchecked")
     public VideoService videoService(VideoPersistence memoryVideoPersistence) {
         return new MemoryVideoService((MemoryVideoPersistence) memoryVideoPersistence);
     }
 
 
-    @ConditionalOnProperty(name = "spider.enable", havingValue = "true")
+    @ConditionalOnProperty(name = "app.spider.enable", havingValue = "true")
     @Configuration
+    @AllArgsConstructor
     public class SpiderBeanAutoConfiguration {
+        private final MongoTemplate mongoTemplate;
+
+        @PostConstruct
+        public void clearData() {
+            //删除表
+            mongoTemplate.dropCollection("video");
+        }
+
         @Bean
         public IQiYiAnimationSpider iQiYiAnimationSpider(VideoPersistence videoPersistence) {
             return new IQiYiAnimationSpider(videoPersistence);

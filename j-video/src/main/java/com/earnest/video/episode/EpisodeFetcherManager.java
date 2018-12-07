@@ -55,7 +55,7 @@ public class EpisodeFetcherManager implements EpisodeFetcher, Manager<EpisodeFet
 
     @Override
     public void setHttpProxySupplier(HttpProxySupplier httpProxySupplier) {
-        episodeFetchers.forEach(s -> s.setHttpProxySupplier(httpProxySupplier));
+
     }
 
 

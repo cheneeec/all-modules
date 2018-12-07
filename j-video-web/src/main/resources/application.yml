@@ -4,11 +4,13 @@ spring:
   profiles:
     active: mongo
 #  redis:
-#    host: 192.168.10.129
+#    host: 192.168.10.134
 logging:
   level:
     com.earnest: debug
-    org .springframework.data.mongodb.core: debug
 
-spider:
-  enable: false
+app:
+  spider:
+    enable: false
+  proxy-pool:
+    enable: false
